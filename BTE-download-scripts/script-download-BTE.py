@@ -1,4 +1,5 @@
 import io
+import os
 import urllib.request
 from pdfminer.converter import TextConverter
 from pdfminer.pdfinterp import PDFPageInterpreter
@@ -33,3 +34,6 @@ for year in range(1977, 2019):
   for number in range(1, 49):
     filename = download_bte( year , number )
     extract_text_from_pdf( filename )
+    
+for fich in os.listdir('../BTE-data/'):
+  if fich[-3:]=="pdf": os.system("ps2pdf -dPDFSETTINGS=/ebook %s reduc/%s" % (fich,fich))
