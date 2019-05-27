@@ -23,13 +23,13 @@ def extract_text_from_pdf( pdf_path ):
 def download_bte( year , number ):	
   filename = "bte" + rep(number) + "_" + rep(year) + ".pdf"
   download_url = "http://bte.gep.msess.gov.pt/completos/" + rep(year) + "/" + filename
- 	response = urllib2.urlopen(download_url)
+  response = urllib2.urlopen(download_url)
   file = open(filename, 'wb')
   file.write(response.read())
   file.close()
-	return filename
+  return filename
 
 for year in range(1977, 1978):
-	for number in range(1, 49):
-		filename = download_bte( year , number )
-		extract_text_from_pdf( filename )	
+  for number in range(1, 49):
+    filename = download_bte( year , number )
+    extract_text_from_pdf( filename )	
