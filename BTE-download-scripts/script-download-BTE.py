@@ -17,7 +17,7 @@ def extract_text_from_pdf( pdf_path ):
      text = fake_file_handle.getvalue()
   converter.close()
   fake_file_handle.close()
-  file = open(filename.replace('.pdf','.txt'), 'w')
+  file = open(pdf_path.replace('.pdf','.txt'), 'w')
   file.write(text)
   file.close()
         
@@ -33,7 +33,11 @@ def download_bte( year , number ):
 for year in range(1977, 2019):
   for number in range(1, 49):
     filename = download_bte( year , number )
-    extract_text_from_pdf( filename )
-    
+    extract_text_from_pdf( "../BTE-data/" + filename )
 for fich in os.listdir('../BTE-data/'):
-  if fich[-3:]=="pdf": os.system("ps2pdf -dPDFSETTINGS=/ebook %s reduc/%s" % (fich,fich))
+  fich = "../BTE-data/" + fich
+  fich2 = "../BTE-data/" + fich + "tmp"
+  if fich[-3:]=="pdf": os.system("ps2pdf -dPDFSETTINGS=/ebook %s %s" % (fich,fich2))
+  if os.path.isfile(fich2):
+    os.remove(fich)
+    os.rename(fich2, fich)
