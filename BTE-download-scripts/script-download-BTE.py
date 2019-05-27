@@ -35,7 +35,7 @@ for year in range(1977, 2020):
     try:
       filename = download_bte( year , number )
       extract_text_from_pdf( "../BTE-data/" + filename )
-    except: print("Error processing number " + repr(number) + " from year " + repr(year) + "...)
+    except: print("Error processing number " + repr(number) + " from year " + repr(year) + "...")
 for fich in os.listdir('../BTE-data/'):
   fich = "../BTE-data/" + fich
   fich2 = "../BTE-data/" + fich + "tmp"
