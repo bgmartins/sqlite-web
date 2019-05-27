@@ -1,5 +1,5 @@
 import io
-import urllib2
+import urllib.request
 from pdfminer.converter import TextConverter
 from pdfminer.pdfinterp import PDFPageInterpreter
 from pdfminer.pdfinterp import PDFResourceManager
@@ -16,20 +16,20 @@ def extract_text_from_pdf( pdf_path ):
      text = fake_file_handle.getvalue()
   converter.close()
   fake_file_handle.close()
-  file = open(filename.replace('.pdf','.txt'), 'wb')
+  file = open(filename.replace('.pdf','.txt'), 'w')
   file.write(text)
   file.close()
-    	
-def download_bte( year , number ):	
-  filename = "bte" + rep(number) + "_" + rep(year) + ".pdf"
-  download_url = "http://bte.gep.msess.gov.pt/completos/" + rep(year) + "/" + filename
-  response = urllib2.urlopen(download_url)
-  file = open(filename, 'wb')
+        
+def download_bte( year , number ):      
+  filename = "bte" + repr(number) + "_" + repr(year) + ".pdf"
+  download_url = "http://bte.gep.msess.gov.pt/completos/" + repr(year) + "/" + filename
+  response = urllib.request.urlopen(download_url)
+  file = open("..//" + filename, 'wb')
   file.write(response.read())
   file.close()
   return filename
 
-for year in range(1977, 1978):
+for year in range(1977, 2019):
   for number in range(1, 49):
     filename = download_bte( year , number )
-    extract_text_from_pdf( filename )	
+    extract_text_from_pdf( filename )
