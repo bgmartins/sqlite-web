@@ -30,10 +30,12 @@ def download_bte( year , number ):
   file.close()
   return filename
 
-for year in range(1977, 2019):
+for year in range(1977, 2020):
   for number in range(1, 49):
-    filename = download_bte( year , number )
-    extract_text_from_pdf( "../BTE-data/" + filename )
+    try:
+      filename = download_bte( year , number )
+      extract_text_from_pdf( "../BTE-data/" + filename )
+    except: print("Error processing number " + repr(number) + " from year " + repr(year) + "...)
 for fich in os.listdir('../BTE-data/'):
   fich = "../BTE-data/" + fich
   fich2 = "../BTE-data/" + fich + "tmp"
