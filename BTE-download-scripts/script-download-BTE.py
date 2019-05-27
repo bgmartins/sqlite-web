@@ -24,7 +24,7 @@ def download_bte( year , number ):
   filename = "bte" + repr(number) + "_" + repr(year) + ".pdf"
   download_url = "http://bte.gep.msess.gov.pt/completos/" + repr(year) + "/" + filename
   response = urllib.request.urlopen(download_url)
-  file = open("..//" + filename, 'wb')
+  file = open("../BTE-data/" + filename, 'wb')
   file.write(response.read())
   file.close()
   return filename
