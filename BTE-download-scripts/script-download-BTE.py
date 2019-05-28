@@ -1,7 +1,7 @@
 import io
 import os
 import urllib.request
-from bs4 import BeautifulSoup
+import html_text
 from pdfminer.converter import TextConverter, HTMLConverter
 from pdfminer.pdfinterp import PDFPageInterpreter
 from pdfminer.pdfinterp import PDFResourceManager
@@ -18,7 +18,7 @@ def extract_text_from_pdf( pdf_path ):
      text = fake_file_handle.getvalue().decode()
   converter.close()
   fake_file_handle.close()
-  text = BeautifulSoup(text).get_text()
+  text = html_text.extract_text(text)
   file = open(pdf_path.replace('.pdf','.txt'), 'w')
   file.write(text)
   file.close()
