@@ -36,13 +36,13 @@ for year in range(1977, 2020):
   for number in range(1, 49):
     try:
       filename = "bte" + repr(number) + "_" + repr(year) + ".pdf"
-      download_bte( year , number )
+      filename = download_bte( year , number )
       extract_text_from_pdf( "../BTE-data/" + filename )
     except: print("Error processing number " + repr(number) + " from year " + repr(year) + "...")
       
 for fich in os.listdir('../BTE-data/'):
   fich = "../BTE-data/" + fich
-  fich2 = "../BTE-data/" + fich + "tmp"
+  fich2 = "../BTE-data/" + fich + ".tmp"
   if fich[-3:]=="pdf": os.system("ps2pdf -dUseFlateCompression=true -dPDFSETTINGS=/screen %s %s" % (fich,fich2))
   if os.path.isfile(fich2):
     os.remove(fich)
