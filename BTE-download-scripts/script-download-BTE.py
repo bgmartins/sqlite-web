@@ -43,7 +43,7 @@ for year in range(1977, 2020):
 for fich in os.listdir('../BTE-data/'):
   fich = "../BTE-data/" + fich
   fich2 = "../BTE-data/" + fich + "tmp"
-  if fich[-3:]=="pdf": os.system("ps2pdf -dPDFSETTINGS=/ebook %s %s" % (fich,fich2))
+  if fich[-3:]=="pdf": os.system("ps2pdf -dUseFlateCompression=true -dPDFSETTINGS=/screen %s %s" % (fich,fich2))
   if os.path.isfile(fich2):
     os.remove(fich)
     os.rename(fich2, fich)
