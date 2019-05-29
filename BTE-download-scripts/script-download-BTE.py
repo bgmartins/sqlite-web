@@ -32,14 +32,21 @@ def download_bte( year , number ):
   file.close()
   return filename
 
+# Downloading data (e.g., from 1977 to 2020)
+for year in range(2019, 2020):
+  for number in range(1, 49):
+    try: download_bte( year , number )
+    except: print("Error processing number " + repr(number) + " from year " + repr(year) + "...")
+
+# Converting all PDF data to TXT
 for year in range(1977, 2020):
   for number in range(1, 49):
     try:
       filename = "bte" + repr(number) + "_" + repr(year) + ".pdf"
-      filename = download_bte( year , number )
       extract_text_from_pdf( "../BTE-data/" + filename )
     except: print("Error processing number " + repr(number) + " from year " + repr(year) + "...")
-      
+
+# Compressing the PDF files
 for fich in os.listdir('../BTE-data/'):
   fich = "../BTE-data/" + fich
   fich2 = "../BTE-data/" + fich + ".tmp"
