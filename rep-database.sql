@@ -1,6 +1,6 @@
-#
-# SQL Instructions for Creating the REP Database
-#
+--
+-- SQL Instructions for Creating the REP Database
+--
 
 DROP TABLE IF EXISTS Avisos_Greve;
 DROP TABLE IF EXISTS Actos_Negociacao_Colectiva;
