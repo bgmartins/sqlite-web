@@ -5,7 +5,7 @@ Project dependencies:
 * [flask](http://flask.pocoo.org)
 * [peewee](http://docs.peewee-orm.com)
 * [pygments](http://pygments.org)
-* [PyRATA](https://github.com/nicolashernandez/PyRATA)
+* [regex](https://pypi.org/project/regex/)
 
 ### Usage
 
