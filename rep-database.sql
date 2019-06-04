@@ -8,9 +8,9 @@ DROP TABLE IF EXISTS Direccao_Organizacao_Patronal;
 DROP TABLE IF EXISTS Direccao_Organizacao_Sindical;
 DROP TABLE IF EXISTS Membros_Organizacao_Sindical;
 DROP TABLE IF EXISTS Actos_Eleitorais_Organizacao_Sindical;
-DROP TABLE IF EXISTS Relacões_Entre_Organizacao_Sindical;
-DROP TABLE IF EXISTS Mencões_BTE_Organizacao_Patronal;
-DROP TABLE IF EXISTS Mencões_BTE_Organizacao_Sindical;
+DROP TABLE IF EXISTS Relacoes_Entre_Organizacao_Sindical;
+DROP TABLE IF EXISTS Mencoes_BTE_Organizacao_Patronal;
+DROP TABLE IF EXISTS Mencoes_BTE_Organizacao_Sindical;
 DROP TABLE IF EXISTS Organizacao_Sindical;
 DROP TABLE IF EXISTS Organizacao_Patronal;
 DROP TABLE IF EXISTS Sectores_Profissionais;
@@ -47,7 +47,7 @@ CREATE TABLE Organizacao_Sindical (
   FOREIGN KEY (Sector) REFERENCES Sectores_Profissionais
 );
 
-CREATE TABLE Mencões_BTE_Organizacao_Sindical (
+CREATE TABLE Mencoes_BTE_Organizacao_Sindical (
   Nome_Organizacao_Sindical             VARCHAR(100),
   Ano                                   INT,
   Numero                                INT,
@@ -57,7 +57,7 @@ CREATE TABLE Mencões_BTE_Organizacao_Sindical (
   FOREIGN KEY (Nome_Organizacao_Sindical) REFERENCES Organizacao_Sindical
 );
 
-CREATE TABLE Mencões_BTE_Organizacao_Patronal (
+CREATE TABLE Mencoes_BTE_Organizacao_Patronal (
   Nome_Organizacao_Patronal             VARCHAR(100),
   Ano                                   INT,
   Numero                                INT,
@@ -67,7 +67,7 @@ CREATE TABLE Mencões_BTE_Organizacao_Patronal (
   FOREIGN KEY (Nome_Organizacao_Patronal) REFERENCES Organizacao_Patronal
 );
 
-CREATE TABLE Relacões_Entre_Organizacao_Sindical (
+CREATE TABLE Relacoes_Entre_Organizacao_Sindical (
   Nome_Organizacao_Sindical_1  VARCHAR(100),
   Nome_Organizacao_Sindical_2  VARCHAR(100),
   Tipo_de_Relacao              VARCHAR(100),
