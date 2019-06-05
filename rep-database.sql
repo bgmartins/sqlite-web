@@ -53,8 +53,8 @@ CREATE TABLE Mencoes_BTE_Organizacao_Sindical (
   Nome_Organizacao_Sindical             VARCHAR(100),
   Ano                                   INT,
   Numero                                INT,
-  Descrição                             VARCHAR(100),
-  Mudança_Estatuto                      BOOLEAN,
+  Descricao                             VARCHAR(100),
+  Mudanca_Estatuto                      BOOLEAN,
   Confianca                             INT,
   PRIMARY KEY (Nome_Organizacao_Sindical,Ano,Numero),
   FOREIGN KEY (Nome_Organizacao_Sindical) REFERENCES Organizacao_Sindical
@@ -64,8 +64,8 @@ CREATE TABLE Mencoes_BTE_Organizacao_Patronal (
   Nome_Organizacao_Patronal             VARCHAR(100),
   Ano                                   INT,
   Numero                                INT,
-  Descrição                             VARCHAR(100),
-  Mudança_Estatuto                      BOOLEAN,
+  Descricao                             VARCHAR(100),
+  Mudanca_Estatuto                      BOOLEAN,
   Confianca                             INT,
   PRIMARY KEY (Nome_Organizacao_Patronal,Ano,Numero),
   FOREIGN KEY (Nome_Organizacao_Patronal) REFERENCES Organizacao_Patronal
