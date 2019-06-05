@@ -37,6 +37,7 @@ CREATE TABLE Organizacao_Patronal (
   
 CREATE TABLE Organizacao_Sindical (
   Nome                   VARCHAR(100) NOT NULL PRIMARY KEY,
+  Acronimo               VARCHAR(100),
   Nome_Organizacao_Pai   VARCHAR(100),
   Concelho_Sede          VARCHAR(100),
   Distrito_Sede          VARCHAR(100),
