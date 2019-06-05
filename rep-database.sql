@@ -55,7 +55,7 @@ CREATE TABLE Mencoes_BTE_Organizacao_Sindical (
   Numero                                INT,
   Descricao                             VARCHAR(100),
   Mudanca_Estatuto                      BOOLEAN,
-  Confianca                             INT,
+  Confianca                             NUMERIC,
   PRIMARY KEY (Nome_Organizacao_Sindical,Ano,Numero),
   FOREIGN KEY (Nome_Organizacao_Sindical) REFERENCES Organizacao_Sindical
 );
@@ -66,7 +66,7 @@ CREATE TABLE Mencoes_BTE_Organizacao_Patronal (
   Numero                                INT,
   Descricao                             VARCHAR(100),
   Mudanca_Estatuto                      BOOLEAN,
-  Confianca                             INT,
+  Confianca                             NUMERIC,
   PRIMARY KEY (Nome_Organizacao_Patronal,Ano,Numero),
   FOREIGN KEY (Nome_Organizacao_Patronal) REFERENCES Organizacao_Patronal
 );
