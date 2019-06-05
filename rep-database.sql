@@ -22,6 +22,7 @@ CREATE TABLE Sectores_Profissionais (
 
 CREATE TABLE Organizacao_Patronal (
   Nome                   VARCHAR(100) NOT NULL PRIMARY KEY,
+  Acronimo               VARCHAR(100),
   Nome_Organizacao_Pai   VARCHAR(100),
   Concelho_Sede          VARCHAR(100),
   Distrito_Sede          VARCHAR(100),
@@ -53,6 +54,7 @@ CREATE TABLE Mencoes_BTE_Organizacao_Sindical (
   Numero                                INT,
   Descrição                             VARCHAR(100),
   Mudança_Estatuto                      BOOLEAN,
+  Confianca                             INT,
   PRIMARY KEY (Nome_Organizacao_Sindical,Ano,Numero),
   FOREIGN KEY (Nome_Organizacao_Sindical) REFERENCES Organizacao_Sindical
 );
@@ -63,6 +65,7 @@ CREATE TABLE Mencoes_BTE_Organizacao_Patronal (
   Numero                                INT,
   Descrição                             VARCHAR(100),
   Mudança_Estatuto                      BOOLEAN,
+  Confianca                             INT,
   PRIMARY KEY (Nome_Organizacao_Patronal,Ano,Numero),
   FOREIGN KEY (Nome_Organizacao_Patronal) REFERENCES Organizacao_Patronal
 );
