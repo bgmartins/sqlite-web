@@ -10,6 +10,11 @@ import sys
 import threading
 import time
 import webbrowser
+import plotly
+import plotly.graph_objs as go
+import pandas as pd
+import numpy as np
+import json
 from collections import namedtuple, OrderedDict
 from functools import wraps
 from getpass import getpass
@@ -71,7 +76,6 @@ from peewee import sqlite3
 from playhouse.dataset import DataSet
 from playhouse.migrate import migrate
 
-
 CUR_DIR = os.path.realpath(os.path.dirname(__file__))
 DEBUG = False
 MAX_RESULT_SIZE = 1000
@@ -89,15 +93,12 @@ migrator = None
 #
 # Database metadata objects.
 #
-
 TriggerMetadata = namedtuple('TriggerMetadata', ('name', 'sql'))
-
 ViewMetadata = namedtuple('ViewMetadata', ('name', 'sql'))
 
 #
 # Database helpers.
 #
-
 class SqliteDataSet(DataSet):
     @property
     def filename(self):
@@ -191,6 +192,22 @@ class SqliteDataSet(DataSet):
 def index():
     return render_template('index.html', sqlite=sqlite3)
 
+@app.route('/dashboard')
+def index():
+    N = 40
+    x = np.linspace(0, 1, N)
+    y = np.random.randn(N)
+    df = pd.DataFrame({'x': x, 'y': y})
+    data = [ go.Bar( x=df['x'], y=df['y'] ) ]
+    graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
+    return render_template('index.html', plot=graphJSON)
+
+@app.route('/barplot', methods=['GET', 'POST'])
+def change_features():
+    feature = request.args['selected']
+    graphJSON= create_plot(feature)
+    return graphJSON
+
 @app.route('/login/', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -219,7 +236,6 @@ def table_create():
     if not table:
         flash('Table name is required.', 'danger')
         return redirect(request.form.get('redirect') or url_for('index'))
-
     dataset[table]
     return redirect(url_for('table_import', table=table))
 
