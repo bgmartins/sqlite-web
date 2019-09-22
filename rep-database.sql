@@ -175,7 +175,7 @@ SELECT CASE trim(NOME_ENTIDADE) WHEN '' THEN trim(SIGLA) ELSE trim(NOME_ENTIDADE
        NULL, 
        NULL, 
        NULL, 
-       NULL, 
+       NULL,
        NULL,
        CASE lower(trim(ESTADO_ENTIDADE)) WHEN 'activa' THEN 1 ELSE 0 END
 FROM TEMP_ENTIDADES WHERE instr(NOME_ENTIDADE, 'SINDICA') <= 0;
@@ -190,7 +190,7 @@ SELECT CASE trim(NOME_ENTIDADE) WHEN '' THEN trim(SIGLA) ELSE trim(NOME_ENTIDADE
        NULL, 
        NULL, 
        NULL, 
-       NULL, 
+       NULL,
        NULL,
        CASE lower(trim(ESTADO_ENTIDADE)) WHEN 'activa' THEN 1 ELSE 0 END
 FROM TEMP_ENTIDADES WHERE instr(NOME_ENTIDADE, 'SINDICA') > 0;
