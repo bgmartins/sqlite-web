@@ -192,8 +192,8 @@ class SqliteDataSet(DataSet):
 def index():
     return render_template('index.html', sqlite=sqlite3)
 
-@app.route('/dashboard')
-def index():
+@app.route('/dashboard/')
+def entry_dashboard():
     N = 40
     x = np.linspace(0, 1, N)
     y = np.random.randn(N)
