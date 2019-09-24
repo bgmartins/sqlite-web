@@ -4,15 +4,15 @@
 
 DROP TABLE IF EXISTS Avisos_Greve;
 DROP TABLE IF EXISTS Actos_Negociacao_Colectiva;
-DROP TABLE IF EXISTS Direccao_Organizacao_Patronal;
-DROP TABLE IF EXISTS Direccao_Organizacao_Sindical;
-DROP TABLE IF EXISTS Membros_Organizacao_Sindical;
-DROP TABLE IF EXISTS Actos_Eleitorais_Organizacao_Sindical;
-DROP TABLE IF EXISTS Relacoes_Entre_Organizacao_Sindical;
-DROP TABLE IF EXISTS Mencoes_BTE_Organizacao_Patronal;
-DROP TABLE IF EXISTS Mencoes_BTE_Organizacao_Sindical;
-DROP TABLE IF EXISTS Organizacao_Sindical;
-DROP TABLE IF EXISTS Organizacao_Patronal;
+DROP TABLE IF EXISTS Direccao_Org_Patronal;
+DROP TABLE IF EXISTS Direccao_Org_Sindical;
+DROP TABLE IF EXISTS Membros_Org_Sindical;
+DROP TABLE IF EXISTS Actos_Eleitorais_Org_Sindical;
+DROP TABLE IF EXISTS Relacoes_Entre_Org_Sindical;
+DROP TABLE IF EXISTS Mencoes_BTE_Org_Patronal;
+DROP TABLE IF EXISTS Mencoes_BTE_Org_Sindical;
+DROP TABLE IF EXISTS Org_Sindical;
+DROP TABLE IF EXISTS Org_Patronal;
 DROP TABLE IF EXISTS Sectores_Profissionais;
 
 CREATE TABLE Sectores_Profissionais (
@@ -20,42 +20,44 @@ CREATE TABLE Sectores_Profissionais (
   Salario_Medio  NUMERIC
 );
 
-CREATE TABLE Organizacao_Patronal (
-  Nome                     VARCHAR(100) NOT NULL PRIMARY KEY,
+CREATE TABLE Org_Patronal (
+  ID                       INT NOT NULL PRIMARY KEY,
+  Nome                     VARCHAR(100) NOT NULL,
   Acronimo                 VARCHAR(100),
   Nome_Organizacao_Pai     VARCHAR(100),
   Concelho_Sede            VARCHAR(100),
   Distrito_Sede            VARCHAR(100),
   Codigo_Postal            VARCHAR(8),
-  Ambito_Geográfico        VARCHAR(100),  
+  Ambito_Geografico        VARCHAR(100),  
   Sector                   VARCHAR(100),
   Numero_Membros           INT,
   Data_Primeira_Actividade DATE,
   Data_Ultima_Actividade   DATE,
   Activa		   BOOLEAN,  
-  FOREIGN KEY (Nome_Organizacao_Pai) REFERENCES Organizacao_Patronal,
+  FOREIGN KEY (Nome_Organizacao_Pai) REFERENCES Org_Patronal,
   FOREIGN KEY (Sector) REFERENCES Sectores_Profissionais
 );
   
-CREATE TABLE Organizacao_Sindical (
-  Nome                     VARCHAR(100) NOT NULL PRIMARY KEY,
+CREATE TABLE Org_Sindical (
+  ID                       INT NOT NULL PRIMARY KEY,
+  Nome                     VARCHAR(100) NOT NULL,
   Acronimo                 VARCHAR(100),
   Nome_Organizacao_Pai     VARCHAR(100),
   Concelho_Sede            VARCHAR(100),
   Distrito_Sede            VARCHAR(100),
   Codigo_Postal            VARCHAR(8),
-  Ambito_Geográfico        VARCHAR(100),
+  Ambito_Geografico        VARCHAR(100),
   Sector                   VARCHAR(100),
   Numero_Membros           INT,
   Data_Primeira_Actividade DATE,
   Data_Ultima_Actividade   DATE,
   Activa                   BOOLEAN,
-  FOREIGN KEY (Nome_Organizacao_Pai) REFERENCES Organizacao_Sindical,
+  FOREIGN KEY (Nome_Organizacao_Pai) REFERENCES Org_Sindical,
   FOREIGN KEY (Sector) REFERENCES Sectores_Profissionais
 );
 
-CREATE TABLE Mencoes_BTE_Organizacao_Sindical (
-  Nome_Organizacao_Sindical             VARCHAR(100),
+CREATE TABLE Mencoes_BTE_Org_Sindical (
+  ID_Organizacao_Sindical               INT,
   Ano                                   INT,
   Numero                                INT,
   Serie                                 INT,
@@ -63,12 +65,12 @@ CREATE TABLE Mencoes_BTE_Organizacao_Sindical (
   Mudanca_Estatuto                      BOOLEAN,
   Eleicoes                              BOOLEAN,
   Confianca                             NUMERIC,
-  PRIMARY KEY (Nome_Organizacao_Sindical,Ano,Numero,Serie),
-  FOREIGN KEY (Nome_Organizacao_Sindical) REFERENCES Organizacao_Sindical
+  PRIMARY KEY (ID_Organizacao_Sindical,Ano,Numero,Serie),
+  FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical
 );
 
-CREATE TABLE Mencoes_BTE_Organizacao_Patronal (
-  Nome_Organizacao_Patronal             VARCHAR(100),
+CREATE TABLE Mencoes_BTE_Org_Patronal (
+  ID_Organizacao_Patronal	        INT,
   Ano                                   INT,
   Numero                                INT,
   Serie                                 INT,
@@ -76,84 +78,84 @@ CREATE TABLE Mencoes_BTE_Organizacao_Patronal (
   Mudanca_Estatuto                      BOOLEAN,
   Eleicoes                              BOOLEAN,
   Confianca                             NUMERIC,
-  PRIMARY KEY (Nome_Organizacao_Patronal,Ano,Numero,Serie),
-  FOREIGN KEY (Nome_Organizacao_Patronal) REFERENCES Organizacao_Patronal
+  PRIMARY KEY (ID_Organizacao_Patronal,Ano,Numero,Serie),
+  FOREIGN KEY (ID_Organizacao_Patronal) REFERENCES Org_Patronal
 );
 
-CREATE TABLE Relacoes_Entre_Organizacao_Sindical (
-  Nome_Organizacao_Sindical_1  VARCHAR(100),
-  Nome_Organizacao_Sindical_2  VARCHAR(100),
-  Tipo_de_Relacao              VARCHAR(100),
-  Data                         DATE,
-  PRIMARY KEY (Nome_Organizacao_Sindical_1,Nome_Organizacao_Sindical_2),
-  FOREIGN KEY (Nome_Organizacao_Sindical_1) REFERENCES Organizacao_Sindical,
-  FOREIGN KEY (Nome_Organizacao_Sindical_2) REFERENCES Organizacao_Sindical
+CREATE TABLE Relacoes_Entre_Org_Sindical (
+  ID_Organizacao_Sindical_1  INT,
+  ID_Organizacao_Sindical_2  INT,
+  Tipo_de_Relacao            VARCHAR(100),
+  Data                       DATE,
+  PRIMARY KEY (ID_Organizacao_Sindical_1,ID_Organizacao_Sindical_2),
+  FOREIGN KEY (ID_Organizacao_Sindical_1) REFERENCES Org_Sindical,
+  FOREIGN KEY (ID_Organizacao_Sindical_2) REFERENCES Org_Sindical
 );
 
-CREATE TABLE Actos_Eleitorais_Organizacao_Sindical (
-  Nome_Organizacao_Sindical             VARCHAR(100),
+CREATE TABLE Actos_Eleitorais_Org_Sindical (
+  ID_Organizacao_Sindical               INT,
   Data                                  DATE,
   Numero_Membros_Cadernos_Eleitoriais   INT,
   Numero_Membros_Inscritos              INT,
   Numero_Membros_Votantes               INT,
   Meses_de_Mandato                      INT,
   Numero_Listas_Concorrentes            INT,
-  PRIMARY KEY (Nome_Organizacao_Sindical,Data),
-  FOREIGN KEY (Nome_Organizacao_Sindical) REFERENCES Organizacao_Sindical
+  PRIMARY KEY (ID_Organizacao_Sindical,Data),
+  FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical
 );
 
-CREATE TABLE Membros_Organizacao_Sindical (
-  Nome_Organizacao_Sindical             VARCHAR(100),
+CREATE TABLE Membros_Org_Sindical (
+  ID_Organizacao_Sindical               INT,
   Data_Inicio                           DATE,
   Data_Fim                              DATE,
   Número_Membros                        INT,
-  PRIMARY KEY (Nome_Organizacao_Sindical,Data_Inicio,Data_Fim),
-  FOREIGN KEY (Nome_Organizacao_Sindical) REFERENCES Organizacao_Sindical
+  PRIMARY KEY (ID_Organizacao_Sindical,Data_Inicio,Data_Fim),
+  FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical
 );
   
-CREATE TABLE Direccao_Organizacao_Sindical (
-  Nome_Organizacao_Sindical   VARCHAR(100),
+CREATE TABLE Direccao_Org_Sindical (
+  ID_Organizacao_Sindical     INT,
   Nome_Pessoa                 VARCHAR(100),
   Género_Sexo                 INT,
   Data_Nascimento             DATETIME,
   Cargo                       VARCHAR(100),
   Data_Inicio                 DATE,
   Data_Fim                    DATE,
-  PRIMARY KEY (Nome_Organizacao_Sindical,Nome_Pessoa,Data_Inicio,Data_Fim),
-  FOREIGN KEY (Nome_Organizacao_Sindical) REFERENCES Organizacao_Sindical
+  PRIMARY KEY (ID_Organizacao_Sindical,Nome_Pessoa,Data_Inicio,Data_Fim),
+  FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical
 );
 
-CREATE TABLE Direccao_Organizacao_Patronal (
-  Nome_Organizacao_Patronal   VARCHAR(100),
+CREATE TABLE Direccao_Org_Patronal (
+  ID_Organizacao_Patronal     INT,
   Nome_Pessoa                 VARCHAR(100),
   Género_Sexo                 INT,
   Data_Nascimento             DATETIME,
   Cargo                       VARCHAR(100),
   Data_Inicio                 DATE,
   Data_Fim                    DATE,
-  PRIMARY KEY (Nome_Organizacao_Patronal,Nome_Pessoa,Data_Inicio,Data_Fim),
-  FOREIGN KEY (Nome_Organizacao_Patronal) REFERENCES Organizacao_Patronal  
+  PRIMARY KEY (ID_Organizacao_Patronal,Nome_Pessoa,Data_Inicio,Data_Fim),
+  FOREIGN KEY (ID_Organizacao_Patronal) REFERENCES Org_Patronal  
 );
 
 CREATE TABLE Actos_Negociacao_Colectiva (
   Nome_Acto                  VARCHAR(100),
-  Nome_Organizacao_Sindical  VARCHAR(100),
-  Nome_Organizacao_Patronal  VARCHAR(100),
+  ID_Organizacao_Sindical    INT,
+  ID_Organizacao_Patronal    INT,
   Empresa                    VARCHAR(100),
   Tipo_Acto                  VARCHAR(100),
   Data                       DATE,
-  PRIMARY KEY (Nome_Acto,Nome_Organizacao_Sindical,Nome_Organizacao_Patronal,Data),
-  FOREIGN KEY (Nome_Organizacao_Sindical) REFERENCES Organizacao_Sindical,
-  FOREIGN KEY (Nome_Organizacao_Patronal) REFERENCES Organizacao_Patronal 
+  PRIMARY KEY (Nome_Acto,ID_Organizacao_Sindical,ID_Organizacao_Patronal,Data),
+  FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical,
+  FOREIGN KEY (ID_Organizacao_Patronal) REFERENCES Org_Patronal 
 );
 
 CREATE TABLE Avisos_Greve (
-  Nome_Organizacao_Sindical  VARCHAR(100),
+  ID_Organizacao_Sindical    INT,
   Descricao                  VARCHAR(100),
   Data_Aviso                 DATE,
   Data_Greve                 DATE,
-  PRIMARY KEY (Nome_Organizacao_Sindical,Data_Aviso),
-  FOREIGN KEY (Nome_Organizacao_Sindical) REFERENCES Organizacao_Sindical
+  PRIMARY KEY (ID_Organizacao_Sindical,Data_Aviso),
+  FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical
 );
 
 --
@@ -170,12 +172,9 @@ UPDATE TEMP_ENTIDADES SET SIGLA = trim(replace(replace(replace(SIGLA, X'0A', ' '
 
 UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' NAC. ',' NACIONAL ')  WHERE instr(NOME_ENTIDADE, ' NAC. ') > 0;
 UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' TRAB. ',' TRABALHADORES ')  WHERE instr(NOME_ENTIDADE, ' TRAB. ') > 0;
-UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' DO DIST. DE  ',' DO DISTRITO DE  ')  WHERE instr(NOME_ENTIDADE, ' DO DIST. DE  ') > 0;
-UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' DA IND.  ',' DA INDUSTRIA  ')  WHERE instr(NOME_ENTIDADE, ' DA IND.  ') > 0;
-UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' DAS IND.  ',' DAS INDUSTRIAS  ')  WHERE instr(NOME_ENTIDADE, ' DAS IND.  ') > 0;
-
-UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = trim(NOME_ENTIDADE) || ' - ' || ID_ENTIDADE
-WHERE trim(NOME_ENTIDADE) IN (SELECT trim(NOME_ENTIDADE) FROM TEMP_ENTIDADES GROUP BY trim(NOME_ENTIDADE) HAVING COUNT(*) > 1);
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' DO DIST. D',' DO DISTRITO D')  WHERE instr(NOME_ENTIDADE, ' DO DIST. D') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' DA IND. ',' DA INDUSTRIA ')  WHERE instr(NOME_ENTIDADE, ' DA IND. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' DAS IND. ',' DAS INDUSTRIAS ')  WHERE instr(NOME_ENTIDADE, ' DAS IND. ') > 0;
 
 CREATE VIEW TEMP_DATAS_ENTIDADES AS SELECT ID_ENTIDADE, MIN(DATA) AS MIN_DATA, MAX(DATA) AS MAX_DATA FROM (
   SELECT ID_ENTIDADE, date(replace(DATABTE,'.','-')) AS DATA FROM TEMP_ALTERACOES_ESTATUTOS
@@ -185,11 +184,12 @@ CREATE VIEW TEMP_DATAS_ENTIDADES AS SELECT ID_ENTIDADE, MIN(DATA) AS MIN_DATA, M
   SELECT ID_ENTIDADE, date(replace(DATA_ELEICAO,'.','-')) AS DATA FROM TEMP_PROCESSOS LEFT OUTER JOIN TEMP_ELEICAO_CORPOS_GERENTES ON TEMP_PROCESSOS.PROCESSO=TEMP_ELEICAO_CORPOS_GERENTES.PROCESSO
 ) GROUP BY ID_ENTIDADE;
 
-INSERT INTO Organizacao_Patronal 
-SELECT CASE trim(NOME_ENTIDADE) WHEN '' THEN trim(SIGLA) ELSE trim(NOME_ENTIDADE) END,
+INSERT INTO Org_Patronal 
+SELECT TEMP_ENTIDADES.ID_ENTIDADE,
+       CASE trim(NOME_ENTIDADE) WHEN '' THEN trim(SIGLA) ELSE trim(NOME_ENTIDADE) END,
        CASE trim(SIGLA) WHEN '' THEN NULL ELSE trim(SIGLA) END,
        NULL, 
-       REPLACE(trim(DISTRITO_DESCRICAO),'DISTRITO DE ',''),
+       REPLACE(REPLACE(REPLACE(REPLACE(trim(DISTRITO_DESCRICAO),'DISTRITO DE ',''),'DIST. DE ',''),'DISTRITO DA ',''),'DIST. DA ',''),
        trim(CODIGOPOSTAL_ENTIDADE), 
        NULL, 
        NULL, 
@@ -198,13 +198,24 @@ SELECT CASE trim(NOME_ENTIDADE) WHEN '' THEN trim(SIGLA) ELSE trim(NOME_ENTIDADE
        MIN_DATA,
        MAX_DATA,
        CASE lower(trim(ESTADO_ENTIDADE)) WHEN 'activa' THEN 1 ELSE 0 END
-FROM TEMP_ENTIDADES NATURAL JOIN TEMP_DATAS_ENTIDADES WHERE instr(NOME_ENTIDADE, 'SINDICA') <= 0;
+FROM TEMP_ENTIDADES LEFT JOIN TEMP_DATAS_ENTIDADES ON TEMP_ENTIDADES.ID_ENTIDADE=TEMP_DATAS_ENTIDADES.ID_ENTIDADE WHERE instr(NOME_ENTIDADE, 'SINDICA') <= 0;
 
-INSERT INTO Organizacao_Sindical 
-SELECT CASE trim(NOME_ENTIDADE) WHEN '' THEN trim(SIGLA) ELSE trim(NOME_ENTIDADE) END,
+UPDATE Org_Patronal SET Ambito_Geografico = ( 
+ SELECT DISTINCT AMBITO_GEOGRAFICO FROM TEMP_ENTIDADES NATURAL JOIN (SELECT DISTINCT ID_ENTIDADE, AMBITO_GEOGRAFICO FROM TEMP_ALTERACOES_ESTATUTOS WHERE trim(AMBITO_GEOGRAFICO) <> '')
+ WHERE ID_ENTIDADE = ID
+) WHERE ID IN (
+ SELECT DISTINCT ID_ENTIDADE
+ FROM TEMP_ENTIDADES NATURAL JOIN (SELECT DISTINCT ID_ENTIDADE, AMBITO_GEOGRAFICO FROM TEMP_ALTERACOES_ESTATUTOS WHERE trim(AMBITO_GEOGRAFICO) <> '')
+ GROUP BY ID_ENTIDADE
+ HAVING COUNT(DISTINCT AMBITO_GEOGRAFICO) = 1
+);
+
+INSERT INTO Org_Sindical 
+SELECT TEMP_ENTIDADES.ID_ENTIDADE, 
+       CASE trim(NOME_ENTIDADE) WHEN '' THEN trim(SIGLA) ELSE trim(NOME_ENTIDADE) END,
        CASE trim(SIGLA) WHEN '' THEN NULL ELSE trim(SIGLA) END, 
        NULL, 
-       REPLACE(trim(DISTRITO_DESCRICAO),'DISTRITO DE ',''),
+       REPLACE(REPLACE(REPLACE(REPLACE(trim(DISTRITO_DESCRICAO),'DISTRITO DE ',''),'DIST. DE ',''),'DISTRITO DA ',''),'DIST. DA ',''),
        trim(CODIGOPOSTAL_ENTIDADE), 
        NULL, 
        NULL, 
@@ -213,88 +224,82 @@ SELECT CASE trim(NOME_ENTIDADE) WHEN '' THEN trim(SIGLA) ELSE trim(NOME_ENTIDADE
        MIN_DATA,
        MAX_DATA,
        CASE lower(trim(ESTADO_ENTIDADE)) WHEN 'activa' THEN 1 ELSE 0 END
-FROM TEMP_ENTIDADES NATURAL JOIN TEMP_DATAS_ENTIDADES WHERE instr(NOME_ENTIDADE, 'SINDICA') > 0;
+FROM TEMP_ENTIDADES LEFT JOIN TEMP_DATAS_ENTIDADES ON TEMP_ENTIDADES.ID_ENTIDADE=TEMP_DATAS_ENTIDADES.ID_ENTIDADE WHERE instr(NOME_ENTIDADE, 'SINDICA') > 0;
 
-INSERT INTO Mencoes_BTE_Organizacao_Sindical
-SELECT CASE trim(NOME_ENTIDADE) WHEN '' THEN trim(SIGLA) ELSE trim(NOME_ENTIDADE) END AS Nome_Organizacao_Sindical,
+UPDATE Org_Sindical SET Ambito_Geografico = ( 
+ SELECT DISTINCT AMBITO_GEOGRAFICO FROM TEMP_ENTIDADES NATURAL JOIN (SELECT DISTINCT ID_ENTIDADE, AMBITO_GEOGRAFICO FROM TEMP_ALTERACOES_ESTATUTOS WHERE trim(AMBITO_GEOGRAFICO) <> '')
+ WHERE ID_ENTIDADE = ID
+) WHERE ID IN (
+ SELECT DISTINCT ID_ENTIDADE
+ FROM TEMP_ENTIDADES NATURAL JOIN (SELECT DISTINCT ID_ENTIDADE, AMBITO_GEOGRAFICO FROM TEMP_ALTERACOES_ESTATUTOS WHERE trim(AMBITO_GEOGRAFICO) <> '')
+ GROUP BY ID_ENTIDADE
+ HAVING COUNT(DISTINCT AMBITO_GEOGRAFICO) = 1
+);
+
+INSERT INTO Mencoes_BTE_Org_Sindical
+SELECT DISTINCT TEMP_ENTIDADES.ID_ENTIDADE,
        strftime('%Y',date(replace(DATABTE,'.','-'))) AS Ano,
        NUMBTE AS Numero,
        SERIEBTE AS Serie,
        NULL AS Descricao,
-       0.0 AS Mudanca_Estatuto,
-       0.0 AS Eleicoes,
-       1.0 AS Confianca
+       0 AS Mudanca_Estatuto,
+       0 AS Eleicoes,
+       1 AS Confianca
 FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ALTERACOES_ESTATUTOS WHERE instr(NOME_ENTIDADE, 'SINDICA') > 0
-GROUP BY Nome_Organizacao_Sindical, Ano, Numero, Serie, Descricao, Mudanca_Estatuto, Confianca
 UNION
-SELECT CASE trim(NOME_ENTIDADE) WHEN '' THEN trim(SIGLA) ELSE trim(NOME_ENTIDADE) END AS Nome_Organizacao_Sindical,
+SELECT DISTINCT TEMP_ENTIDADES.ID_ENTIDADE,
        strftime('%Y',date(replace(DATABTE,'.','-'))) AS Ano,
        NUMBTE AS Numero,
        SERIEBTE AS Serie,
        NULL AS Descricao,
-       0.0 AS Mudanca_Estatuto,
-       0.0 AS Eleicoes,
-       1.0 AS Confianca
-FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ELEICAO_CORPOS_GERENTES WHERE instr(NOME_ENTIDADE, 'SINDICA') > 0
-GROUP BY Nome_Organizacao_Sindical, Ano, Numero, Serie, Descricao, Mudanca_Estatuto, Confianca;
+       0 AS Mudanca_Estatuto,
+       0 AS Eleicoes,
+       1 AS Confianca
+FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ELEICAO_CORPOS_GERENTES WHERE instr(NOME_ENTIDADE, 'SINDICA') > 0;
 
-UPDATE Mencoes_BTE_Organizacao_Sindical SET Mudanca_Estatuto = 1.0 
-WHERE (Nome_Organizacao_Sindical,Ano,Numero,Serie) IN (
-  SELECT CASE trim(NOME_ENTIDADE) WHEN '' THEN trim(SIGLA) ELSE trim(NOME_ENTIDADE) END AS Nome_Organizacao_Sindical,
-       strftime('%Y',date(replace(DATABTE,'.','-'))) AS Ano,
-       NUMBTE AS Numero,
-       SERIEBTE AS Serie
-FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ALTERACOES_ESTATUTOS );
+UPDATE Mencoes_BTE_Org_Sindical SET Mudanca_Estatuto = 1 WHERE ID_Organizacao_Sindical || ' - ' || Ano || ' - ' || Numero || ' - ' || Serie IN (
+  SELECT TEMP_ENTIDADES.ID_ENTIDADE || ' - ' || strftime('%Y',date(replace(DATABTE,'.','-'))) || ' - ' || NUMBTE || ' - ' || SERIEBTE 
+  FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ALTERACOES_ESTATUTOS 
+);
 
-UPDATE Mencoes_BTE_Organizacao_Sindical SET Eleicoes = 1.0 
-WHERE (Nome_Organizacao_Sindical,Ano,Numero,Serie) IN (
-  SELECT CASE trim(NOME_ENTIDADE) WHEN '' THEN trim(SIGLA) ELSE trim(NOME_ENTIDADE) END AS Nome_Organizacao_Sindical,
-       strftime('%Y',date(replace(DATABTE,'.','-'))) AS Ano,
-       NUMBTE AS Numero,
-       SERIEBTE AS Serie
-FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ELEICAO_CORPOS_GERENTES );
+UPDATE Mencoes_BTE_Org_Sindical SET Eleicoes = 1 WHERE ID_Organizacao_Sindical || ' - ' || Ano || ' - ' || Numero || ' - ' || Serie IN (
+  SELECT TEMP_ENTIDADES.ID_ENTIDADE || ' - ' || strftime('%Y',date(replace(DATABTE,'.','-'))) || ' - ' || NUMBTE || ' - ' || SERIEBTE 
+  FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ELEICAO_CORPOS_GERENTES
+);
 
-INSERT INTO Mencoes_BTE_Organizacao_Patronal
-SELECT CASE trim(NOME_ENTIDADE) WHEN '' THEN trim(SIGLA) ELSE trim(NOME_ENTIDADE) END AS Nome_Organizacao_Patronal,
+INSERT INTO Mencoes_BTE_Org_Patronal
+SELECT DISTINCT TEMP_ENTIDADES.ID_ENTIDADE,
        strftime('%Y',date(replace(DATABTE,'.','-'))) AS Ano,
        NUMBTE AS Numero,
        SERIEBTE AS Serie,
        NULL AS Descricao, 
-       0.0 AS Mudanca_Estatuto,
-       0.0 AS Eleicoes,
-       1.0 AS Confianca
+       0 AS Mudanca_Estatuto,
+       0 AS Eleicoes,
+       1 AS Confianca
 FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ALTERACOES_ESTATUTOS WHERE instr(NOME_ENTIDADE, 'SINDICA') <= 0
-GROUP BY Nome_Organizacao_Patronal, Ano, Numero, Serie, Descricao, Mudanca_Estatuto, Confianca
 UNION
-SELECT CASE trim(NOME_ENTIDADE) WHEN '' THEN trim(SIGLA) ELSE trim(NOME_ENTIDADE) END AS Nome_Organizacao_Patronal,
+SELECT DISTINCT TEMP_ENTIDADES.ID_ENTIDADE,
        strftime('%Y',date(replace(DATABTE,'.','-'))) AS Ano,
        NUMBTE AS Numero,
        SERIEBTE AS Serie,
        NULL AS Descricao, 
-       0.0 AS Mudanca_Estatuto,
-       0.0 AS Eleicoes,
-       1.0 AS Confianca
-FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ELEICAO_CORPOS_GERENTES WHERE instr(NOME_ENTIDADE, 'SINDICA') <= 0
-GROUP BY Nome_Organizacao_Patronal, Ano, Numero, Serie, Descricao, Mudanca_Estatuto, Confianca;
+       0 AS Mudanca_Estatuto,
+       0 AS Eleicoes,
+       1 AS Confianca
+FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ELEICAO_CORPOS_GERENTES WHERE instr(NOME_ENTIDADE, 'SINDICA') <= 0;
 
-UPDATE Mencoes_BTE_Organizacao_Patronal SET Mudanca_Estatuto = 1.0 
-WHERE (Nome_Organizacao_Patronal,Ano,Numero,Serie) IN (
-  SELECT CASE trim(NOME_ENTIDADE) WHEN '' THEN trim(SIGLA) ELSE trim(NOME_ENTIDADE) END AS Nome_Organizacao_Patronal,
-       strftime('%Y',date(replace(DATABTE,'.','-'))) AS Ano,
-       NUMBTE AS Numero,
-       SERIEBTE AS Serie
-FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ALTERACOES_ESTATUTOS );
+UPDATE Mencoes_BTE_Org_Patronal SET Mudanca_Estatuto = 1 WHERE ID_Organizacao_Patronal || ' - ' || Ano || ' - ' || Numero || ' - ' || Serie IN (
+  SELECT TEMP_ENTIDADES.ID_ENTIDADE || ' - ' || strftime('%Y',date(replace(DATABTE,'.','-'))) || ' - ' || NUMBTE || ' - ' || SERIEBTE 
+  FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ALTERACOES_ESTATUTOS 
+);
 
-UPDATE Mencoes_BTE_Organizacao_Patronal SET Eleicoes = 1.0 
-WHERE (Nome_Organizacao_Patronal,Ano,Numero,Serie) IN (
-  SELECT CASE trim(NOME_ENTIDADE) WHEN '' THEN trim(SIGLA) ELSE trim(NOME_ENTIDADE) END AS Nome_Organizacao_Patronal,
-       strftime('%Y',date(replace(DATABTE,'.','-'))) AS Ano,
-       NUMBTE AS Numero,
-       SERIEBTE AS Serie
-FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ELEICAO_CORPOS_GERENTES );
+UPDATE Mencoes_BTE_Org_Patronal SET Eleicoes = 1 WHERE ID_Organizacao_Patronal || ' - ' || Ano || ' - ' || Numero || ' - ' || Serie IN (
+  SELECT TEMP_ENTIDADES.ID_ENTIDADE || ' - ' || strftime('%Y',date(replace(DATABTE,'.','-'))) || ' - ' || NUMBTE || ' - ' || SERIEBTE 
+  FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ELEICAO_CORPOS_GERENTES
+);
 
-INSERT INTO Actos_Eleitorais_Organizacao_Sindical
-SELECT CASE trim(NOME_ENTIDADE) WHEN '' THEN trim(SIGLA) ELSE trim(NOME_ENTIDADE) END AS Nome_Organizacao_Sindical,
+INSERT INTO Actos_Eleitorais_Org_Sindical
+SELECT TEMP_ENTIDADES.ID_ENTIDADE AS ID_Organizacao_Sindical,
        date(replace(DATA_ELEICAO,'.','-')) AS Data,
        MAX(NUM_H_EFECT + NUM_H_SUPL + NUM_M_EFECT + NUM_M_SUPL) AS Numero_Membros_Cadernos_Eleitoriais,
        MAX(INSCRITOS) AS Numero_Membros_Inscritos,
@@ -302,7 +307,7 @@ SELECT CASE trim(NOME_ENTIDADE) WHEN '' THEN trim(SIGLA) ELSE trim(NOME_ENTIDADE
        MAX(MESES_MANDATO) AS Meses_de_Mandato,
        NULL
 FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ELEICAO_CORPOS_GERENTES WHERE instr(NOME_ENTIDADE, 'SINDICA') > 0
-GROUP BY Nome_Organizacao_Sindical, Data;
+GROUP BY ID_Organizacao_Sindical, Data;
 
 DROP VIEW TEMP_DATAS_ENTIDADES;
 DROP TABLE TEMP_ALTERACOES_ESTATUTOS;
