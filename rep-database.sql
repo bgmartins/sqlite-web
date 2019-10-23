@@ -34,8 +34,8 @@ CREATE TABLE Org_Patronal (
   Data_Primeira_Actividade DATE,
   Data_Ultima_Actividade   DATE,
   Activa		   BOOLEAN,  
-  FOREIGN KEY (Nome_Organizacao_Pai) REFERENCES Org_Patronal,
-  FOREIGN KEY (Sector) REFERENCES Sectores_Profissionais
+  FOREIGN KEY (Nome_Organizacao_Pai) REFERENCES Org_Patronal(ID),
+  FOREIGN KEY (Sector) REFERENCES Sectores_Profissionais(Sector)
 );
   
 CREATE TABLE Org_Sindical (
@@ -52,8 +52,8 @@ CREATE TABLE Org_Sindical (
   Data_Primeira_Actividade DATE,
   Data_Ultima_Actividade   DATE,
   Activa                   BOOLEAN,
-  FOREIGN KEY (Nome_Organizacao_Pai) REFERENCES Org_Sindical,
-  FOREIGN KEY (Sector) REFERENCES Sectores_Profissionais
+  FOREIGN KEY (Nome_Organizacao_Pai) REFERENCES Org_Sindical(ID),
+  FOREIGN KEY (Sector) REFERENCES Sectores_Profissionais(Sector)
 );
 
 CREATE TABLE Mencoes_BTE_Org_Sindical (
@@ -66,7 +66,7 @@ CREATE TABLE Mencoes_BTE_Org_Sindical (
   Eleicoes                              BOOLEAN,
   Confianca                             NUMERIC,
   PRIMARY KEY (ID_Organizacao_Sindical,Ano,Numero,Serie),
-  FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical
+  FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical(ID)
 );
 
 CREATE TABLE Mencoes_BTE_Org_Patronal (
@@ -79,7 +79,7 @@ CREATE TABLE Mencoes_BTE_Org_Patronal (
   Eleicoes                              BOOLEAN,
   Confianca                             NUMERIC,
   PRIMARY KEY (ID_Organizacao_Patronal,Ano,Numero,Serie),
-  FOREIGN KEY (ID_Organizacao_Patronal) REFERENCES Org_Patronal
+  FOREIGN KEY (ID_Organizacao_Patronal) REFERENCES Org_Patronal(ID)
 );
 
 CREATE TABLE Relacoes_Entre_Org_Sindical (
@@ -88,8 +88,8 @@ CREATE TABLE Relacoes_Entre_Org_Sindical (
   Tipo_de_Relacao            VARCHAR(100),
   Data                       DATE,
   PRIMARY KEY (ID_Organizacao_Sindical_1,ID_Organizacao_Sindical_2),
-  FOREIGN KEY (ID_Organizacao_Sindical_1) REFERENCES Org_Sindical,
-  FOREIGN KEY (ID_Organizacao_Sindical_2) REFERENCES Org_Sindical
+  FOREIGN KEY (ID_Organizacao_Sindical_1) REFERENCES Org_Sindical(ID),
+  FOREIGN KEY (ID_Organizacao_Sindical_2) REFERENCES Org_Sindical(ID)
 );
 
 CREATE TABLE Actos_Eleitorais_Org_Sindical (
@@ -101,7 +101,7 @@ CREATE TABLE Actos_Eleitorais_Org_Sindical (
   Meses_de_Mandato                      INT,
   Numero_Listas_Concorrentes            INT,
   PRIMARY KEY (ID_Organizacao_Sindical,Data),
-  FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical
+  FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical(ID)
 );
 
 CREATE TABLE Membros_Org_Sindical (
@@ -110,7 +110,7 @@ CREATE TABLE Membros_Org_Sindical (
   Data_Fim                              DATE,
   Número_Membros                        INT,
   PRIMARY KEY (ID_Organizacao_Sindical,Data_Inicio,Data_Fim),
-  FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical
+  FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical(ID)
 );
   
 CREATE TABLE Direccao_Org_Sindical (
@@ -122,7 +122,7 @@ CREATE TABLE Direccao_Org_Sindical (
   Data_Inicio                 DATE,
   Data_Fim                    DATE,
   PRIMARY KEY (ID_Organizacao_Sindical,Nome_Pessoa,Data_Inicio,Data_Fim),
-  FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical
+  FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical(ID)
 );
 
 CREATE TABLE Direccao_Org_Patronal (
@@ -134,7 +134,7 @@ CREATE TABLE Direccao_Org_Patronal (
   Data_Inicio                 DATE,
   Data_Fim                    DATE,
   PRIMARY KEY (ID_Organizacao_Patronal,Nome_Pessoa,Data_Inicio,Data_Fim),
-  FOREIGN KEY (ID_Organizacao_Patronal) REFERENCES Org_Patronal  
+  FOREIGN KEY (ID_Organizacao_Patronal) REFERENCES Org_Patronal(ID)
 );
 
 CREATE TABLE Actos_Negociacao_Colectiva (
@@ -145,8 +145,8 @@ CREATE TABLE Actos_Negociacao_Colectiva (
   Tipo_Acto                  VARCHAR(100),
   Data                       DATE,
   PRIMARY KEY (Nome_Acto,ID_Organizacao_Sindical,ID_Organizacao_Patronal,Data),
-  FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical,
-  FOREIGN KEY (ID_Organizacao_Patronal) REFERENCES Org_Patronal 
+  FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical(ID),
+  FOREIGN KEY (ID_Organizacao_Patronal) REFERENCES Org_Patronal(ID) 
 );
 
 CREATE TABLE Avisos_Greve (
@@ -155,7 +155,7 @@ CREATE TABLE Avisos_Greve (
   Data_Aviso                 DATE,
   Data_Greve                 DATE,
   PRIMARY KEY (ID_Organizacao_Sindical,Data_Aviso),
-  FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical
+  FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical(ID)
 );
 
 --
