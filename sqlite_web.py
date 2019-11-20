@@ -10,8 +10,6 @@ import sys
 import threading
 import time
 import webbrowser
-import plotly
-import plotly.graph_objs as go
 import pandas as pd
 import numpy as np
 import json
@@ -131,6 +129,16 @@ class SqliteDataSet(DataSet):
         stat = os.stat(self.filename)
         return stat.st_size
 
+    @property
+    def barchart_labels(self):
+        cursor = self.query("SELECT ANO, COUNT(DISTINCT ID) FROM Org_Sindical, ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL ) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO ) GROUP BY ANO")
+        return [row[0] for row in cursor.fetchall()]
+        
+    @property
+    def barchart_data(self):
+        cursor = self.query("SELECT ANO, COUNT(DISTINCT ID) FROM Org_Sindical, ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL ) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO ) GROUP BY ANO")
+        return [row[1] for row in cursor.fetchall()]
+
     def get_indexes(self, table):
         return dataset._database.get_indexes(table)
 
@@ -191,22 +199,6 @@ class SqliteDataSet(DataSet):
 @app.route('/')
 def index():
     return render_template('index.html', sqlite=sqlite3)
-
-@app.route('/dashboard/')
-def entry_dashboard():
-    N = 40
-    x = np.linspace(0, 1, N)
-    y = np.random.randn(N)
-    df = pd.DataFrame({'x': x, 'y': y})
-    data = [ go.Bar( x=df['x'], y=df['y'] ) ]
-    graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
-    return render_template('index.html', plot=graphJSON)
-
-@app.route('/barplot', methods=['GET', 'POST'])
-def change_features():
-    feature = request.args['selected']
-    graphJSON= create_plot(feature)
-    return graphJSON
 
 @app.route('/login/', methods=['GET', 'POST'])
 def login():
@@ -542,15 +534,12 @@ def export(table, sql, export_format):
         kwargs = {}
         filename = '%s-export.csv' % table
         mimetype = 'text/csv'
-
     dataset.freeze(query, export_format, file_obj=buf, **kwargs)
-
     response_data = buf.getvalue()
     response = make_response(response_data)
     response.headers['Content-Length'] = len(response_data)
     response.headers['Content-Type'] = mimetype
-    response.headers['Content-Disposition'] = 'attachment; filename=%s' % (
-        filename)
+    response.headers['Content-Disposition'] = 'attachment; filename=%s' % (filename)
     response.headers['Expires'] = 0
     response.headers['Pragma'] = 'public'
     return response
