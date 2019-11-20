@@ -58,6 +58,7 @@ CREATE TABLE Org_Sindical (
 
 CREATE TABLE Mencoes_BTE_Org_Sindical (
   ID_Organizacao_Sindical               INT,
+  URL                                   VARCHAR(100),
   Ano                                   INT,
   Numero                                INT,
   Serie                                 INT,
@@ -71,6 +72,7 @@ CREATE TABLE Mencoes_BTE_Org_Sindical (
 
 CREATE TABLE Mencoes_BTE_Org_Patronal (
   ID_Organizacao_Patronal	        INT,
+  URL			                VARCHAR(100),
   Ano                                   INT,
   Numero                                INT,
   Serie                                 INT,
@@ -157,6 +159,30 @@ CREATE TABLE Avisos_Greve (
   PRIMARY KEY (ID_Organizacao_Sindical,Data_Aviso),
   FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical(ID)
 );
+
+CREATE TRIGGER Mencoes_BTE_Org_Sindical_update AFTER UPDATE ON Mencoes_BTE_Org_Sindical BEGIN
+    UPDATE Mencoes_BTE_Org_Sindical
+    SET    URL = "https://github.com/bgmartins/rep-database/raw/master/BTE-data/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
+    WHERE ID_Organizacao_Sindical = [NEW].ID_Organizacao_Sindical; 
+END;
+
+CREATE TRIGGER Mencoes_BTE_Org_Patronal_update AFTER UPDATE ON Mencoes_BTE_Org_Patronal BEGIN
+    UPDATE Mencoes_BTE_Org_Patronal
+    SET    URL = "https://github.com/bgmartins/rep-database/raw/master/BTE-data/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
+    WHERE ID_Organizacao_Patronal = [NEW].ID_Organizacao_Patronal; 
+END;
+
+CREATE TRIGGER Mencoes_BTE_Org_Sindical_insert AFTER INSERT ON Mencoes_BTE_Org_Sindical BEGIN
+    UPDATE Mencoes_BTE_Org_Sindical
+    SET    URL = "https://github.com/bgmartins/rep-database/raw/master/BTE-data/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
+    WHERE ID_Organizacao_Sindical = [NEW].ID_Organizacao_Sindical; 
+END;
+
+CREATE TRIGGER Mencoes_BTE_Org_Patronal_insert AFTER INSERT ON Mencoes_BTE_Org_Patronal BEGIN
+    UPDATE Mencoes_BTE_Org_Patronal
+    SET    URL = "https://github.com/bgmartins/rep-database/raw/master/BTE-data/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
+    WHERE ID_Organizacao_Patronal = [NEW].ID_Organizacao_Patronal; 
+END;
 
 --
 -- SQL Instructions for Populating the REP Database (first using the unoconv command line tool to convert Excel files to CSV)
@@ -369,7 +395,7 @@ UPDATE ORG_SINDICAL SET ACRONIMO=replace(ACRONIMO, '.', '') WHERE instr(ACRONIMO
 UPDATE ORG_SINDICAL SET ACRONIMO=replace(ACRONIMO, ' - ', '-') WHERE instr(ACRONIMO, ' - ') > 0;
 
 INSERT INTO Mencoes_BTE_Org_Sindical
-SELECT DISTINCT TEMP_ENTIDADES.ID_ENTIDADE,
+SELECT DISTINCT TEMP_ENTIDADES.ID_ENTIDADE, NULL,
        strftime('%Y',date(replace(DATABTE,'.','-'))) AS Ano,
        NUMBTE AS Numero,
        SERIEBTE AS Serie,
@@ -379,7 +405,7 @@ SELECT DISTINCT TEMP_ENTIDADES.ID_ENTIDADE,
        1 AS Confianca
 FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ALTERACOES_ESTATUTOS WHERE instr(NOME_ENTIDADE, 'SIND') > 0 OR instr(NOME_ENTIDADE, 'TRABALH') > 0 OR instr(NOME_ENTIDADE, 'PROFISSI') > 0 OR instr(NOME_ENTIDADE, 'CGTPIN') > 0 OR instr(NOME_ENTIDADE, 'FEDERA') > 0
 UNION
-SELECT DISTINCT TEMP_ENTIDADES.ID_ENTIDADE,
+SELECT DISTINCT TEMP_ENTIDADES.ID_ENTIDADE, NULL,
        strftime('%Y',date(replace(DATABTE,'.','-'))) AS Ano,
        NUMBTE AS Numero,
        SERIEBTE AS Serie,
@@ -400,7 +426,7 @@ UPDATE Mencoes_BTE_Org_Sindical SET Eleicoes = 1 WHERE ID_Organizacao_Sindical |
 );
 
 INSERT INTO Mencoes_BTE_Org_Patronal
-SELECT DISTINCT TEMP_ENTIDADES.ID_ENTIDADE,
+SELECT DISTINCT TEMP_ENTIDADES.ID_ENTIDADE, NULL,
        strftime('%Y',date(replace(DATABTE,'.','-'))) AS Ano,
        NUMBTE AS Numero,
        SERIEBTE AS Serie,
@@ -410,7 +436,7 @@ SELECT DISTINCT TEMP_ENTIDADES.ID_ENTIDADE,
        1 AS Confianca
 FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ALTERACOES_ESTATUTOS WHERE instr(NOME_ENTIDADE, 'SIND') <= 0 AND instr(NOME_ENTIDADE, 'TRABALH') <= 0 AND instr(NOME_ENTIDADE, 'PROFISSI') <= 0 AND instr(NOME_ENTIDADE, 'CGTPIN') <= 0 AND instr(NOME_ENTIDADE, 'FEDERA') <= 0
 UNION
-SELECT DISTINCT TEMP_ENTIDADES.ID_ENTIDADE,
+SELECT DISTINCT TEMP_ENTIDADES.ID_ENTIDADE, NULL,
        strftime('%Y',date(replace(DATABTE,'.','-'))) AS Ano,
        NUMBTE AS Numero,
        SERIEBTE AS Serie,

@@ -77,13 +77,13 @@ FROM (
 ) ORDER BY ID_ENTIDADE;
 
 -- Contar numero de entidades sindicais activas a cada ano registado na base de dados
-SELECT ANO, COUNT(DISTINCT ID)
-FROM Org_Sindical, (
-  SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL
-  UNION
-  SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL ) AS ANOS
-WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO )
-GROUP BY ANO;
+--SELECT ANO, COUNT(DISTINCT ID)
+--FROM Org_Sindical, (
+--  SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL
+--  UNION
+--  SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL ) AS ANOS
+--WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO )
+--GROUP BY ANO;
 
 DROP TABLE TEMP_ALTERACOES_ESTATUTOS;
 DROP TABLE TEMP_ELEICAO_CORPOS_GERENTES;
