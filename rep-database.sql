@@ -293,7 +293,7 @@ UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'ASSISTÊNCIA SA
 UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,', EPE',', E.P.E.')  WHERE instr(NOME_ENTIDADE, ', EPE') > 0;
 UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' S. ',' SXO ')  WHERE instr(NOME_ENTIDADE, ' S. ') > 0;
 UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' ST. ',' SANTO ')  WHERE instr(NOME_ENTIDADE, ' ST. ') > 0;
-UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'E.U.A.','ESTADOS UNIDOS DA AMXRICA')  WHERE instr(NOME_ENTIDADE, 'E.U.A.') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'E.U.A.','ESTADOS UNIDOS DA AMÉRICA')  WHERE instr(NOME_ENTIDADE, 'E.U.A.') > 0;
 UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'FÁB. ','FÁBRICA ')  WHERE instr(NOME_ENTIDADE, 'FÁB. ') > 0;
 UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'NOT. ','NOTÍCIAS ')  WHERE instr(NOME_ENTIDADE, 'NOT. ') > 0;
 UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'G.E. ','GENERAL ELECTRIC ')  WHERE instr(NOME_ENTIDADE, 'G.E. ') > 0;
@@ -471,11 +471,60 @@ SELECT TEMP_ENTIDADES.ID_ENTIDADE AS ID_Organizacao_Sindical,
 FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ELEICAO_CORPOS_GERENTES WHERE instr(NOME_ENTIDADE, 'SIND') > 0 OR instr(NOME_ENTIDADE, 'TRABALH') > 0 OR instr(NOME_ENTIDADE, 'PROFISSI') > 0 OR instr(NOME_ENTIDADE, 'CGTPIN') > 0  OR instr(NOME_ENTIDADE, 'FEDERA') > 0
 GROUP BY ID_Organizacao_Sindical, Data;
 
+UPDATE Org_Sindical SET (Concelho_Sede) = (SELECT TEMP_CONCELHOS.Cnome FROM TEMP_CODIGOS, TEMP_CONCELHOS WHERE TEMP_CODIGOS.num_cod_postal = substr(Org_Sindical.Codigo_Postal,1,4) AND TEMP_CODIGOS.ext_cod_postal = substr(Org_Sindical.Codigo_Postal,6,9) AND TEMP_CONCELHOS.Dcod = TEMP_CODIGOS.cod_distrito AND TEMP_CONCELHOS.Ccod = TEMP_CODIGOS.cod_concelho) WHERE substr(Org_Sindical.Codigo_Postal,6,3) IS NOT NULL;
+
 DROP VIEW TEMP_DATAS_ENTIDADES;
 DROP TABLE TEMP_ALTERACOES_ESTATUTOS;
 DROP TABLE TEMP_ELEICAO_CORPOS_GERENTES;
 DROP TABLE TEMP_ENTIDADES;
 DROP TABLE TEMP_PROCESSOS;
+
+UPDATE Org_Sindical SET Nome = replace(Nome,'NA IND. ','NA INDÚSTRIA ')  WHERE instr(Nome, 'NA IND. ') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,'NAS IND. ','NAS INDÚSTRIAS ')  WHERE instr(Nome, 'NAS IND. ') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,'IND. E ','INDÚSTRIA E')  WHERE instr(Nome, 'IND. E ') > 0;
+
+UPDATE Org_Sindical SET Nome = replace(Nome,' (U.S. BRAGANÇA/CGTPIN)','')  WHERE instr(Nome, ' (U.S. BRAGANÇA/CGTPIN)') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,', I.P. (IEFP)','')  WHERE instr(Nome, ', I.P. (IEFP)') > 0;
+
+UPDATE Org_Sindical SET Nome = replace(Nome,' (CTP)','')  WHERE instr(Nome, ' (CTP)') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,' (ASFIC/PJ)','')  WHERE instr(Nome, ' (ASFIC/PJ)') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,' (SMTP)','')  WHERE instr(Nome, ' (SMTP)') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,' (SINPROFE)','')  WHERE instr(Nome, ' (SINPROFE)') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,' (SIPE)','')  WHERE instr(Nome, ' (SIPE)') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,' (ASPTC)','')  WHERE instr(Nome, ' (ASPTC)') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,' (SINAPSA)','')  WHERE instr(Nome, ' (SINAPSA)') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,' (SICOMP)','')  WHERE instr(Nome, ' (SICOMP)') > 0;
+
+UPDATE Org_Sindical SET Acronimo = ('CNEF')  WHERE instr(Nome, ' (CNEF)') > 0;
+UPDATE Org_Sindical SET Acronimo = ('ASAPOL')  WHERE instr(Nome, ' (ASAPOL)') > 0;
+UPDATE Org_Sindical SET Acronimo = ('SINTICAVS')  WHERE instr(Nome, ' (SINTICAVS)') > 0;
+UPDATE Org_Sindical SET Acronimo = ('SINCESAHT')  WHERE instr(Nome, ' (SINCESAHT)') > 0;
+UPDATE Org_Sindical SET Acronimo = ('CPLP-SE')  WHERE instr(Nome, ' (CPLP-SE)') > 0;
+
+UPDATE Org_Sindical SET Nome = replace(Nome,' (CNEF)','')  WHERE instr(Nome, ' (CNEF)') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,' (ASAPOL)','')  WHERE instr(Nome, ' (ASAPOL)') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,' (SINTICAVS)','')  WHERE instr(Nome, ' (SINTICAVS)') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,' (SINCESAHT)','')  WHERE instr(Nome, ' (SINCESAHT)') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,' (CPLP-SE)','')  WHERE instr(Nome, ' (CPLP-SE)') > 0;
+
+UPDATE Org_Sindical SET Ambito_Geografico = ('ZONA CENTRO')  WHERE instr(Nome, ' (ZONA CENTRO)') > 0;
+UPDATE Org_Sindical SET Ambito_Geografico = ('REGIÃO SUL')  WHERE instr(Nome, ' (REGIÃO SUL)') > 0;
+UPDATE Org_Sindical SET Ambito_Geografico = ('DISTRITO DE SANTARÉM')  WHERE instr(Nome, ' (DISTRITO DE SANTARÉM)') > 0;
+UPDATE Org_Sindical SET Ambito_Geografico = ('SECÇÃO DE VIANA DO CASTELO')  WHERE instr(Nome, ' (SECÇÃO DE VIANA DO CASTELO)') > 0;
+UPDATE Org_Sindical SET Ambito_Geografico = ('VILA VELHA DO RÓDÃO')  WHERE instr(Nome, ' (VILA VELHA DO RÓDÃO)') > 0;
+
+UPDATE Org_Sindical SET Nome = replace(Nome,' (ZONA CENTRO)','')  WHERE instr(Nome, ' (ZONA CENTRO)') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,' (REGIÃO SUL)','')  WHERE instr(Nome, ' (REGIÃO SUL)') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,' (DISTRITO DE SANTARÉM)','')  WHERE instr(Nome, ' (DISTRITO DE SANTARÉM)') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,' (SECÇÃO DE VIANA DO CASTELO)','')  WHERE instr(Nome, ' (SECÇÃO DE VIANA DO CASTELO)') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,' (VILA VELHA DO RÓDÃO)','')  WHERE instr(Nome, ' (VILA VELHA DO RÓDÃO)') > 0;
+
+UPDATE Org_Sindical SET Sector = ('INDÚSTRIA E COMÉRCIO')  WHERE instr(Nome, ' (INDÚSTRIA ECOMÉRCIO)') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,' (INDÚSTRIA ECOMÉRCIO)','')  WHERE instr(Nome, ' (INDÚSTRIA ECOMÉRCIO)') > 0;
+
+UPDATE Org_Sindical SET Sector = ('INDÚSTRIA E COMÉRCIO')  WHERE instr(Nome, ' (INDÚSTRIA E COMÉRCIO)') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,' (INDÚSTRIA E COMÉRCIO)','')  WHERE instr(Nome, ' (INDÚSTRIA E COMÉRCIO)') > 0;
+
 
 CREATE TABLE CAE_SECCOES_TEMP( SECCAO CHAR(1) PRIMARY KEY , RANK, INTEGER, TITLE VARCHAR(100) , SALARY FLOAT );
 CREATE TABLE CAE_SECCOES_KEYWORDS_TEMP( SECCAO CHAR(1) , KEYWORD VARCHAR(100) , FOREIGN KEY(SECCAO) REFERENCES CAE_SECCOES_TEMP );
