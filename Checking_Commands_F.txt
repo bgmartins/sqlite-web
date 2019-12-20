@@ -1,0 +1,145 @@
+-- START OF TABLE TESTING
+
+SELECT ID_ENTIDADE, NOME_ENTIDADE  FROM TEMP_ENTIDADES WHERE instr(NOME_ENTIDADE, '. ') > 0;
+
+-- Contar quantas entidades existem e quantos nomes distintos
+SELECT COUNT(DISTINCT ID_ENTIDADE) AS ENTIDADES, COUNT(DISTINCT NOME_ENTIDADE) AS NOMES FROM TEMP_ENTIDADES;
+-- 2160,2155
+
+-- Contar quantas entidades (e nomes de entidades) têm uma sigla defenida
+SELECT COUNT(DISTINCT ID_ENTIDADE) AS ENTIDADES, COUNT(DISTINCT NOME_ENTIDADE) AS NOMES  FROM TEMP_ENTIDADES WHERE SIGLA IS NOT NULL AND SIGLA <> '';
+-- 863,863
+
+-- Contar quantas entidades é que têm um nome repetido na tabela original.
+SELECT COUNT(DISTINCT ID_ENTIDADE) AS ENTIDADES, NOME_ENTIDADE FROM TEMP_ENTIDADES GROUP BY NOME_ENTIDADE HAVING COUNT(*) > 2;
+-- 2,"FEDERAÇÃO DOS SINDICATOS DOS TRABALHADORES AGRÍCOLAS DO SUL"
+-- 2,"SINDICATO DO COMÉRCIO, ESCRITÓRIOS E SERVIÇOS"
+-- 2,"SINDICATO DOS BANCÁRIOS DO SUL E ILHAS"
+-- 2,"SINDICATO DOS DESCARREGADORES DE MAR E TERRA DO DISTRITO DE SETÚBAL"
+-- 2,"SINDICATO DOS TRABALHADORES DA CONSTRUÇÃO, MADEIRAS E MÁRMORE DO DISTRITO DE SANTARÉM"
+-- 2,"UNIÃO DOS SINDICATOS DO DISTRITO DE LEIRIA"
+
+-- Contar quantas entidades é que têm um hifen como parte do nome, potencialmente indicando que a sigla é dada em conjunto com o nome.
+SELECT COUNT(DISTINCT ID_ENTIDADE) AS ENTIDADES, COUNT(DISTINCT NOME_ENTIDADE) AS NOMES, 'Com Sigla Definida'  FROM TEMP_ENTIDADES WHERE SIGLA IS NOT NULL AND SIGLA <> '' AND instr(NOME_ENTIDADE, ' - ') > 0
+UNION
+SELECT COUNT(DISTINCT ID_ENTIDADE) AS ENTIDADES, COUNT(DISTINCT NOME_ENTIDADE) AS NOMES, 'Sem Sigla Definida'  FROM TEMP_ENTIDADES WHERE (SIGLA IS NULL OR SIGLA = '') AND instr(NOME_ENTIDADE, ' - ') > 0;
+-- 125,125,"Com Sigla Definida"
+-- 244,244,"Sem Sigla Definida"
+
+-- Contar quantas entidades é que têm as palavras CGTP, C.G.T.P, UGT, ou U.G.T. como parte do nome.
+SELECT COUNT(DISTINCT ID_ENTIDADE) AS ENTIDADES, COUNT(DISTINCT NOME_ENTIDADE) AS NOMES, 'Com Sigla Definida'  FROM TEMP_ENTIDADES WHERE SIGLA IS NOT NULL AND SIGLA <> '' AND (instr(NOME_ENTIDADE, ' CGTP') > 0 OR instr(NOME_ENTIDADE, 'CGTP ') OR instr(NOME_ENTIDADE, ' UGT') > 0 OR instr(NOME_ENTIDADE, 'UGT ') OR instr(NOME_ENTIDADE, ' C.G.T.P.') > 0 OR instr(NOME_ENTIDADE, 'C.G.T.P. ') OR instr(NOME_ENTIDADE, ' U.G.T.') > 0 OR instr(NOME_ENTIDADE, 'U.G.T. '))
+UNION
+SELECT COUNT(DISTINCT ID_ENTIDADE) AS ENTIDADES, COUNT(DISTINCT NOME_ENTIDADE) AS NOMES, 'Sem Sigla Definida'  FROM TEMP_ENTIDADES WHERE (SIGLA IS NULL OR SIGLA = '') AND (instr(NOME_ENTIDADE, ' CGTP') > 0 OR instr(NOME_ENTIDADE, 'CGTP ') OR instr(NOME_ENTIDADE, ' UGT') > 0 OR instr(NOME_ENTIDADE, 'UGT ') OR instr(NOME_ENTIDADE, ' C.G.T.P.') > 0 OR instr(NOME_ENTIDADE, 'C.G.T.P. ') OR instr(NOME_ENTIDADE, ' U.G.T.') > 0 OR instr(NOME_ENTIDADE, 'U.G.T. '));
+-- 7,7,"Sem Sigla Definida"
+-- 12,12,"Com Sigla Definida"
+
+-- Contar quantas entidades é que têm um ponto final como parte do nome, potencialmente indicando uma abreviatura.
+SELECT COUNT(DISTINCT ID_ENTIDADE) AS ENTIDADES, COUNT(DISTINCT NOME_ENTIDADE) AS NOMES, 'Com Sigla Definida'  FROM TEMP_ENTIDADES WHERE SIGLA IS NOT NULL AND SIGLA <> '' AND instr(NOME_ENTIDADE, '.') > 0
+UNION
+SELECT COUNT(DISTINCT ID_ENTIDADE) AS ENTIDADES, COUNT(DISTINCT NOME_ENTIDADE) AS NOMES, 'Sem Sigla Definida'  FROM TEMP_ENTIDADES WHERE (SIGLA IS NULL OR SIGLA = '') AND instr(NOME_ENTIDADE, '.') > 0;
+-- 91,91,"Com Sigla Definida"
+-- 525,525,"Sem Sigla Definida"
+
+-- Contar quantas entidades sindicais é que não têm uma entrada correspondente na tabela das mudanças de estatutos.
+SELECT COUNT(DISTINCT ID_ENTIDADE) AS ENTIDADES, COUNT(DISTINCT NOME_ENTIDADE) AS NOMES
+FROM TEMP_ENTIDADES
+WHERE ID_ENTIDADE NOT IN ( SELECT ID_ENTIDADE FROM TEMP_ALTERACOES_ESTATUTOS) AND instr(NOME_ENTIDADE, 'SINDICA') > 0;
+-- 189,189
+
+-- Contar quantas entidades sindicais é que não têm uma entrada correspondente na tabela das eleições.
+SELECT COUNT(DISTINCT ID_ENTIDADE) AS ENTIDADES, COUNT(DISTINCT NOME_ENTIDADE) AS NOMES
+FROM TEMP_ENTIDADES
+WHERE ID_ENTIDADE NOT IN ( SELECT ID_ENTIDADE FROM TEMP_ELEICAO_CORPOS_GERENTES) AND instr(NOME_ENTIDADE, 'SINDICA') > 0;
+-- 324,321
+
+-- Contar quantas entidades é que têm uma entrada correspondente na tabela das mudanças de estatutos, correspondente a um processo com o código da criaçaõ de entidade sindical/patronal.
+SELECT COUNT(DISTINCT ID_ENTIDADE) AS ENTIDADES, COUNT(DISTINCT NOME_ENTIDADE) AS NOMES
+FROM TEMP_ENTIDADES
+WHERE ID_ENTIDADE IN ( SELECT ID_ENTIDADE FROM TEMP_ALTERACOES_ESTATUTOS NATURAL JOIN TEMP_PROCESSOS WHERE PROCESSO LIKE '2.4.13%' OR PROCESSO LIKE '2.5.13%');
+-- 233,233
+
+-- Contar quantas entidades é que têm uma entrada correspondente na tabela das mudanças de estatutos, correspondente a um processo com o código da extinção de entidade sindical/patronal.
+SELECT COUNT(DISTINCT ID_ENTIDADE) AS ENTIDADES, COUNT(DISTINCT NOME_ENTIDADE) AS NOMES
+FROM TEMP_ENTIDADES
+WHERE ID_ENTIDADE IN ( SELECT ID_ENTIDADE FROM TEMP_ALTERACOES_ESTATUTOS NATURAL JOIN TEMP_PROCESSOS WHERE PROCESSO LIKE '2.4.18%' OR PROCESSO LIKE '2.5.18%');
+-- 422,421
+
+-- Contar quantas entidades é que têm várias entradas na tabela das mudanças de estatutos, indicando um âmbito geográfico diferente.
+SELECT COUNT(*) 
+FROM (
+ SELECT DISTINCT ID_ENTIDADE, NOME_ENTIDADE
+ FROM TEMP_ENTIDADES NATURAL JOIN (SELECT DISTINCT ID_ENTIDADE, AMBITO_GEOGRAFICO FROM TEMP_ALTERACOES_ESTATUTOS WHERE trim(AMBITO_GEOGRAFICO) <> '')
+ GROUP BY ID_ENTIDADE, NOME_ENTIDADE
+ HAVING COUNT(DISTINCT AMBITO_GEOGRAFICO) > 1
+) ORDER BY ID_ENTIDADE;
+-- 11
+
+-- Contar numero de entidades sindicais activas a cada ano registado na base de dados
+SELECT ANO, COUNT(DISTINCT ID)
+FROM Org_Sindical, (
+  SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL
+  UNION
+  SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL ) AS ANOS
+WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO )
+GROUP BY ANO;
+
+-- 200,2
+-- 209,3
+-- 227,4
+-- 1977,5
+-- 1988,6
+-- 1992,7
+-- 1993,8
+-- 1994,9
+-- 1995,12
+-- 1996,75
+-- 1997,118
+-- 1998,166
+-- 1999,188
+-- 2000,204
+-- 2001,214
+-- 2002,231
+-- 2003.240
+-- 2004,252
+-- 2005,259
+-- 2006,272
+-- 2007,273
+-- 2008,270
+-- 2009,275
+-- 2010,295
+-- 2011,328
+-- 2012,309
+-- 2013,310
+-- 2014,317
+-- 2015,319
+-- 2016,323
+-- 2017,333
+-- 2018,345
+-- 2019,351
+
+-- Caso não exista distrito escrever o respectivo distrito (e contar a substituição):
+SELECT COUNT(e.Codigo_Postal) AS FALTAS1, COUNT(e.Distrito_Sede) AS FALTAS2, COUNT(d.num_cod_postal) AS FALTAS3, COUNT(d.cod_distrito) AS FALTAS4 FROM Org_Sindical e, TEMP_CODIGOS d WHERE (Codigo_Postal = num_cod_postal) AND (cod_distrito IS NULL OR cod_distrito = '');
+-- 0:0:0:0
+
+-- CircunstanciaS em que uma Organização Sindical tenha explicitado o seu Concelho: ESTE MUDOU
+SELECT COUNT(e.Codigo_Postal), e.Distrito_Sede, d.num_cod_postal, d.cod_distrito FROM Org_Sindical e, TEMP_CODIGOS d WHERE (Concelho_Sede IS NOT NULL);
+-- 0:::
+
+-- Existem 520 casos em que o Codigo-Postal permite identificar o Concelho:
+SELECT Count(substr(e.Codigo_Postal,1,4)), Count(substr(e.Codigo_Postal,6,3)), Count(e.Distrito_Sede), Count(e.Concelho_Sede), Count(DISTINCT d.num_cod_postal), Count(DISTINCT d.ext_cod_postal), Count(DISTINCT d.cod_distrito) FROM Org_Sindical e, TEMP_CODIGOS d WHERE (substr(Codigo_Postal,1,4) = num_cod_postal) AND (substr(Codigo_Postal,6,9) = ext_cod_postal) AND (substr(e.Codigo_Postal,6,3) IS NOT NULL);
+-- 520:520:520:0:90:199:15
+
+SELECT substr(e.Codigo_Postal,1,4), substr(e.Codigo_Postal,6,3), e.Codigo_Postal FROM Org_Sindical e WHERE (substr(e.Codigo_Postal,6,3) IS NOT NULL AND substr(e.Codigo_Postal,6,3) <> '' AND substr(e.Codigo_Postal,5,1) <> '-' AND substr(e.Codigo_Postal,5,1) <> '_' AND substr(e.Codigo_Postal,5,1) <> ' ');
+-- xxxx,xxx,xxxxxxxx
+
+SELECT ID, Nome  FROM Org_Sindical WHERE instr(Nome, '. ') > 0;
+--
+
+-- Este Comando de Selecção do Nome de Conselhos funciona
+SELECT TEMP_CONCELHOS.Cnome FROM Org_Sindical, TEMP_CONCELHOS, TEMP_CODIGOS WHERE ((substr(Org_Sindical.Codigo_Postal,1,4) = TEMP_CODIGOS.num_cod_postal) AND (substr(Org_Sindical.Codigo_Postal,6,9) = TEMP_CODIGOS.ext_cod_postal) AND (TEMP_CONCELHOS.Dcod = TEMP_CODIGOS.cod_distrito)  AND (TEMP_CONCELHOS.Ccod = TEMP_CODIGOS.cod_concelho));
+
+--Este comando visualiza o estado actual da table
+SELECT substr(e.Codigo_Postal,1,4), substr(e.Codigo_Postal,6,3), d.num_cod_postal, d.ext_cod_postal, e.Distrito_Sede, e.Concelho_Sede, c.Cnome, d.cod_distrito, c.Dcod, d.cod_concelho, c.Ccod FROM Org_Sindical e, TEMP_CODIGOS d, TEMP_CONCELHOS c WHERE (substr(e.Codigo_Postal,6,3) IS NOT NULL) AND (substr(Codigo_Postal,1,4) = num_cod_postal) AND (substr(Codigo_Postal,6,9) = ext_cod_postal) AND (cod_distrito = Dcod) AND (cod_concelho = Ccod);
+
+
+-- ENF OF TABLE TESTING

@@ -1,0 +1,460 @@
+DROP TABLE IF EXISTS Avisos_Greve;
+DROP TABLE IF EXISTS Actos_Negociacao_Colectiva;
+DROP TABLE IF EXISTS Direccao_Org_Patronal;
+DROP TABLE IF EXISTS Direccao_Org_Sindical;
+DROP TABLE IF EXISTS Membros_Org_Sindical;
+DROP TABLE IF EXISTS Actos_Eleitorais_Org_Sindical;
+DROP TABLE IF EXISTS Relacoes_Entre_Org_Sindical;
+DROP TABLE IF EXISTS Mencoes_BTE_Org_Patronal;
+DROP TABLE IF EXISTS Mencoes_BTE_Org_Sindical;
+DROP TABLE IF EXISTS Org_Sindical;
+DROP TABLE IF EXISTS Org_Patronal;
+DROP TABLE IF EXISTS Sectores_Profissionais;
+
+CREATE TABLE Sectores_Profissionais (
+  Sector         VARCHAR(100) NOT NULL PRIMARY KEY,
+  Salario_Medio  NUMERIC
+);
+
+CREATE TABLE Org_Patronal (
+  ID                       INT NOT NULL PRIMARY KEY,
+  Nome                     VARCHAR(100) NOT NULL,
+  Acronimo                 VARCHAR(100),
+  Nome_Organizacao_Pai     VARCHAR(100),
+  Concelho_Sede            VARCHAR(100),
+  Distrito_Sede            VARCHAR(100),
+  Codigo_Postal            VARCHAR(8),
+  Ambito_Geografico        VARCHAR(100),  
+  Sector                   VARCHAR(100),
+  Numero_Membros           INT,
+  Data_Primeira_Actividade DATE,
+  Data_Ultima_Actividade   DATE,
+  Activa		   BOOLEAN,  
+  FOREIGN KEY (Nome_Organizacao_Pai) REFERENCES Org_Patronal,
+  FOREIGN KEY (Sector) REFERENCES Sectores_Profissionais
+);
+  
+CREATE TABLE Org_Sindical (
+  ID                       INT NOT NULL PRIMARY KEY,
+  Nome                     VARCHAR(100) NOT NULL,
+  Acronimo                 VARCHAR(100),
+  Nome_Organizacao_Pai     VARCHAR(100),
+  Concelho_Sede            VARCHAR(100),
+  Distrito_Sede            VARCHAR(100),
+  Codigo_Postal            VARCHAR(8),
+  Ambito_Geografico        VARCHAR(100),
+  Sector                   VARCHAR(100),
+  Numero_Membros           INT,
+  Data_Primeira_Actividade DATE,
+  Data_Ultima_Actividade   DATE,
+  Activa                   BOOLEAN,
+  FOREIGN KEY (Nome_Organizacao_Pai) REFERENCES Org_Sindical,
+  FOREIGN KEY (Sector) REFERENCES Sectores_Profissionais
+);
+
+CREATE TABLE Mencoes_BTE_Org_Sindical (
+  ID_Organizacao_Sindical               INT,
+  Ano                                   INT,
+  Numero                                INT,
+  Serie                                 INT,
+  Descricao                             VARCHAR(100),
+  Mudanca_Estatuto                      BOOLEAN,
+  Eleicoes                              BOOLEAN,
+  Confianca                             NUMERIC,
+  PRIMARY KEY (ID_Organizacao_Sindical,Ano,Numero,Serie),
+  FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical
+);
+
+CREATE TABLE Mencoes_BTE_Org_Patronal (
+  ID_Organizacao_Patronal	        INT,
+  Ano                                   INT,
+  Numero                                INT,
+  Serie                                 INT,
+  Descricao                             VARCHAR(100),
+  Mudanca_Estatuto                      BOOLEAN,
+  Eleicoes                              BOOLEAN,
+  Confianca                             NUMERIC,
+  PRIMARY KEY (ID_Organizacao_Patronal,Ano,Numero,Serie),
+  FOREIGN KEY (ID_Organizacao_Patronal) REFERENCES Org_Patronal
+);
+
+CREATE TABLE Relacoes_Entre_Org_Sindical (
+  ID_Organizacao_Sindical_1  INT,
+  ID_Organizacao_Sindical_2  INT,
+  Tipo_de_Relacao            VARCHAR(100),
+  Data                       DATE,
+  PRIMARY KEY (ID_Organizacao_Sindical_1,ID_Organizacao_Sindical_2),
+  FOREIGN KEY (ID_Organizacao_Sindical_1) REFERENCES Org_Sindical,
+  FOREIGN KEY (ID_Organizacao_Sindical_2) REFERENCES Org_Sindical
+);
+
+CREATE TABLE Actos_Eleitorais_Org_Sindical (
+  ID_Organizacao_Sindical               INT,
+  Data                                  DATE,
+  Numero_Membros_Cadernos_Eleitoriais   INT,
+  Numero_Membros_Inscritos              INT,
+  Numero_Membros_Votantes               INT,
+  Meses_de_Mandato                      INT,
+  Numero_Listas_Concorrentes            INT,
+  PRIMARY KEY (ID_Organizacao_Sindical,Data),
+  FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical
+);
+
+CREATE TABLE Membros_Org_Sindical (
+  ID_Organizacao_Sindical               INT,
+  Data_Inicio                           DATE,
+  Data_Fim                              DATE,
+  Número_Membros                        INT,
+  PRIMARY KEY (ID_Organizacao_Sindical,Data_Inicio,Data_Fim),
+  FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical
+);
+  
+CREATE TABLE Direccao_Org_Sindical (
+  ID_Organizacao_Sindical     INT,
+  Nome_Pessoa                 VARCHAR(100),
+  Género_Sexo                 INT,
+  Data_Nascimento             DATETIME,
+  Cargo                       VARCHAR(100),
+  Data_Inicio                 DATE,
+  Data_Fim                    DATE,
+  PRIMARY KEY (ID_Organizacao_Sindical,Nome_Pessoa,Data_Inicio,Data_Fim),
+  FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical
+);
+
+CREATE TABLE Direccao_Org_Patronal (
+  ID_Organizacao_Patronal     INT,
+  Nome_Pessoa                 VARCHAR(100),
+  Género_Sexo                 INT,
+  Data_Nascimento             DATETIME,
+  Cargo                       VARCHAR(100),
+  Data_Inicio                 DATE,
+  Data_Fim                    DATE,
+  PRIMARY KEY (ID_Organizacao_Patronal,Nome_Pessoa,Data_Inicio,Data_Fim),
+  FOREIGN KEY (ID_Organizacao_Patronal) REFERENCES Org_Patronal  
+);
+
+CREATE TABLE Actos_Negociacao_Colectiva (
+  Nome_Acto                  VARCHAR(100),
+  ID_Organizacao_Sindical    INT,
+  ID_Organizacao_Patronal    INT,
+  Empresa                    VARCHAR(100),
+  Tipo_Acto                  VARCHAR(100),
+  Data                       DATE,
+  PRIMARY KEY (Nome_Acto,ID_Organizacao_Sindical,ID_Organizacao_Patronal,Data),
+  FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical,
+  FOREIGN KEY (ID_Organizacao_Patronal) REFERENCES Org_Patronal 
+);
+
+CREATE TABLE Avisos_Greve (
+  ID_Organizacao_Sindical    INT,
+  Descricao                  VARCHAR(100),
+  Data_Aviso                 DATE,
+  Data_Greve                 DATE,
+  PRIMARY KEY (ID_Organizacao_Sindical,Data_Aviso),
+  FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical
+);
+
+
+.mode csv
+.import ./CSV-files/ALTERACOES_ESTATUTOS.csv TEMP_ALTERACOES_ESTATUTOS
+.import ./CSV-files/ELEICAO_CORPOS_GERENTES.csv TEMP_ELEICAO_CORPOS_GERENTES
+.import ./CSV-files/ENTIDADES.csv TEMP_ENTIDADES
+.import ./CSV-files/PROCESSOS.csv TEMP_PROCESSOS
+.import ./CSV-files/codigos_postais.csv TEMP_CODIGOS
+.import ./CSV-files/concelhos.txt TEMP_CONCELHOS
+.import ./CSV-files/Protocolo_ICS_INESC_DGERT_ListaIRCTs_ID.csv Lista_IRCTs_ID
+
+
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = trim(replace(replace(replace(NOME_ENTIDADE, X'0A', ' '),'  ',' '),'  ',' '));
+UPDATE TEMP_ENTIDADES SET SIGLA = trim(replace(replace(replace(SIGLA, X'0A', ' '),'  ',' '),'  ',' '));
+
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' NAC. ',' NACIONAL ')  WHERE instr(NOME_ENTIDADE, ' NAC. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' TRAB. ',' TRABALHADORES ')  WHERE instr(NOME_ENTIDADE, ' TRAB. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' DO DIST. D',' DO DISTRITO D')  WHERE instr(NOME_ENTIDADE, ' DO DIST. D') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' DOS DIST. ',' DO DISTRITOS ')  WHERE instr(NOME_ENTIDADE, ' DOS DIST. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' DA IND. ',' DA INDÚSTRIA ')  WHERE instr(NOME_ENTIDADE, ' DA IND. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' DAS IND. ',' DAS INDÚSTRIAS ')  WHERE instr(NOME_ENTIDADE, ' DAS IND. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' DOS SIND. ',' DOS SINDICATOS ')  WHERE instr(NOME_ENTIDADE, ' DOS SIND. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'SIND. ','SINDICATO ')  WHERE instr(NOME_ENTIDADE, 'SIND. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'ASS. ','ASSOCIAÇÃO ')  WHERE instr(NOME_ENTIDADE, 'ASS. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'ASSOC. ','ASSOCIAÇÃO ')  WHERE instr(NOME_ENTIDADE, 'ASSOC. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'FED. ','FEDERAÇÃO ')  WHERE instr(NOME_ENTIDADE, 'FED. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'IND. ','INDÚSTRIA ')  WHERE instr(NOME_ENTIDADE, 'IND. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'ASSOC.DOS ','ASSOCIAçÂO DOS ')  WHERE instr(NOME_ENTIDADE, 'ASSOC.DOS ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'ESCRIT. ','ESCRITÓRIO ')  WHERE instr(NOME_ENTIDADE, 'ESCRIT. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'IMP.E EXP. ','IMPORT E EXPORT ')  WHERE instr(NOME_ENTIDADE, 'IMP.E EXP. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DEMOC. ','DEMOCRÁTICO ')  WHERE instr(NOME_ENTIDADE, 'DEMOC. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DIST. ','DISTRITO ')  WHERE instr(NOME_ENTIDADE, 'DIST. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'TRANSP. ','TRANSPORTES ')  WHERE instr(NOME_ENTIDADE, 'TRANSP. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'AGRICULT. ','AGRICULTORES ')  WHERE instr(NOME_ENTIDADE, 'AGRICULT. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'SOC. ','SOCIEDADE ')  WHERE instr(NOME_ENTIDADE, 'SOC. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'COOP. ','COOPERATIVA ')  WHERE instr(NOME_ENTIDADE, 'COOP. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' REGIÕES AUTÓNOMAS ',' R. AUTÓNOMAS ')  WHERE instr(NOME_ENTIDADE, ' R. AUTÓNOMAS ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'IMPORT. ','IMPORTAçÂO ')  WHERE instr(NOME_ENTIDADE, 'IMPORT. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'AS PORT. ','AS PORTUGUESAS ')  WHERE instr(NOME_ENTIDADE, 'AS PORT. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'PORT. ','PORTUGUESA ')  WHERE instr(NOME_ENTIDADE, 'PORT. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' . ','. ')  WHERE instr(NOME_ENTIDADE, ' . ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' S. A. ','S.A. ')  WHERE instr(NOME_ENTIDADE, 'S.A. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' SA ',' S.A. ')  WHERE instr(NOME_ENTIDADE, ' SA ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' S. A.','S.A.')  WHERE instr(NOME_ENTIDADE, 'S. A.') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,',S.A.',', S.A.')  WHERE instr(NOME_ENTIDADE, ',S.A.') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'TRANSPORTAD. ','TRANSPORTADORES ')  WHERE instr(NOME_ENTIDADE, 'TRANSPORTAD. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'INT. ','INTERNACIONAL ')  WHERE instr(NOME_ENTIDADE, 'INT. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'LAB.FARM.,','LABORATÓRIOS FARMACÊUTICOS, ')  WHERE instr(NOME_ENTIDADE, 'LAB.FARM.,') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DE PROD. DE ','DE PRODUTORES DE ')  WHERE instr(NOME_ENTIDADE, 'DE PROD. DE ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DE PROD. QU','DE PRODUTOS QU')  WHERE instr(NOME_ENTIDADE, 'DE PROD. QU') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'PROD. E C','PRODUÇÃO E C')  WHERE instr(NOME_ENTIDADE, 'PROD. E COM') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DIS. ','DISTRITO ')  WHERE instr(NOME_ENTIDADE, 'DIS. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'SERV. ','SERVIÇOS ')  WHERE instr(NOME_ENTIDADE, 'SERV. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'REG. ','REGIONAL ')  WHERE instr(NOME_ENTIDADE, 'REG. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'TABALHADORES PORTUG.','TRABALHADORES PORTUGUESES')  WHERE instr(NOME_ENTIDADE, 'TRABALHADORES PORTUG.') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'SEG. ','SEGURANÇA ')  WHERE instr(NOME_ENTIDADE, 'SEG. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DOS COM. ','DOS COMERCIANTES ')  WHERE instr(NOME_ENTIDADE, 'DOS COM. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'SOCIEDADE COM. ','SOCIEDADE COMERCIAL ')  WHERE instr(NOME_ENTIDADE, 'SOCIEDADE COM. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'TRABALHADORES AGRI. ','TRABALHADORES AGRÍCOLAS ')  WHERE instr(NOME_ENTIDADE, 'TRABALHADORES AGRI. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'INDUST. ','INDUSTRIAIS ')  WHERE instr(NOME_ENTIDADE, 'INDUST. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'PORTUG. ','PORTUGUESA ')  WHERE instr(NOME_ENTIDADE, 'PORTUG. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'COMER. ','COMERCIANTES ')  WHERE instr(NOME_ENTIDADE, 'COMER. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'PORTUG.','PORTUGUESES')  WHERE instr(NOME_ENTIDADE, 'PORTUG.') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DOS PROF.','DOS PROFISSIONAIS')  WHERE instr(NOME_ENTIDADE, 'DOS PROF.') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'CONST. CIV.','CONSTRUÇÃO CIVIL')  WHERE instr(NOME_ENTIDADE, 'CONST. CIV.') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'TRANSP.RODOVIARIOS,','TRANSPORTES RODOVIARIOS, ')  WHERE instr(NOME_ENTIDADE, 'TRANSP.RODOVIARIOS,') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'AGRICULT, ESCRIT, COMER, SERV,','AGRICULTURA, ESCRITÓRIO, COMERCIO, SERVIÇOS,')  WHERE instr(NOME_ENTIDADE, 'AGRICULT, ESCRIT, COMER, SERV,') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'METALOMEC, METAL,','METALOMECÂNICA, METALÚRGIA,')  WHERE instr(NOME_ENTIDADE, 'METALOMEC, METAL,') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DO CONC. ','DO CONCELHO ')  WHERE instr(NOME_ENTIDADE, 'DO CONC. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DOS CONC. ','DOS CONCELHOS ')  WHERE instr(NOME_ENTIDADE, 'DOS CONC. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'MUNICÍPIOS. ','MUNICÍPIOS ')  WHERE instr(NOME_ENTIDADE, 'MUNICÍPIOS. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DOS INDÚSTRIA DE CONST. ','DOS INDUSTRIAIS DE CONSTRUçÃO ')  WHERE instr(NOME_ENTIDADE, 'DOS INDÚSTRIA DE CONST. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DOS INDÚSTRIA REFINAD. ','DOS INDUSTRIAIS REFINADORES ')  WHERE instr(NOME_ENTIDADE, 'DOS INDÚSTRIA REFINAD. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DOS DISTRIT. ','DOS DISTRITOS ')  WHERE instr(NOME_ENTIDADE, 'DOS DISTRIT. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'TECNOLOG. ','TECNOLOGIAS ')  WHERE instr(NOME_ENTIDADE, 'TECNOLOG. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'PROFIS. ','PROFISSIONAIS ')  WHERE instr(NOME_ENTIDADE, 'PROFIS. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'INST. ','INSTITUTO ')  WHERE instr(NOME_ENTIDADE, 'INST. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'ASS ','ASSOCIAÇÃO ')  WHERE instr(NOME_ENTIDADE, 'ASS ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'GLASSOCIAÇÃO ','GLASS ')  WHERE instr(NOME_ENTIDADE, 'GLASSOCIAÇÃO ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'E IMP. ','E IMPORTADORES ')  WHERE instr(NOME_ENTIDADE, 'E IMP. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'CONF. ','CONFEDERAÇÃO ')  WHERE instr(NOME_ENTIDADE, 'CONF. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DOS COMERC. ','DOS COMERCIANTES ')  WHERE instr(NOME_ENTIDADE, 'DOS COMERC. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'INDÚSTRIA EXPORTADORES ','INDÚSTRIA, EXPORTADORES ')  WHERE instr(NOME_ENTIDADE, 'INDÚSTRIA EXPORTADORES ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DOS INDÚSTRIA ','DOS INDUSTRIAIS ')  WHERE instr(NOME_ENTIDADE, 'DOS INDÚSTRIA ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'REP. ','REPARAÇÂO ')  WHERE instr(NOME_ENTIDADE, 'REP. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'COM. ','COMÉRCIO ')  WHERE instr(NOME_ENTIDADE, 'COM. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'COMP. ','COMPANHIA ')  WHERE instr(NOME_ENTIDADE, 'COMP. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' LDª',' LDA')  WHERE instr(NOME_ENTIDADE, ' LDª') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,',LDª',', LDA')  WHERE instr(NOME_ENTIDADE, ',LDª') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,',LD.ª',', LDA')  WHERE instr(NOME_ENTIDADE, ',LD.ª') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,',LDA',', LDA')  WHERE instr(NOME_ENTIDADE, ',LDA') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' LDA',' LDA.')  WHERE instr(NOME_ENTIDADE, ' LDA') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' LDA..',' LDA.')  WHERE instr(NOME_ENTIDADE, ' LDA..') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'Cª. ','Companhia ')  WHERE instr(NOME_ENTIDADE, 'Cª. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,', SA',', S.A.')  WHERE instr(NOME_ENTIDADE, ', SA') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,', S.A.RL',', SARL')  WHERE instr(NOME_ENTIDADE, ', S.A.RL') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,', S.A.N',', SAN')  WHERE instr(NOME_ENTIDADE, ', S.A.N') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'METAL., E PROJ.IND.','METALÚRGICA, E PROJECTOS INDUSTRIAIS')  WHERE instr(NOME_ENTIDADE, 'METAL., E PROJ.IND.') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DUSTRIES SA','DUSTRIES, S.A.')  WHERE instr(NOME_ENTIDADE, 'DUSTRIES SA') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'FIGUEIRA SA','FIGUEIRA, S.A.')  WHERE instr(NOME_ENTIDADE, 'FIGUEIRA SA') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'PARVALOREM SA','PARVALOREM, S.A.')  WHERE instr(NOME_ENTIDADE, 'PARVALOREM SA') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'PORTUGAL) SA','PORTUGAL), S.A.')  WHERE instr(NOME_ENTIDADE, 'PORTUGAL) SA') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'PAPEL SA','PAPEL, S.A.')  WHERE instr(NOME_ENTIDADE, 'PAPEL SA') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'ASSISTÊNCIA SA','ASSISTÊNCIA, S.A.')  WHERE instr(NOME_ENTIDADE, 'ASSISTÊNCIA SA') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,', EPE',', E.P.E.')  WHERE instr(NOME_ENTIDADE, ', EPE') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' S. ',' SÃO ')  WHERE instr(NOME_ENTIDADE, ' S. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' ST. ',' SANTO ')  WHERE instr(NOME_ENTIDADE, ' ST. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'E.U.A.','ESTADOS UNIDOS DA AMÉRICA')  WHERE instr(NOME_ENTIDADE, 'E.U.A.') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'FÁB. ','FÁBRICA ')  WHERE instr(NOME_ENTIDADE, 'FÁB. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'NOT. ','NOTÍCIAS ')  WHERE instr(NOME_ENTIDADE, 'NOT. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'G.E. ','General Electric ')  WHERE instr(NOME_ENTIDADE, 'G.E. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'R. AUT','REGIÕES AUT')  WHERE instr(NOME_ENTIDADE, 'R. AUT') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'GAB. ','GABINETE ')  WHERE instr(NOME_ENTIDADE, 'GAB. ') > 0;
+
+
+
+CREATE VIEW TEMP_DATAS_ENTIDADES AS SELECT ID_ENTIDADE, MIN(DATA) AS MIN_DATA, MAX(DATA) AS MAX_DATA FROM (
+  SELECT ID_ENTIDADE, date(replace(DATABTE,'.','-')) AS DATA FROM TEMP_ALTERACOES_ESTATUTOS
+  UNION
+  SELECT ID_ENTIDADE, date(replace(DATABTE,'.','-')) AS DATA FROM TEMP_PROCESSOS LEFT OUTER JOIN TEMP_ELEICAO_CORPOS_GERENTES ON TEMP_PROCESSOS.PROCESSO=TEMP_ELEICAO_CORPOS_GERENTES.PROCESSO
+  UNION
+  SELECT ID_ENTIDADE, date(replace(DATA_ELEICAO,'.','-')) AS DATA FROM TEMP_PROCESSOS LEFT OUTER JOIN TEMP_ELEICAO_CORPOS_GERENTES ON TEMP_PROCESSOS.PROCESSO=TEMP_ELEICAO_CORPOS_GERENTES.PROCESSO
+) GROUP BY ID_ENTIDADE;
+
+INSERT INTO Org_Patronal 
+SELECT TEMP_ENTIDADES.ID_ENTIDADE,
+       CASE trim(NOME_ENTIDADE) WHEN '' THEN trim(SIGLA) ELSE trim(NOME_ENTIDADE) END,
+       CASE trim(SIGLA) WHEN '' THEN NULL ELSE trim(SIGLA) END,
+       NULL, 
+       NULL,
+       REPLACE(REPLACE(REPLACE(REPLACE(trim(DISTRITO_DESCRICAO),'DISTRITO DE ',''),'DIST. DE ',''),'DISTRITO DA ',''),'DIST. DA ',''),
+       trim(CODIGOPOSTAL_ENTIDADE), 
+       NULL, 
+       NULL, 
+       NULL, 
+       MIN_DATA,
+       MAX_DATA,
+       CASE lower(trim(ESTADO_ENTIDADE)) WHEN 'ativa' THEN 1 ELSE 0 END
+FROM TEMP_ENTIDADES LEFT JOIN TEMP_DATAS_ENTIDADES ON TEMP_ENTIDADES.ID_ENTIDADE=TEMP_DATAS_ENTIDADES.ID_ENTIDADE WHERE instr(NOME_ENTIDADE, 'SIND') <= 0;
+
+UPDATE Org_Patronal SET Ambito_Geografico = ( 
+ SELECT DISTINCT AMBITO_GEOGRAFICO FROM TEMP_ENTIDADES NATURAL JOIN (SELECT DISTINCT ID_ENTIDADE, AMBITO_GEOGRAFICO FROM TEMP_ALTERACOES_ESTATUTOS WHERE trim(AMBITO_GEOGRAFICO) <> '')
+ WHERE ID_ENTIDADE = ID
+) WHERE ID IN (
+ SELECT DISTINCT ID_ENTIDADE
+ FROM TEMP_ENTIDADES NATURAL JOIN (SELECT DISTINCT ID_ENTIDADE, AMBITO_GEOGRAFICO FROM TEMP_ALTERACOES_ESTATUTOS WHERE trim(AMBITO_GEOGRAFICO) <> '')
+ GROUP BY ID_ENTIDADE
+ HAVING COUNT(DISTINCT AMBITO_GEOGRAFICO) = 1
+);
+
+INSERT INTO Org_Sindical 
+SELECT TEMP_ENTIDADES.ID_ENTIDADE, 
+       CASE trim(NOME_ENTIDADE) WHEN '' THEN trim(SIGLA) ELSE trim(NOME_ENTIDADE) END,
+       CASE trim(SIGLA) WHEN '' THEN NULL ELSE trim(SIGLA) END, 
+       NULL,
+       NULL,
+       REPLACE(REPLACE(REPLACE(REPLACE(trim(DISTRITO_DESCRICAO),'DISTRITO DE ',''),'DIST. DE ',''),'DISTRITO DA ',''),'DIST. DA ',''),
+       trim(CODIGOPOSTAL_ENTIDADE),  
+       NULL, 
+       NULL, 
+       NULL, 
+       MIN_DATA,
+       MAX_DATA,
+       CASE lower(trim(ESTADO_ENTIDADE)) WHEN 'ativa' THEN 1 ELSE 0 END
+FROM TEMP_ENTIDADES LEFT JOIN TEMP_DATAS_ENTIDADES ON TEMP_ENTIDADES.ID_ENTIDADE=TEMP_DATAS_ENTIDADES.ID_ENTIDADE WHERE instr(NOME_ENTIDADE, 'SIND') > 0;
+
+UPDATE Org_Sindical SET Ambito_Geografico = ( 
+ SELECT DISTINCT AMBITO_GEOGRAFICO FROM TEMP_ENTIDADES NATURAL JOIN (SELECT DISTINCT ID_ENTIDADE, AMBITO_GEOGRAFICO FROM TEMP_ALTERACOES_ESTATUTOS WHERE trim(AMBITO_GEOGRAFICO) <> '')
+ WHERE ID_ENTIDADE = ID
+) WHERE ID IN (
+ SELECT DISTINCT ID_ENTIDADE
+ FROM TEMP_ENTIDADES NATURAL JOIN (SELECT DISTINCT ID_ENTIDADE, AMBITO_GEOGRAFICO FROM TEMP_ALTERACOES_ESTATUTOS WHERE trim(AMBITO_GEOGRAFICO) <> '')
+ GROUP BY ID_ENTIDADE
+ HAVING COUNT(DISTINCT AMBITO_GEOGRAFICO) = 1
+);
+
+INSERT INTO Mencoes_BTE_Org_Sindical
+SELECT DISTINCT TEMP_ENTIDADES.ID_ENTIDADE,
+       strftime('%Y',date(replace(DATABTE,'.','-'))) AS Ano,
+       NUMBTE AS Numero,
+       SERIEBTE AS Serie,
+       NULL AS Descricao,
+       0 AS Mudanca_Estatuto,
+       0 AS Eleicoes,
+       1 AS Confianca
+FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ALTERACOES_ESTATUTOS WHERE instr(NOME_ENTIDADE, 'SIND') > 0
+UNION
+SELECT DISTINCT TEMP_ENTIDADES.ID_ENTIDADE,
+       strftime('%Y',date(replace(DATABTE,'.','-'))) AS Ano,
+       NUMBTE AS Numero,
+       SERIEBTE AS Serie,
+       NULL AS Descricao,
+       0 AS Mudanca_Estatuto,
+       0 AS Eleicoes,
+       1 AS Confianca
+FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ELEICAO_CORPOS_GERENTES WHERE instr(NOME_ENTIDADE, 'SIND') > 0;
+
+UPDATE Mencoes_BTE_Org_Sindical SET Mudanca_Estatuto = 1 WHERE ID_Organizacao_Sindical || ' - ' || Ano || ' - ' || Numero || ' - ' || Serie IN (
+  SELECT TEMP_ENTIDADES.ID_ENTIDADE || ' - ' || strftime('%Y',date(replace(DATABTE,'.','-'))) || ' - ' || NUMBTE || ' - ' || SERIEBTE 
+  FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ALTERACOES_ESTATUTOS 
+);
+
+UPDATE Mencoes_BTE_Org_Sindical SET Eleicoes = 1 WHERE ID_Organizacao_Sindical || ' - ' || Ano || ' - ' || Numero || ' - ' || Serie IN (
+  SELECT TEMP_ENTIDADES.ID_ENTIDADE || ' - ' || strftime('%Y',date(replace(DATABTE,'.','-'))) || ' - ' || NUMBTE || ' - ' || SERIEBTE 
+  FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ELEICAO_CORPOS_GERENTES
+);
+
+INSERT INTO Mencoes_BTE_Org_Patronal
+SELECT DISTINCT TEMP_ENTIDADES.ID_ENTIDADE,
+       strftime('%Y',date(replace(DATABTE,'.','-'))) AS Ano,
+       NUMBTE AS Numero,
+       SERIEBTE AS Serie,
+       NULL AS Descricao, 
+       0 AS Mudanca_Estatuto,
+       0 AS Eleicoes,
+       1 AS Confianca
+FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ALTERACOES_ESTATUTOS WHERE instr(NOME_ENTIDADE, 'SIND') <= 0
+UNION
+SELECT DISTINCT TEMP_ENTIDADES.ID_ENTIDADE,
+       strftime('%Y',date(replace(DATABTE,'.','-'))) AS Ano,
+       NUMBTE AS Numero,
+       SERIEBTE AS Serie,
+       NULL AS Descricao, 
+       0 AS Mudanca_Estatuto,
+       0 AS Eleicoes,
+       1 AS Confianca
+FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ELEICAO_CORPOS_GERENTES WHERE instr(NOME_ENTIDADE, 'SIND') <= 0;
+
+UPDATE Mencoes_BTE_Org_Patronal SET Mudanca_Estatuto = 1 WHERE ID_Organizacao_Patronal || ' - ' || Ano || ' - ' || Numero || ' - ' || Serie IN (
+  SELECT TEMP_ENTIDADES.ID_ENTIDADE || ' - ' || strftime('%Y',date(replace(DATABTE,'.','-'))) || ' - ' || NUMBTE || ' - ' || SERIEBTE 
+  FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ALTERACOES_ESTATUTOS 
+);
+
+UPDATE Mencoes_BTE_Org_Patronal SET Eleicoes = 1 WHERE ID_Organizacao_Patronal || ' - ' || Ano || ' - ' || Numero || ' - ' || Serie IN (
+  SELECT TEMP_ENTIDADES.ID_ENTIDADE || ' - ' || strftime('%Y',date(replace(DATABTE,'.','-'))) || ' - ' || NUMBTE || ' - ' || SERIEBTE 
+  FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ELEICAO_CORPOS_GERENTES
+);
+
+INSERT INTO Actos_Eleitorais_Org_Sindical
+SELECT TEMP_ENTIDADES.ID_ENTIDADE AS ID_Organizacao_Sindical,
+       date(replace(DATA_ELEICAO,'.','-')) AS Data,
+       MAX(NUM_H_EFECT + NUM_H_SUPL + NUM_M_EFECT + NUM_M_SUPL) AS Numero_Membros_Cadernos_Eleitoriais,
+       MAX(INSCRITOS) AS Numero_Membros_Inscritos,
+       MAX(VOTANTES) AS Numero_Membros_Votantes,
+       MAX(MESES_MANDATO) AS Meses_de_Mandato,
+       NULL
+FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ELEICAO_CORPOS_GERENTES WHERE instr(NOME_ENTIDADE, 'SIND') > 0
+GROUP BY ID_Organizacao_Sindical, Data;
+
+
+UPDATE Org_Sindical SET Distrito_Sede = replace(Distrito_Sede,'DISTRITO DO ','')  WHERE instr(Distrito_Sede, 'DISTRITO DO ') > 0;
+
+
+UPDATE Org_Sindical SET Concelho_Sede  = '';
+
+
+UPDATE Org_Sindical SET (Concelho_Sede) = (SELECT TEMP_CONCELHOS.Cnome FROM TEMP_CODIGOS, TEMP_CONCELHOS WHERE TEMP_CODIGOS.num_cod_postal = substr(Org_Sindical.Codigo_Postal,1,4) AND TEMP_CODIGOS.ext_cod_postal = substr(Org_Sindical.Codigo_Postal,6,9) AND TEMP_CONCELHOS.Dcod = TEMP_CODIGOS.cod_distrito AND TEMP_CONCELHOS.Ccod = TEMP_CODIGOS.cod_concelho) WHERE substr(Org_Sindical.Codigo_Postal,6,3) IS NOT NULL;
+
+UPDATE Org_Sindical SET Nome = replace(Nome,'NA IND. ','NA INDÚSTRIA ')  WHERE instr(Nome, 'NA IND. ') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,'NAS IND. ','NAS INDÚSTRIAS ')  WHERE instr(Nome, 'NAS IND. ') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,'IND. E ','INDÚSTRIA E')  WHERE instr(Nome, 'IND. E ') > 0;
+
+
+UPDATE Org_Sindical SET Nome = replace(Nome,', I.P. (IEFP)','')  WHERE instr(Nome, ', I.P. (IEFP)') > 0;
+
+UPDATE Org_Sindical SET Nome = replace(Nome,' (CTP)','')  WHERE instr(Nome, ' (CTP)') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,' (ASFIC/PJ)','')  WHERE instr(Nome, ' (ASFIC/PJ)') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,' (SMTP)','')  WHERE instr(Nome, ' (SMTP)') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,' (SINPROFE)','')  WHERE instr(Nome, ' (SINPROFE)') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,' (SIPE)','')  WHERE instr(Nome, ' (SIPE)') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,' (ASPTC)','')  WHERE instr(Nome, ' (ASPTC)') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,' (SINAPSA)','')  WHERE instr(Nome, ' (SINAPSA)') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,' (SICOMP)','')  WHERE instr(Nome, ' (SICOMP)') > 0;
+
+UPDATE Org_Sindical SET Acronimo = ('CNEF')  WHERE instr(Nome, ' (CNEF)') > 0;
+UPDATE Org_Sindical SET Acronimo = ('ASAPOL')  WHERE instr(Nome, ' (ASAPOL)') > 0;
+UPDATE Org_Sindical SET Acronimo = ('SINTICAVS')  WHERE instr(Nome, ' (SINTICAVS)') > 0;
+UPDATE Org_Sindical SET Acronimo = ('SINCESAHT')  WHERE instr(Nome, ' (SINCESAHT)') > 0;
+UPDATE Org_Sindical SET Acronimo = ('CPLP-SE')  WHERE instr(Nome, ' (CPLP-SE)') > 0;
+
+UPDATE Org_Sindical SET Nome = replace(Nome,' (CNEF)','')  WHERE instr(Nome, ' (CNEF)') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,' (ASAPOL)','')  WHERE instr(Nome, ' (ASAPOL)') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,' (SINTICAVS)','')  WHERE instr(Nome, ' (SINTICAVS)') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,' (SINCESAHT)','')  WHERE instr(Nome, ' (SINCESAHT)') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,' (CPLP-SE)','')  WHERE instr(Nome, ' (CPLP-SE)') > 0;
+
+UPDATE Org_Sindical SET Ambito_Geografico = ('ZONA CENTRO')  WHERE instr(Nome, ' (ZONA CENTRO)') > 0;
+UPDATE Org_Sindical SET Ambito_Geografico = ('REGIÃO SUL')  WHERE instr(Nome, ' (REGIÃO SUL)') > 0;
+UPDATE Org_Sindical SET Ambito_Geografico = ('DISTRITO DE SANTARÉM')  WHERE instr(Nome, ' (DISTRITO DE SANTARÉM)') > 0;
+UPDATE Org_Sindical SET Ambito_Geografico = ('SECÇÃO DE VIANA DO CASTELO')  WHERE instr(Nome, ' (SECÇÃO DE VIANA DO CASTELO)') > 0;
+UPDATE Org_Sindical SET Ambito_Geografico = ('VILA VELHA DO RÓDÃO')  WHERE instr(Nome, ' (VILA VELHA DO RÓDÃO)') > 0;
+
+UPDATE Org_Sindical SET Nome = replace(Nome,' (ZONA CENTRO)','')  WHERE instr(Nome, ' (ZONA CENTRO)') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,' (REGIÃO SUL)','')  WHERE instr(Nome, ' (REGIÃO SUL)') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,' (DISTRITO DE SANTARÉM)','')  WHERE instr(Nome, ' (DISTRITO DE SANTARÉM)') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,' (SECÇÃO DE VIANA DO CASTELO)','')  WHERE instr(Nome, ' (SECÇÃO DE VIANA DO CASTELO)') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,' (VILA VELHA DO RÓDÃO)','')  WHERE instr(Nome, ' (VILA VELHA DO RÓDÃO)') > 0;
+
+UPDATE Org_Sindical SET Sector = ('INDÚSTRIA E COMÉRCIO')  WHERE instr(Nome, ' (INDÚSTRIA ECOMÉRCIO)') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,' (INDÚSTRIA ECOMÉRCIO)','')  WHERE instr(Nome, ' (INDÚSTRIA ECOMÉRCIO)') > 0;
+
+UPDATE Org_Sindical SET Sector = ('INDÚSTRIA E COMÉRCIO')  WHERE instr(Nome, ' (INDÚSTRIA E COMÉRCIO)') > 0;
+UPDATE Org_Sindical SET Nome = replace(Nome,' (INDÚSTRIA E COMÉRCIO)','')  WHERE instr(Nome, ' (INDÚSTRIA E COMÉRCIO)') > 0;
+
+UPDATE Org_Sindical SET Nome = replace(Nome,' (U.S. BRAGANÇA/CGTP-IN)','')  WHERE instr(Nome, ' (U.S. BRAGANÇA/CGTP-IN)') > 0;
