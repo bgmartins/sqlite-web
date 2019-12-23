@@ -192,6 +192,8 @@ END;
 .import ./CSV-files/ELEICAO_CORPOS_GERENTES.csv TEMP_ELEICAO_CORPOS_GERENTES
 .import ./CSV-files/ENTIDADES.csv TEMP_ENTIDADES
 .import ./CSV-files/PROCESSOS.csv TEMP_PROCESSOS
+.import ./CSV-files/Protocolo_ICS_INESC_DGERT_ListaIRCTs_ID.csv Lista_IRCTs_ID
+
 
 UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = trim(replace(replace(replace(NOME_ENTIDADE, X'0A', ' '),'  ',' '),'  ',' '));
 UPDATE TEMP_ENTIDADES SET SIGLA = trim(replace(replace(replace(SIGLA, X'0A', ' '),'  ',' '),'  ',' '));
@@ -524,6 +526,8 @@ UPDATE Org_Sindical SET Nome = replace(Nome,' (INDÚSTRIA ECOMÉRCIO)','')  WHER
 
 UPDATE Org_Sindical SET Sector = ('INDÚSTRIA E COMÉRCIO')  WHERE instr(Nome, ' (INDÚSTRIA E COMÉRCIO)') > 0;
 UPDATE Org_Sindical SET Nome = replace(Nome,' (INDÚSTRIA E COMÉRCIO)','')  WHERE instr(Nome, ' (INDÚSTRIA E COMÉRCIO)') > 0;
+
+UPDATE Org_Sindical SET Nome = replace(Nome,' (U.S. BRAGANÇA/CGTP-IN)','')  WHERE instr(Nome, ' (U.S. BRAGANÇA/CGTP-IN)') > 0;
 
 
 CREATE TABLE CAE_SECCOES_TEMP( SECCAO CHAR(1) PRIMARY KEY , RANK, INTEGER, TITLE VARCHAR(100) , SALARY FLOAT );
