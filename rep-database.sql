@@ -193,7 +193,6 @@ END;
 .import ./CSV-files/ENTIDADES.csv TEMP_ENTIDADES
 .import ./CSV-files/PROCESSOS.csv TEMP_PROCESSOS
 .import ./CSV-files/Protocolo_ICS_INESC_DGERT_ListaIRCTs_ID.csv Lista_IRCTs_ID
--- O ficheiro abaixo é conversão para UTF8 usando NOTEPAD do Protocolo_ICS_INESC_DGERT_ListadosOutorgantes.csv que tinha sido convertido para CSV usando Excel e os ; passados para , em NOTEPAD 
 .import ./CSV-files/Protocolo_ICS_INESC_DGERT_ListadosOutorgantes_UTF8.txt LISTA_OUTORGANTES_UTF
 
 
