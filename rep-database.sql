@@ -3,6 +3,7 @@
 --
 
 DROP TABLE IF EXISTS Avisos_Greve;
+DROP TABLE IF EXISTS Outorgantes_Actos_Negociacao_Colectiva;
 DROP TABLE IF EXISTS Actos_Negociacao_Colectiva;
 DROP TABLE IF EXISTS Direccao_Org_Patronal;
 DROP TABLE IF EXISTS Direccao_Org_Sindical;
@@ -142,13 +143,30 @@ CREATE TABLE Direccao_Org_Patronal (
 );
 
 CREATE TABLE Actos_Negociacao_Colectiva (
+  ID                         INT,
   Nome_Acto                  VARCHAR(100),
+  Tipo_Acto                  VARCHAR(100),
+  Natureza                   VARCHAR(100),
+  Ano                        INT,
+  Numero                     INT,
+  Serie                      INT,
+  Data                       DATE,
+  URL                        VARCHAR(100),
+  Ambito_Geografico          VARCHAR(100),
+  PRIMARY KEY (ID,Ano,Numero,Serie,Nome_Acto)
+);
+
+CREATE TABLE Outorgantes_Actos_Negociacao_Colectiva (
+  ID                         INT,
+  Nome_Acto                  VARCHAR(100),
+  Ano                        INT,
+  Numero                     INT,
+  Serie                      INT,  
   ID_Organizacao_Sindical    INT,
   ID_Organizacao_Patronal    INT,
-  Empresa                    VARCHAR(100),
-  Tipo_Acto                  VARCHAR(100),
-  Data                       DATE,
-  PRIMARY KEY (Nome_Acto,ID_Organizacao_Sindical,ID_Organizacao_Patronal,Data),
+  CAE                        VARCHAR(100),
+  PRIMARY KEY (ID,ID_Organizacao_Sindical,ID_Organizacao_Patronal),
+  FOREIGN KEY (ID,Ano,Numero,Serie,Nome_Acto) REFERENCES Actos_Negociacao_Colectiva(ID,Ano,Numero,Serie,Nome_Acto),
   FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical(ID),
   FOREIGN KEY (ID_Organizacao_Patronal) REFERENCES Org_Patronal(ID) 
 );
@@ -168,22 +186,34 @@ CREATE TRIGGER Mencoes_BTE_Org_Sindical_update AFTER UPDATE ON Mencoes_BTE_Org_S
     WHERE ID_Organizacao_Sindical = [NEW].ID_Organizacao_Sindical; 
 END;
 
-CREATE TRIGGER Mencoes_BTE_Org_Patronal_update AFTER UPDATE ON Mencoes_BTE_Org_Patronal BEGIN
-    UPDATE Mencoes_BTE_Org_Patronal
-    SET    URL = "https://github.com/bgmartins/rep-database/raw/master/BTE-data/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
-    WHERE ID_Organizacao_Patronal = [NEW].ID_Organizacao_Patronal; 
-END;
-
 CREATE TRIGGER Mencoes_BTE_Org_Sindical_insert AFTER INSERT ON Mencoes_BTE_Org_Sindical BEGIN
     UPDATE Mencoes_BTE_Org_Sindical
     SET    URL = "https://github.com/bgmartins/rep-database/raw/master/BTE-data/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
     WHERE ID_Organizacao_Sindical = [NEW].ID_Organizacao_Sindical; 
 END;
 
+CREATE TRIGGER Mencoes_BTE_Org_Patronal_update AFTER UPDATE ON Mencoes_BTE_Org_Patronal BEGIN
+    UPDATE Mencoes_BTE_Org_Patronal
+    SET    URL = "https://github.com/bgmartins/rep-database/raw/master/BTE-data/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
+    WHERE ID_Organizacao_Patronal = [NEW].ID_Organizacao_Patronal; 
+END;
+
 CREATE TRIGGER Mencoes_BTE_Org_Patronal_insert AFTER INSERT ON Mencoes_BTE_Org_Patronal BEGIN
     UPDATE Mencoes_BTE_Org_Patronal
     SET    URL = "https://github.com/bgmartins/rep-database/raw/master/BTE-data/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
     WHERE ID_Organizacao_Patronal = [NEW].ID_Organizacao_Patronal; 
+END;
+
+CREATE TRIGGER Actos_Negociacao_Colectiva_update AFTER UPDATE ON Actos_Negociacao_Colectiva BEGIN
+    UPDATE Actos_Negociacao_Colectiva
+    SET    URL = "https://github.com/bgmartins/rep-database/raw/master/BTE-data/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
+    WHERE ID = [NEW].ID; 
+END;
+
+CREATE TRIGGER Actos_Negociacao_Colectiva_insert AFTER INSERT ON Actos_Negociacao_Colectiva BEGIN
+    UPDATE Actos_Negociacao_Colectiva
+    SET    URL = "https://github.com/bgmartins/rep-database/raw/master/BTE-data/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
+    WHERE ID = [NEW].ID; 
 END;
 
 --
@@ -496,6 +526,19 @@ SELECT TEMP_ENTIDADES.ID_ENTIDADE AS ID_Organizacao_Sindical,
        NULL
 FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ELEICAO_CORPOS_GERENTES WHERE CAST(SUBSTR(TEMP_ENTIDADES.ID_ENTIDADE,0,INSTR(TEMP_ENTIDADES.ID_ENTIDADE, '.')) AS INT) < 5
 GROUP BY ID_Organizacao_Sindical, Data;
+
+INSERT INTO Actos_Negociacao_Colectiva
+SELECT DISTINCT TEMP_IRCT.NUMERO AS ID,
+       NOMECC AS Nome_Acto,
+       TIPO_CONVENCAO_DESCR_LONG AS Tipo_Acto,
+       NATUREZA_DESCRICAO AS Natureza,
+       ANO as Ano,
+       NUMBTE AS Numero,
+       SERIEBTE AS Serie,
+       date(replace(DATABTE,'.','-')) AS Data,
+       NULL AS URL,
+       AMBITO_GEOGRAFICO_IRCT AS Ambito_Geografico
+FROM TEMP_IRCT;
 
 DROP VIEW TEMP_DATAS_ENTIDADES;
 DROP TABLE TEMP_ALTERACOES_ESTATUTOS;
