@@ -226,6 +226,8 @@ END;
 .import ./CSV-files/PROCESSOS.csv TEMP_PROCESSOS
 .import ./CSV-files/IRCT.csv TEMP_IRCT
 .import ./CSV-files/OUTORGANTES.csv TEMP_OUTORGANTES
+.import ./CSV-files/AVISOS_GREVE_2013_2014.csv TEMP_AVISOS_GREVE1
+.import ./CSV-files/AVISOS_GREVE_2015_2019.csv TEMP_AVISOS_GREVE2
 
 UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = trim(replace(replace(replace(NOME_ENTIDADE, X'0A', ' '),'  ',' '),'  ',' '));
 UPDATE TEMP_ENTIDADES SET SIGLA = trim(replace(replace(replace(SIGLA, X'0A', ' '),'  ',' '),'  ',' '));

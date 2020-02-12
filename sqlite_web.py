@@ -10,6 +10,9 @@ import sys
 import threading
 import time
 import webbrowser
+import pandas as pd
+import numpy as np
+import json
 from collections import namedtuple, OrderedDict
 from functools import wraps
 from getpass import getpass
@@ -129,6 +132,16 @@ class SqliteDataSet(DataSet):
     def size_on_disk(self):
         stat = os.stat(self.filename)
         return stat.st_size
+
+    @property
+    def barchart_labels(self):
+        cursor = self.query("SELECT ANO, COUNT(DISTINCT ID) FROM Org_Sindical, ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL ) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO ) GROUP BY ANO")
+        return [row[0] for row in cursor.fetchall()]
+
+    @property
+    def barchart_data(self):
+        cursor = self.query("SELECT ANO, COUNT(DISTINCT ID) FROM Org_Sindical, ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL ) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO ) GROUP BY ANO")
+        return [row[1] for row in cursor.fetchall()]
 
     def get_indexes(self, table):
         return dataset._database.get_indexes(table)
