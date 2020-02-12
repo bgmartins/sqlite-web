@@ -10,9 +10,6 @@ import sys
 import threading
 import time
 import webbrowser
-import pandas as pd
-import numpy as np
-import json
 from collections import namedtuple, OrderedDict
 from functools import wraps
 from getpass import getpass
@@ -74,6 +71,7 @@ from peewee import sqlite3
 from playhouse.dataset import DataSet
 from playhouse.migrate import migrate
 
+
 CUR_DIR = os.path.realpath(os.path.dirname(__file__))
 DEBUG = False
 MAX_RESULT_SIZE = 1000
@@ -91,12 +89,15 @@ migrator = None
 #
 # Database metadata objects.
 #
+
 TriggerMetadata = namedtuple('TriggerMetadata', ('name', 'sql'))
+
 ViewMetadata = namedtuple('ViewMetadata', ('name', 'sql'))
 
 #
 # Database helpers.
 #
+
 class SqliteDataSet(DataSet):
     @property
     def filename(self):
@@ -128,16 +129,6 @@ class SqliteDataSet(DataSet):
     def size_on_disk(self):
         stat = os.stat(self.filename)
         return stat.st_size
-
-    @property
-    def barchart_labels(self):
-        cursor = self.query("SELECT ANO, COUNT(DISTINCT ID) FROM Org_Sindical, ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL ) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO ) GROUP BY ANO")
-        return [row[0] for row in cursor.fetchall()]
-        
-    @property
-    def barchart_data(self):
-        cursor = self.query("SELECT ANO, COUNT(DISTINCT ID) FROM Org_Sindical, ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL ) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO ) GROUP BY ANO")
-        return [row[1] for row in cursor.fetchall()]
 
     def get_indexes(self, table):
         return dataset._database.get_indexes(table)
@@ -228,6 +219,7 @@ def table_create():
     if not table:
         flash('Table name is required.', 'danger')
         return redirect(request.form.get('redirect') or url_for('index'))
+
     dataset[table]
     return redirect(url_for('table_import', table=table))
 
@@ -534,12 +526,15 @@ def export(table, sql, export_format):
         kwargs = {}
         filename = '%s-export.csv' % table
         mimetype = 'text/csv'
+
     dataset.freeze(query, export_format, file_obj=buf, **kwargs)
+
     response_data = buf.getvalue()
     response = make_response(response_data)
     response.headers['Content-Length'] = len(response_data)
     response.headers['Content-Type'] = mimetype
-    response.headers['Content-Disposition'] = 'attachment; filename=%s' % (filename)
+    response.headers['Content-Disposition'] = 'attachment; filename=%s' % (
+        filename)
     response.headers['Expires'] = 0
     response.headers['Pragma'] = 'public'
     return response
@@ -825,7 +820,6 @@ def main():
     # This function exists to act as a console script entry-point.
     parser = get_option_parser()
     options, args = parser.parse_args()
-    if not args: args = [ "rep-database.db" ]
 
     password = None
     if options.prompt_password:
@@ -839,6 +833,9 @@ def main():
                     print('Passwords did not match!')
                 else:
                     break
+    if not args: 
+        args = [ "rep-database.db" ]
+        password = "rep-database"
 
     # Initialize the dataset instance and (optionally) authentication handler.
     initialize_app(args[0], options.read_only, password, options.url_prefix)
@@ -846,7 +843,6 @@ def main():
     if options.browser:
         open_browser_tab(options.host, options.port)
     app.run(host=options.host, port=options.port, debug=options.debug)
-
 
 if __name__ == '__main__':
     main()
