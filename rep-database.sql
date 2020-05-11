@@ -17,203 +17,221 @@ DROP TABLE IF EXISTS Org_Patronal;
 DROP TABLE IF EXISTS Sectores_Profissionais;
 
 CREATE TABLE Sectores_Profissionais (
-  Sector         VARCHAR(100) NOT NULL PRIMARY KEY,
-  Salario_Medio  NUMERIC
+	Sector         VARCHAR(100) NOT NULL PRIMARY KEY,
+	Salario_Medio  NUMERIC
 );
 
 CREATE TABLE Org_Patronal (
-  ID                       INT NOT NULL PRIMARY KEY,
-  Tipo			   VARCHAR(100),
-  Nome                     VARCHAR(100) NOT NULL,
-  Acronimo                 VARCHAR(100),
-  Nome_Organizacao_Pai     VARCHAR(100),
-  Concelho_Sede            VARCHAR(100),
-  Distrito_Sede            VARCHAR(100),
-  Codigo_Postal            VARCHAR(8),
-  Ambito_Geografico        VARCHAR(100),  
-  Sector                   VARCHAR(100),
-  Numero_Membros           INT,
-  Data_Primeira_Actividade DATE,
-  Data_Ultima_Actividade   DATE,
-  Activa		   BOOLEAN,  
-  FOREIGN KEY (Nome_Organizacao_Pai) REFERENCES Org_Patronal(ID),
-  FOREIGN KEY (Sector) REFERENCES Sectores_Profissionais(Sector)
+	ID                       INT NOT NULL PRIMARY KEY,
+	Tipo         VARCHAR(100),
+	Nome                     VARCHAR(100) NOT NULL,
+	Acronimo                 VARCHAR(100),
+	Nome_Organizacao_Pai     VARCHAR(100),
+	Concelho_Sede            VARCHAR(100),
+	Distrito_Sede            VARCHAR(100),
+	Codigo_Postal            VARCHAR(8),
+	Ambito_Geografico        VARCHAR(100),  
+	Sector                   VARCHAR(100),
+	Numero_Membros           INT,
+	Data_Primeira_Actividade DATE,
+	Data_Ultima_Actividade   DATE,
+	Activa       BOOLEAN,  
+	FOREIGN KEY (Nome_Organizacao_Pai) REFERENCES Org_Patronal(ID),
+	FOREIGN KEY (Sector) REFERENCES Sectores_Profissionais(Sector)
 );
-  
+	
 CREATE TABLE Org_Sindical (
-  ID                       INT NOT NULL PRIMARY KEY,
-  Tipo                     VARCHAR(100),
-  Nome                     VARCHAR(100) NOT NULL,
-  Acronimo                 VARCHAR(100),
-  Nome_Organizacao_Pai     VARCHAR(100),
-  Concelho_Sede            VARCHAR(100),
-  Distrito_Sede            VARCHAR(100),
-  Codigo_Postal            VARCHAR(8),
-  Ambito_Geografico        VARCHAR(100),
-  Sector                   VARCHAR(100),
-  Numero_Membros           INT,
-  Data_Primeira_Actividade DATE,
-  Data_Ultima_Actividade   DATE,
-  Activa                   BOOLEAN,
-  FOREIGN KEY (Nome_Organizacao_Pai) REFERENCES Org_Sindical(ID),
-  FOREIGN KEY (Sector) REFERENCES Sectores_Profissionais(Sector)
+	ID                       INT NOT NULL PRIMARY KEY,
+	Tipo                     VARCHAR(100),
+	Nome                     VARCHAR(100) NOT NULL,
+	Acronimo                 VARCHAR(100),
+	Nome_Organizacao_Pai     VARCHAR(100),
+	Concelho_Sede            VARCHAR(100),
+	Distrito_Sede            VARCHAR(100),
+	Codigo_Postal            VARCHAR(8),
+	Ambito_Geografico        VARCHAR(100),
+	Sector                   VARCHAR(100),
+	Numero_Membros           INT,
+	Data_Primeira_Actividade DATE,
+	Data_Ultima_Actividade   DATE,
+	Activa                   BOOLEAN,
+	FOREIGN KEY (Nome_Organizacao_Pai) REFERENCES Org_Sindical(ID),
+	FOREIGN KEY (Sector) REFERENCES Sectores_Profissionais(Sector)
 );
 
 CREATE TABLE Mencoes_BTE_Org_Sindical (
-  ID_Organizacao_Sindical               INT,
-  URL                                   VARCHAR(100),
-  Ano                                   INT,
-  Numero                                INT,
-  Serie                                 INT,
-  Descricao                             VARCHAR(100),
-  Mudanca_Estatuto                      BOOLEAN,
-  Eleicoes                              BOOLEAN,
-  Confianca                             NUMERIC,
-  PRIMARY KEY (ID_Organizacao_Sindical,Ano,Numero,Serie),
-  FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical(ID)
+	ID_Organizacao_Sindical               INT,
+	URL                                   VARCHAR(100),
+	Ano                                   INT,
+	Numero                                INT,
+	Serie                                 INT,
+	Descricao                             VARCHAR(100),
+	Mudanca_Estatuto                      BOOLEAN,
+	Eleicoes                              BOOLEAN,
+	Confianca                             NUMERIC,
+	PRIMARY KEY (ID_Organizacao_Sindical,Ano,Numero,Serie),
+	FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical(ID)
 );
 
 CREATE TABLE Mencoes_BTE_Org_Patronal (
-  ID_Organizacao_Patronal	        INT,
-  URL			                VARCHAR(100),
-  Ano                                   INT,
-  Numero                                INT,
-  Serie                                 INT,
-  Descricao                             VARCHAR(100),
-  Mudanca_Estatuto                      BOOLEAN,
-  Eleicoes                              BOOLEAN,
-  Confianca                             NUMERIC,
-  PRIMARY KEY (ID_Organizacao_Patronal,Ano,Numero,Serie),
-  FOREIGN KEY (ID_Organizacao_Patronal) REFERENCES Org_Patronal(ID)
+	ID_Organizacao_Patronal         INT,
+	URL                     VARCHAR(100),
+	Ano                                   INT,
+	Numero                                INT,
+	Serie                                 INT,
+	Descricao                             VARCHAR(100),
+	Mudanca_Estatuto                      BOOLEAN,
+	Eleicoes                              BOOLEAN,
+	Confianca                             NUMERIC,
+	PRIMARY KEY (ID_Organizacao_Patronal,Ano,Numero,Serie),
+	FOREIGN KEY (ID_Organizacao_Patronal) REFERENCES Org_Patronal(ID)
 );
 
 CREATE TABLE Relacoes_Entre_Org_Sindical (
-  ID_Organizacao_Sindical_1  INT,
-  ID_Organizacao_Sindical_2  INT,
-  Tipo_de_Relacao            VARCHAR(100),
-  Data                       DATE,
-  PRIMARY KEY (ID_Organizacao_Sindical_1,ID_Organizacao_Sindical_2),
-  FOREIGN KEY (ID_Organizacao_Sindical_1) REFERENCES Org_Sindical(ID),
-  FOREIGN KEY (ID_Organizacao_Sindical_2) REFERENCES Org_Sindical(ID)
+	ID_Organizacao_Sindical_1  INT,
+	ID_Organizacao_Sindical_2  INT,
+	Tipo_de_Relacao            VARCHAR(100),
+	Data                       DATE,
+	PRIMARY KEY (ID_Organizacao_Sindical_1,ID_Organizacao_Sindical_2),
+	FOREIGN KEY (ID_Organizacao_Sindical_1) REFERENCES Org_Sindical(ID),
+	FOREIGN KEY (ID_Organizacao_Sindical_2) REFERENCES Org_Sindical(ID)
 );
 
 CREATE TABLE Actos_Eleitorais_Org_Sindical (
-  ID_Organizacao_Sindical               INT,
-  Data                                  DATE,
-  Numero_Membros_Cadernos_Eleitoriais   INT,
-  Numero_Membros_Inscritos              INT,
-  Numero_Membros_Votantes               INT,
-  Meses_de_Mandato                      INT,
-  Numero_Listas_Concorrentes            INT,
-  PRIMARY KEY (ID_Organizacao_Sindical,Data),
-  FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical(ID)
+	ID_Organizacao_Sindical               INT,
+	Data                                  DATE,
+	Numero_Membros_Cadernos_Eleitoriais   INT,
+	Numero_Membros_Inscritos              INT,
+	Numero_Membros_Votantes               INT,
+	Meses_de_Mandato                      INT,
+	Numero_Listas_Concorrentes            INT,
+	PRIMARY KEY (ID_Organizacao_Sindical,Data),
+	FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical(ID)
 );
 
 CREATE TABLE Membros_Org_Sindical (
-  ID_Organizacao_Sindical               INT,
-  Data_Inicio                           DATE,
-  Data_Fim                              DATE,
-  Número_Membros                        INT,
-  PRIMARY KEY (ID_Organizacao_Sindical,Data_Inicio,Data_Fim),
-  FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical(ID)
+	ID_Organizacao_Sindical               INT,
+	Data_Inicio                           DATE,
+	Data_Fim                              DATE,
+	Número_Membros                        INT,
+	PRIMARY KEY (ID_Organizacao_Sindical,Data_Inicio,Data_Fim),
+	FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical(ID)
 );
-  
+	
 CREATE TABLE Direccao_Org_Sindical (
-  ID_Organizacao_Sindical     INT,
-  Nome_Pessoa                 VARCHAR(100),
-  Género_Sexo                 INT,
-  Data_Nascimento             DATETIME,
-  Cargo                       VARCHAR(100),
-  Data_Inicio                 DATE,
-  Data_Fim                    DATE,
-  PRIMARY KEY (ID_Organizacao_Sindical,Nome_Pessoa,Data_Inicio,Data_Fim),
-  FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical(ID)
+	ID_Organizacao_Sindical     INT,
+	Nome_Pessoa                 VARCHAR(100),
+	Género_Sexo                 INT,
+	Data_Nascimento             DATETIME,
+	Cargo                       VARCHAR(100),
+	Data_Inicio                 DATE,
+	Data_Fim                    DATE,
+	PRIMARY KEY (ID_Organizacao_Sindical,Nome_Pessoa,Data_Inicio,Data_Fim),
+	FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical(ID)
 );
 
 CREATE TABLE Direccao_Org_Patronal (
-  ID_Organizacao_Patronal     INT,
-  Nome_Pessoa                 VARCHAR(100),
-  Género_Sexo                 INT,
-  Data_Nascimento             DATETIME,
-  Cargo                       VARCHAR(100),
-  Data_Inicio                 DATE,
-  Data_Fim                    DATE,
-  PRIMARY KEY (ID_Organizacao_Patronal,Nome_Pessoa,Data_Inicio,Data_Fim),
-  FOREIGN KEY (ID_Organizacao_Patronal) REFERENCES Org_Patronal(ID)
+	ID_Organizacao_Patronal     INT,
+	Nome_Pessoa                 VARCHAR(100),
+	Género_Sexo                 INT,
+	Data_Nascimento             DATETIME,
+	Cargo                       VARCHAR(100),
+	Data_Inicio                 DATE,
+	Data_Fim                    DATE,
+	PRIMARY KEY (ID_Organizacao_Patronal,Nome_Pessoa,Data_Inicio,Data_Fim),
+	FOREIGN KEY (ID_Organizacao_Patronal) REFERENCES Org_Patronal(ID)
 );
 
 CREATE TABLE Actos_Negociacao_Colectiva (
-  ID                         INT,
-  ID_SEQUENCIAL		     INT,
-  Nome_Acto                  VARCHAR(100),
-  Tipo_Acto                  VARCHAR(100),
-  Natureza                   VARCHAR(100),
-  Ano                        INT,
-  Numero                     INT,
-  Serie                      INT,
-  Data                       DATE,
-  URL                        VARCHAR(100),
-  Ambito_Geografico          VARCHAR(100),
-  PRIMARY KEY (ID,ID_SEQUENCIAL,Ano)
+	ID                         INT,
+	ID_SEQUENCIAL        INT,
+	Nome_Acto                  VARCHAR(100),
+	Tipo_Acto                  VARCHAR(100),
+	Natureza                   VARCHAR(100),
+	Ano                        INT,
+	Numero                     INT,
+	Serie                      INT,
+	Data                       DATE,
+	URL                        VARCHAR(100),
+	Ambito_Geografico          VARCHAR(100),
+	PRIMARY KEY (ID,ID_SEQUENCIAL,Ano)
 );
 
 CREATE TABLE Outorgantes_Actos (
-  ID                         INT,
-  ID_SEQUENCIAL              INT,
-  Ano                        INT,
-  ID_Organizacao_Sindical    INT,
-  ID_Organizacao_Patronal    INT,
-  Sector                     VARCHAR(100),
-  PRIMARY KEY (ID,ID_SEQUENCIAL,Ano,ID_Organizacao_Sindical,ID_Organizacao_Patronal,Sector),
-  FOREIGN KEY (ID,ID_SEQUENCIAL,Ano) REFERENCES Actos_Negociacao_Colectiva(ID,ID_SEQUENCIAL,Ano),
-  FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical(ID),
-  FOREIGN KEY (ID_Organizacao_Patronal) REFERENCES Org_Patronal(ID),
-  FOREIGN KEY (Sector) REFERENCES Sectores_Profissionais(Sector)
+	ID                         INT,
+	ID_SEQUENCIAL              INT,
+	Ano                        INT,
+	ID_Organizacao_Sindical    INT,
+	ID_Organizacao_Patronal    INT,
+	Sector                     VARCHAR(100),
+	PRIMARY KEY (ID,ID_SEQUENCIAL,Ano,ID_Organizacao_Sindical,ID_Organizacao_Patronal,Sector),
+	FOREIGN KEY (ID,ID_SEQUENCIAL,Ano) REFERENCES Actos_Negociacao_Colectiva(ID,ID_SEQUENCIAL,Ano),
+	FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical(ID),
+	FOREIGN KEY (ID_Organizacao_Patronal) REFERENCES Org_Patronal(ID),
+	FOREIGN KEY (Sector) REFERENCES Sectores_Profissionais(Sector)
+);
+
+CREATE TABLE TEMP_AVISOS_GREVE (
+	Id_Entidade_Sindical      VARCHAR(7),
+	Ano_Inicio                INT,
+	Mes_Inicio                INT,
+	Entidade_Sindical         VARCHAR(100),
+	Entidade_Patronal         VARCHAR(100),
+	Ano_Fim                   INT,
+	Mes_Fim                   INT,
+	Duracao                   INT,
+	PRIMARY KEY(Id_Entidade_Sindical,Ano_Inicio,Mes_Inicio,Entidade_Sindical,Entidade_Patronal,Ano_Fim,Mes_Fim,Duracao),
+  FOREIGN KEY (Id_Entidade_Sindical) REFERENCES Org_Sindical(ID)
 );
 
 CREATE TABLE Avisos_Greve (
-  ID_Organizacao_Sindical    INT,
-  Descricao                  VARCHAR(100),
-  Data_Aviso                 DATE,
-  Data_Greve                 DATE,
-  PRIMARY KEY (ID_Organizacao_Sindical,Data_Aviso),
-  FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical(ID)
+	Id_Entidade_Sindical      VARCHAR(7),
+	Ano_Inicio                INT,
+	Mes_Inicio                INT,
+	Entidade_Sindical         VARCHAR(100),
+	Entidade_Patronal         VARCHAR(100),
+	Ano_Fim                   INT,
+	Mes_Fim                   INT,
+	Duracao                   INT,
+	PRIMARY KEY(Id_Entidade_Sindical,Ano_Inicio,Mes_Inicio,Entidade_Sindical,Entidade_Patronal,Ano_Fim,Mes_Fim,Duracao),
+  FOREIGN KEY (Id_Entidade_Sindical) REFERENCES Org_Sindical(ID)
 );
 
+
 CREATE TRIGGER Mencoes_BTE_Org_Sindical_update AFTER UPDATE ON Mencoes_BTE_Org_Sindical BEGIN
-    UPDATE Mencoes_BTE_Org_Sindical
-    SET    URL = "https://github.com/bgmartins/rep-database/raw/master/BTE-data/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
-    WHERE ID_Organizacao_Sindical = [NEW].ID_Organizacao_Sindical; 
+		UPDATE Mencoes_BTE_Org_Sindical
+		SET    URL = "https://github.com/bgmartins/rep-database/raw/master/BTE-data/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
+		WHERE ID_Organizacao_Sindical = [NEW].ID_Organizacao_Sindical; 
 END;
 
 CREATE TRIGGER Mencoes_BTE_Org_Sindical_insert AFTER INSERT ON Mencoes_BTE_Org_Sindical BEGIN
-    UPDATE Mencoes_BTE_Org_Sindical
-    SET    URL = "https://github.com/bgmartins/rep-database/raw/master/BTE-data/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
-    WHERE ID_Organizacao_Sindical = [NEW].ID_Organizacao_Sindical; 
+		UPDATE Mencoes_BTE_Org_Sindical
+		SET    URL = "https://github.com/bgmartins/rep-database/raw/master/BTE-data/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
+		WHERE ID_Organizacao_Sindical = [NEW].ID_Organizacao_Sindical; 
 END;
 
 CREATE TRIGGER Mencoes_BTE_Org_Patronal_update AFTER UPDATE ON Mencoes_BTE_Org_Patronal BEGIN
-    UPDATE Mencoes_BTE_Org_Patronal
-    SET    URL = "https://github.com/bgmartins/rep-database/raw/master/BTE-data/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
-    WHERE ID_Organizacao_Patronal = [NEW].ID_Organizacao_Patronal; 
+		UPDATE Mencoes_BTE_Org_Patronal
+		SET    URL = "https://github.com/bgmartins/rep-database/raw/master/BTE-data/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
+		WHERE ID_Organizacao_Patronal = [NEW].ID_Organizacao_Patronal; 
 END;
 
 CREATE TRIGGER Mencoes_BTE_Org_Patronal_insert AFTER INSERT ON Mencoes_BTE_Org_Patronal BEGIN
-    UPDATE Mencoes_BTE_Org_Patronal
-    SET    URL = "https://github.com/bgmartins/rep-database/raw/master/BTE-data/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
-    WHERE ID_Organizacao_Patronal = [NEW].ID_Organizacao_Patronal; 
+		UPDATE Mencoes_BTE_Org_Patronal
+		SET    URL = "https://github.com/bgmartins/rep-database/raw/master/BTE-data/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
+		WHERE ID_Organizacao_Patronal = [NEW].ID_Organizacao_Patronal; 
 END;
 
 CREATE TRIGGER Actos_Negociacao_Colectiva_update AFTER UPDATE ON Actos_Negociacao_Colectiva BEGIN
-    UPDATE Actos_Negociacao_Colectiva
-    SET    URL = "https://github.com/bgmartins/rep-database/raw/master/BTE-data/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
-    WHERE ID = [NEW].ID; 
+		UPDATE Actos_Negociacao_Colectiva
+		SET    URL = "https://github.com/bgmartins/rep-database/raw/master/BTE-data/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
+		WHERE ID = [NEW].ID; 
 END;
 
 CREATE TRIGGER Actos_Negociacao_Colectiva_insert AFTER INSERT ON Actos_Negociacao_Colectiva BEGIN
-    UPDATE Actos_Negociacao_Colectiva
-    SET    URL = "https://github.com/bgmartins/rep-database/raw/master/BTE-data/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
-    WHERE ID = [NEW].ID; 
+		UPDATE Actos_Negociacao_Colectiva
+		SET    URL = "https://github.com/bgmartins/rep-database/raw/master/BTE-data/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
+		WHERE ID = [NEW].ID; 
 END;
 
 --
@@ -244,8 +262,12 @@ UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' DA IND. ',' DA
 UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' DAS IND. ',' DAS INDÚSTRIAS ')  WHERE instr(NOME_ENTIDADE, ' DAS IND. ') > 0;
 UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' DOS IND. ',' DOS INDUSTRIAIS ')  WHERE instr(NOME_ENTIDADE, ' DOS IND. ') > 0;
 UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' NA IND. ',' NA INDÚSTRIA ')  WHERE instr(NOME_ENTIDADE, ' NA IND. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' NA IND, ',' DA INDÚSTRIA ')  WHERE instr(NOME_ENTIDADE, ' NA IND, ') > 0;
 UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' NAS IND. ',' NAS INDÚSTRIAS ')  WHERE instr(NOME_ENTIDADE, ' NAS IND. ') > 0;
 UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' IND. E ',' INDÚSTRIA E')  WHERE instr(NOME_ENTIDADE, ' IND. E ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' IND. ',' INDÚSTRIAS ')  WHERE instr(NOME_ENTIDADE, ' IND. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' IND.',' INDÚSTRIAS ')  WHERE instr(NOME_ENTIDADE, ' IND.') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'(IND. ','(INDÚSTRIA ')  WHERE instr(NOME_ENTIDADE, '(IND. ') > 0;
 UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' DOS SIND. ',' DOS SINDICATOS ')  WHERE instr(NOME_ENTIDADE, ' DOS SIND. ') > 0;
 UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'SIND. ','SINDICATO ')  WHERE instr(NOME_ENTIDADE, 'SIND. ') > 0;
 UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'ASS. ','ASSOCIAÇÃO ')  WHERE instr(NOME_ENTIDADE, 'ASS. ') > 0;
@@ -337,6 +359,16 @@ UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'R. AUT','REGIÕ
 UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'GAB. ','GABINETE ')  WHERE instr(NOME_ENTIDADE, 'GAB. ') > 0;
 UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' R. AUTÓNOMAS ',' REGIÕES AUTÓNOMAS ')  WHERE instr(NOME_ENTIDADE, ' R. AUTÓNOMAS ') > 0;
 UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'PORTUG. ','PORTUGUESA ')  WHERE instr(NOME_ENTIDADE, 'PORTUG. ') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = SUBSTR(NOME_ENTIDADE,3) WHERE NOME_ENTIDADE LIKE "O %" AND instr(NOME_ENTIDADE,'ALMADA') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'.','')  WHERE NOME_ENTIDADE LIKE "%.";
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'METALOM.','METALOMECÂNICA')  WHERE instr(NOME_ENTIDADE, 'METALOM.') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'FISCALIAÇÃO.','FISCALIZAÇÃO ')  WHERE instr(NOME_ENTIDADE, 'FISCALIAÇÃO.') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'TEXTIL','TÊXTIL')  WHERE instr(NOME_ENTIDADE, 'TEXTIL') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'INDUSTRIAS','INDÚSTRIAS')  WHERE instr(NOME_ENTIDADE, 'INDUSTRIAS') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'INDUSTRIA','INDÚSTRIA')  WHERE instr(NOME_ENTIDADE, 'INDUSTRIA') > 0;
+UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'CERAMICA','CERÂMICA')  WHERE instr(NOME_ENTIDADE, 'CERAMICA') > 0;
+
+
 
 UPDATE TEMP_ENTIDADES SET SIGLA = TRIM(SUBSTR(NOME_ENTIDADE,0,instr(NOME_ENTIDADE,'-'))) 
 WHERE (SIGLA IS NULL OR TRIM(SIGLA)='') AND instr(NOME_ENTIDADE, '-') > 0 AND instr(TRIM(SUBSTR(NOME_ENTIDADE,0,instr(NOME_ENTIDADE,'-'))),' ') <=0;
@@ -353,38 +385,38 @@ WHERE instr(NOME_ENTIDADE, '-') > 0 AND instr(TRIM(SUBSTR(NOME_ENTIDADE,instr(NO
 AND (TRIM(SIGLA)='' OR TRIM(SIGLA)=TRIM(SUBSTR(NOME_ENTIDADE,instr(NOME_ENTIDADE,'-') + 1, LENGTH(NOME_ENTIDADE) - instr(NOME_ENTIDADE,'-') + 1)));
 
 CREATE VIEW TEMP_DATAS_ENTIDADES AS SELECT ID_ENTIDADE, MIN(DATA) AS MIN_DATA, MAX(DATA) AS MAX_DATA FROM (
-  SELECT ID_ENTIDADE, date(replace(DATABTE,'.','-')) AS DATA FROM TEMP_ALTERACOES_ESTATUTOS
-  UNION
-  SELECT ID_ENTIDADE, date(replace(DATABTE,'.','-')) AS DATA FROM TEMP_PROCESSOS LEFT OUTER JOIN TEMP_ELEICAO_CORPOS_GERENTES ON TEMP_PROCESSOS.PROCESSO=TEMP_ELEICAO_CORPOS_GERENTES.PROCESSO
-  UNION
-  SELECT ID_ENTIDADE, date(replace(DATA_ELEICAO,'.','-')) AS DATA FROM TEMP_PROCESSOS LEFT OUTER JOIN TEMP_ELEICAO_CORPOS_GERENTES ON TEMP_PROCESSOS.PROCESSO=TEMP_ELEICAO_CORPOS_GERENTES.PROCESSO
+	SELECT ID_ENTIDADE, date(replace(DATABTE,'.','-')) AS DATA FROM TEMP_ALTERACOES_ESTATUTOS
+	UNION
+	SELECT ID_ENTIDADE, date(replace(DATABTE,'.','-')) AS DATA FROM TEMP_PROCESSOS LEFT OUTER JOIN TEMP_ELEICAO_CORPOS_GERENTES ON TEMP_PROCESSOS.PROCESSO=TEMP_ELEICAO_CORPOS_GERENTES.PROCESSO
+	UNION
+	SELECT ID_ENTIDADE, date(replace(DATA_ELEICAO,'.','-')) AS DATA FROM TEMP_PROCESSOS LEFT OUTER JOIN TEMP_ELEICAO_CORPOS_GERENTES ON TEMP_PROCESSOS.PROCESSO=TEMP_ELEICAO_CORPOS_GERENTES.PROCESSO
 ) GROUP BY ID_ENTIDADE;
 
 INSERT INTO Org_Patronal 
 SELECT TEMP_ENTIDADES.ID_ENTIDADE, NULL,
-       CASE trim(NOME_ENTIDADE) WHEN '' THEN trim(SIGLA) ELSE trim(NOME_ENTIDADE) END,
-       CASE trim(SIGLA) WHEN '' THEN NULL ELSE trim(SIGLA) END,
-       NULL, 
-       NULL,
-       REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(trim(DISTRITO_DESCRICAO),'DISTRITO DO ',''),'DIST. DO ',''),'DISTRITO DE ',''),'DIST. DE ',''),'DISTRITO DA ',''),'DIST. DA ',''),
-       trim(CODIGOPOSTAL_ENTIDADE), 
-       NULL, 
-       NULL, 
-       NULL, 
-       MIN_DATA,
-       MAX_DATA,
-       CASE lower(trim(ESTADO_ENTIDADE)) WHEN 'ativa' THEN 1 ELSE 0 END
+			 CASE trim(NOME_ENTIDADE) WHEN '' THEN trim(SIGLA) ELSE trim(NOME_ENTIDADE) END,
+			 CASE trim(SIGLA) WHEN '' THEN NULL ELSE trim(SIGLA) END,
+			 NULL, 
+			 NULL,
+			 REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(trim(DISTRITO_DESCRICAO),'DISTRITO DO ',''),'DIST. DO ',''),'DISTRITO DE ',''),'DIST. DE ',''),'DISTRITO DA ',''),'DIST. DA ',''),
+			 trim(CODIGOPOSTAL_ENTIDADE), 
+			 NULL, 
+			 NULL, 
+			 NULL, 
+			 MIN_DATA,
+			 MAX_DATA,
+			 CASE lower(trim(ESTADO_ENTIDADE)) WHEN 'ativa' THEN 1 ELSE 0 END
 FROM TEMP_ENTIDADES LEFT JOIN TEMP_DATAS_ENTIDADES ON TEMP_ENTIDADES.ID_ENTIDADE=TEMP_DATAS_ENTIDADES.ID_ENTIDADE WHERE CAST(SUBSTR(TEMP_ENTIDADES.ID_ENTIDADE,0,INSTR(TEMP_ENTIDADES.ID_ENTIDADE, '.')) AS INT) > 4;
 
 UPDATE Org_Patronal SET TIPO = CASE 
-     WHEN CAST(SUBSTR(ID,0,INSTR(ID, '.')) AS INT) = 1 THEN 'SINDICATO'
-     WHEN CAST(SUBSTR(ID,0,INSTR(ID, '.')) AS INT) = 2 THEN 'FEDERAÇÃO SINDICAL'
-     WHEN CAST(SUBSTR(ID,0,INSTR(ID, '.')) AS INT) = 3 THEN 'UNIÃO SINDICAL'
-     WHEN CAST(SUBSTR(ID,0,INSTR(ID, '.')) AS INT) = 4 THEN 'CONFEDERAÇÃO SINDICAL'
-     WHEN CAST(SUBSTR(ID,0,INSTR(ID, '.')) AS INT) = 5 THEN 'ASSOCIAÇÃO PATRONAL'
-     WHEN CAST(SUBSTR(ID,0,INSTR(ID, '.')) AS INT) = 6 THEN 'FEDERAÇÃO PATRONAL'
-     WHEN CAST(SUBSTR(ID,0,INSTR(ID, '.')) AS INT) = 7 THEN 'UNIÃO PATRONAL'
-     WHEN CAST(SUBSTR(ID,0,INSTR(ID, '.')) AS INT) = 8 THEN 'CONFEDERAÇÃO PATRONAL'
+		 WHEN CAST(SUBSTR(ID,0,INSTR(ID, '.')) AS INT) = 1 THEN 'SINDICATO'
+		 WHEN CAST(SUBSTR(ID,0,INSTR(ID, '.')) AS INT) = 2 THEN 'FEDERAÇÃO SINDICAL'
+		 WHEN CAST(SUBSTR(ID,0,INSTR(ID, '.')) AS INT) = 3 THEN 'UNIÃO SINDICAL'
+		 WHEN CAST(SUBSTR(ID,0,INSTR(ID, '.')) AS INT) = 4 THEN 'CONFEDERAÇÃO SINDICAL'
+		 WHEN CAST(SUBSTR(ID,0,INSTR(ID, '.')) AS INT) = 5 THEN 'ASSOCIAÇÃO PATRONAL'
+		 WHEN CAST(SUBSTR(ID,0,INSTR(ID, '.')) AS INT) = 6 THEN 'FEDERAÇÃO PATRONAL'
+		 WHEN CAST(SUBSTR(ID,0,INSTR(ID, '.')) AS INT) = 7 THEN 'UNIÃO PATRONAL'
+		 WHEN CAST(SUBSTR(ID,0,INSTR(ID, '.')) AS INT) = 8 THEN 'CONFEDERAÇÃO PATRONAL'
 END;
 
 UPDATE Org_Patronal SET Ambito_Geografico = ( 
@@ -399,29 +431,29 @@ UPDATE Org_Patronal SET Ambito_Geografico = (
 
 INSERT INTO Org_Sindical 
 SELECT TEMP_ENTIDADES.ID_ENTIDADE, NULL,
-       CASE trim(NOME_ENTIDADE) WHEN '' THEN trim(SIGLA) ELSE trim(NOME_ENTIDADE) END,
-       CASE trim(SIGLA) WHEN '' THEN NULL ELSE trim(SIGLA) END, 
-       NULL,
-       NULL,
-       REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(trim(DISTRITO_DESCRICAO),'DISTRITO DO ',''),'DIST. DO ',''),'DISTRITO DE ',''),'DIST. DE ',''),'DISTRITO DA ',''),'DIST. DA ',''),
-       trim(CODIGOPOSTAL_ENTIDADE),  
-       NULL, 
-       NULL, 
-       NULL, 
-       MIN_DATA,
-       MAX_DATA,
-       CASE lower(trim(ESTADO_ENTIDADE)) WHEN 'ativa' THEN 1 ELSE 0 END
+			 CASE trim(NOME_ENTIDADE) WHEN '' THEN trim(SIGLA) ELSE trim(NOME_ENTIDADE) END,
+			 CASE trim(SIGLA) WHEN '' THEN NULL ELSE trim(SIGLA) END, 
+			 NULL,
+			 NULL,
+			 REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(trim(DISTRITO_DESCRICAO),'DISTRITO DO ',''),'DIST. DO ',''),'DISTRITO DE ',''),'DIST. DE ',''),'DISTRITO DA ',''),'DIST. DA ',''),
+			 trim(CODIGOPOSTAL_ENTIDADE),  
+			 NULL, 
+			 NULL, 
+			 NULL, 
+			 MIN_DATA,
+			 MAX_DATA,
+			 CASE lower(trim(ESTADO_ENTIDADE)) WHEN 'ativa' THEN 1 ELSE 0 END
 FROM TEMP_ENTIDADES LEFT JOIN TEMP_DATAS_ENTIDADES ON TEMP_ENTIDADES.ID_ENTIDADE=TEMP_DATAS_ENTIDADES.ID_ENTIDADE WHERE CAST(SUBSTR(TEMP_ENTIDADES.ID_ENTIDADE,0,INSTR(TEMP_ENTIDADES.ID_ENTIDADE, '.')) AS INT) < 5;
 
 UPDATE Org_Sindical SET TIPO = CASE 
-     WHEN CAST(SUBSTR(ID,0,INSTR(ID, '.')) AS INT) = 1 THEN 'SINDICATO'
-     WHEN CAST(SUBSTR(ID,0,INSTR(ID, '.')) AS INT) = 2 THEN 'FEDERAÇÃO SINDICAL'
-     WHEN CAST(SUBSTR(ID,0,INSTR(ID, '.')) AS INT) = 3 THEN 'UNIÃO SINDICAL'
-     WHEN CAST(SUBSTR(ID,0,INSTR(ID, '.')) AS INT) = 4 THEN 'CONFEDERAÇÃO SINDICAL'
-     WHEN CAST(SUBSTR(ID,0,INSTR(ID, '.')) AS INT) = 5 THEN 'ASSOCIAÇÃO PATRONAL'
-     WHEN CAST(SUBSTR(ID,0,INSTR(ID, '.')) AS INT) = 6 THEN 'FEDERAÇÃO PATRONAL'
-     WHEN CAST(SUBSTR(ID,0,INSTR(ID, '.')) AS INT) = 7 THEN 'UNIÃO PATRONAL'
-     WHEN CAST(SUBSTR(ID,0,INSTR(ID, '.')) AS INT) = 8 THEN 'CONFEDERAÇÃO PATRONAL'
+		 WHEN CAST(SUBSTR(ID,0,INSTR(ID, '.')) AS INT) = 1 THEN 'SINDICATO'
+		 WHEN CAST(SUBSTR(ID,0,INSTR(ID, '.')) AS INT) = 2 THEN 'FEDERAÇÃO SINDICAL'
+		 WHEN CAST(SUBSTR(ID,0,INSTR(ID, '.')) AS INT) = 3 THEN 'UNIÃO SINDICAL'
+		 WHEN CAST(SUBSTR(ID,0,INSTR(ID, '.')) AS INT) = 4 THEN 'CONFEDERAÇÃO SINDICAL'
+		 WHEN CAST(SUBSTR(ID,0,INSTR(ID, '.')) AS INT) = 5 THEN 'ASSOCIAÇÃO PATRONAL'
+		 WHEN CAST(SUBSTR(ID,0,INSTR(ID, '.')) AS INT) = 6 THEN 'FEDERAÇÃO PATRONAL'
+		 WHEN CAST(SUBSTR(ID,0,INSTR(ID, '.')) AS INT) = 7 THEN 'UNIÃO PATRONAL'
+		 WHEN CAST(SUBSTR(ID,0,INSTR(ID, '.')) AS INT) = 8 THEN 'CONFEDERAÇÃO PATRONAL'
 END;
 
 UPDATE Org_Sindical SET Ambito_Geografico = ( 
@@ -455,129 +487,397 @@ UPDATE ORG_SINDICAL SET ACRONIMO=replace(ACRONIMO, 'UGT/', '') WHERE instr(ACRON
 UPDATE ORG_SINDICAL SET ACRONIMO=replace(replace(ACRONIMO, '(', ''), ')', '') WHERE instr(ACRONIMO, '(') > 0 OR instr(ACRONIMO, ')') > 0;
 UPDATE ORG_SINDICAL SET ACRONIMO=replace(ACRONIMO, '.', '') WHERE instr(ACRONIMO, '.') > 0;
 UPDATE ORG_SINDICAL SET ACRONIMO=replace(ACRONIMO, ' - ', '-') WHERE instr(ACRONIMO, ' - ') > 0;
+UPDATE ORG_SINDICAL SET ACRONIMO="STMTM" WHERE Acronimo = "OS-MONTES";
+UPDATE ORG_SINDICAL SET Nome="SINDICATO TÊXTIL DO MINHO E TRÁS-OS-MONTES" WHERE Acronimo = "STMTM";
+
 
 INSERT INTO Mencoes_BTE_Org_Sindical
 SELECT DISTINCT TEMP_ENTIDADES.ID_ENTIDADE, NULL,
-       strftime('%Y',date(replace(DATABTE,'.','-'))) AS Ano,
-       NUMBTE AS Numero,
-       SERIEBTE AS Serie,
-       NULL AS Descricao,
-       0 AS Mudanca_Estatuto,
-       0 AS Eleicoes,
-       1 AS Confianca
+			 strftime('%Y',date(replace(DATABTE,'.','-'))) AS Ano,
+			 NUMBTE AS Numero,
+			 SERIEBTE AS Serie,
+			 NULL AS Descricao,
+			 0 AS Mudanca_Estatuto,
+			 0 AS Eleicoes,
+			 1 AS Confianca
 FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ALTERACOES_ESTATUTOS WHERE CAST(SUBSTR(TEMP_ENTIDADES.ID_ENTIDADE,0,INSTR(TEMP_ENTIDADES.ID_ENTIDADE, '.')) AS INT) < 5
 UNION
 SELECT DISTINCT TEMP_ENTIDADES.ID_ENTIDADE, NULL,
-       strftime('%Y',date(replace(DATABTE,'.','-'))) AS Ano,
-       NUMBTE AS Numero,
-       SERIEBTE AS Serie,
-       NULL AS Descricao,
-       0 AS Mudanca_Estatuto,
-       0 AS Eleicoes,
-       1 AS Confianca
+			 strftime('%Y',date(replace(DATABTE,'.','-'))) AS Ano,
+			 NUMBTE AS Numero,
+			 SERIEBTE AS Serie,
+			 NULL AS Descricao,
+			 0 AS Mudanca_Estatuto,
+			 0 AS Eleicoes,
+			 1 AS Confianca
 FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ELEICAO_CORPOS_GERENTES WHERE CAST(SUBSTR(TEMP_ENTIDADES.ID_ENTIDADE,0,INSTR(TEMP_ENTIDADES.ID_ENTIDADE, '.')) AS INT) < 5;
 
 UPDATE Mencoes_BTE_Org_Sindical SET Mudanca_Estatuto = 1 WHERE ID_Organizacao_Sindical || ' - ' || Ano || ' - ' || Numero || ' - ' || Serie IN (
-  SELECT TEMP_ENTIDADES.ID_ENTIDADE || ' - ' || strftime('%Y',date(replace(DATABTE,'.','-'))) || ' - ' || NUMBTE || ' - ' || SERIEBTE 
-  FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ALTERACOES_ESTATUTOS 
+	SELECT TEMP_ENTIDADES.ID_ENTIDADE || ' - ' || strftime('%Y',date(replace(DATABTE,'.','-'))) || ' - ' || NUMBTE || ' - ' || SERIEBTE 
+	FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ALTERACOES_ESTATUTOS 
 );
 
 UPDATE Mencoes_BTE_Org_Sindical SET Eleicoes = 1 WHERE ID_Organizacao_Sindical || ' - ' || Ano || ' - ' || Numero || ' - ' || Serie IN (
-  SELECT TEMP_ENTIDADES.ID_ENTIDADE || ' - ' || strftime('%Y',date(replace(DATABTE,'.','-'))) || ' - ' || NUMBTE || ' - ' || SERIEBTE 
-  FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ELEICAO_CORPOS_GERENTES
+	SELECT TEMP_ENTIDADES.ID_ENTIDADE || ' - ' || strftime('%Y',date(replace(DATABTE,'.','-'))) || ' - ' || NUMBTE || ' - ' || SERIEBTE 
+	FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ELEICAO_CORPOS_GERENTES
 );
 
 INSERT INTO Mencoes_BTE_Org_Patronal
 SELECT DISTINCT TEMP_ENTIDADES.ID_ENTIDADE, NULL,
-       strftime('%Y',date(replace(DATABTE,'.','-'))) AS Ano,
-       NUMBTE AS Numero,
-       SERIEBTE AS Serie,
-       NULL AS Descricao, 
-       0 AS Mudanca_Estatuto,
-       0 AS Eleicoes,
-       1 AS Confianca
+			 strftime('%Y',date(replace(DATABTE,'.','-'))) AS Ano,
+			 NUMBTE AS Numero,
+			 SERIEBTE AS Serie,
+			 NULL AS Descricao, 
+			 0 AS Mudanca_Estatuto,
+			 0 AS Eleicoes,
+			 1 AS Confianca
 FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ALTERACOES_ESTATUTOS WHERE CAST(SUBSTR(TEMP_ENTIDADES.ID_ENTIDADE,0,INSTR(TEMP_ENTIDADES.ID_ENTIDADE, '.')) AS INT) > 4
 UNION
 SELECT DISTINCT TEMP_ENTIDADES.ID_ENTIDADE, NULL,
-       strftime('%Y',date(replace(DATABTE,'.','-'))) AS Ano,
-       NUMBTE AS Numero,
-       SERIEBTE AS Serie,
-       NULL AS Descricao, 
-       0 AS Mudanca_Estatuto,
-       0 AS Eleicoes,
-       1 AS Confianca
+			 strftime('%Y',date(replace(DATABTE,'.','-'))) AS Ano,
+			 NUMBTE AS Numero,
+			 SERIEBTE AS Serie,
+			 NULL AS Descricao, 
+			 0 AS Mudanca_Estatuto,
+			 0 AS Eleicoes,
+			 1 AS Confianca
 FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ELEICAO_CORPOS_GERENTES WHERE CAST(SUBSTR(TEMP_ENTIDADES.ID_ENTIDADE,0,INSTR(TEMP_ENTIDADES.ID_ENTIDADE, '.')) AS INT) > 4;
 
 UPDATE Mencoes_BTE_Org_Patronal SET Mudanca_Estatuto = 1 WHERE ID_Organizacao_Patronal || ' - ' || Ano || ' - ' || Numero || ' - ' || Serie IN (
-  SELECT TEMP_ENTIDADES.ID_ENTIDADE || ' - ' || strftime('%Y',date(replace(DATABTE,'.','-'))) || ' - ' || NUMBTE || ' - ' || SERIEBTE 
-  FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ALTERACOES_ESTATUTOS 
+	SELECT TEMP_ENTIDADES.ID_ENTIDADE || ' - ' || strftime('%Y',date(replace(DATABTE,'.','-'))) || ' - ' || NUMBTE || ' - ' || SERIEBTE 
+	FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ALTERACOES_ESTATUTOS 
 );
 
 UPDATE Mencoes_BTE_Org_Patronal SET Eleicoes = 1 WHERE ID_Organizacao_Patronal || ' - ' || Ano || ' - ' || Numero || ' - ' || Serie IN (
-  SELECT TEMP_ENTIDADES.ID_ENTIDADE || ' - ' || strftime('%Y',date(replace(DATABTE,'.','-'))) || ' - ' || NUMBTE || ' - ' || SERIEBTE 
-  FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ELEICAO_CORPOS_GERENTES
+	SELECT TEMP_ENTIDADES.ID_ENTIDADE || ' - ' || strftime('%Y',date(replace(DATABTE,'.','-'))) || ' - ' || NUMBTE || ' - ' || SERIEBTE 
+	FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ELEICAO_CORPOS_GERENTES
 );
 
 INSERT INTO Actos_Eleitorais_Org_Sindical
 SELECT TEMP_ENTIDADES.ID_ENTIDADE AS ID_Organizacao_Sindical,
-       date(replace(DATA_ELEICAO,'.','-')) AS Data,
-       MAX(NUM_H_EFECT + NUM_H_SUPL + NUM_M_EFECT + NUM_M_SUPL) AS Numero_Membros_Cadernos_Eleitoriais,
-       MAX(INSCRITOS) AS Numero_Membros_Inscritos,
-       MAX(VOTANTES) AS Numero_Membros_Votantes,
-       MAX(MESES_MANDATO) AS Meses_de_Mandato,
-       NULL
+			 date(replace(DATA_ELEICAO,'.','-')) AS Data,
+			 MAX(NUM_H_EFECT + NUM_H_SUPL + NUM_M_EFECT + NUM_M_SUPL) AS Numero_Membros_Cadernos_Eleitoriais,
+			 MAX(INSCRITOS) AS Numero_Membros_Inscritos,
+			 MAX(VOTANTES) AS Numero_Membros_Votantes,
+			 MAX(MESES_MANDATO) AS Meses_de_Mandato,
+			 NULL
 FROM TEMP_ENTIDADES NATURAL JOIN TEMP_ELEICAO_CORPOS_GERENTES WHERE CAST(SUBSTR(TEMP_ENTIDADES.ID_ENTIDADE,0,INSTR(TEMP_ENTIDADES.ID_ENTIDADE, '.')) AS INT) < 5
 GROUP BY ID_Organizacao_Sindical, Data;
 
 INSERT INTO Actos_Negociacao_Colectiva
 SELECT DISTINCT TEMP_IRCT.NUMERO AS ID,
-       NUMERO_SEQUENCIAL AS ID_SEQUENCIAL,
-       NOMECC AS Nome_Acto,
-       TIPO_CONVENCAO_DESCR_LONG AS Tipo_Acto,
-       NATUREZA_DESCRICAO AS Natureza,
-       ANO as Ano,
-       NUMBTE AS Numero,
-       SERIEBTE AS Serie,
-       date(replace(DATABTE,'.','-')) AS Data,
-       NULL AS URL,
-       AMBITO_GEOGRAFICO_IRCT AS Ambito_Geografico
+			 NUMERO_SEQUENCIAL AS ID_SEQUENCIAL,
+			 NOMECC AS Nome_Acto,
+			 TIPO_CONVENCAO_DESCR_LONG AS Tipo_Acto,
+			 NATUREZA_DESCRICAO AS Natureza,
+			 ANO as Ano,
+			 NUMBTE AS Numero,
+			 SERIEBTE AS Serie,
+			 date(replace(DATABTE,'.','-')) AS Data,
+			 NULL AS URL,
+			 AMBITO_GEOGRAFICO_IRCT AS Ambito_Geografico
 FROM TEMP_IRCT;
 
+
 CREATE INDEX IDX1 ON TEMP_IRCT(NUMERO,NUMERO_SEQUENCIAL,ANO,CODCAE);
-UPDATE TEMP_OUTORGANTES SET CODCAE=REPLACE(CODCAE,'0','')
 INSERT INTO Outorgantes_Actos
 SELECT DISTINCT
-  TEMP_OUTORGANTES.NUM AS ID,
-  TEMP_OUTORGANTES.NUMSEQ AS ID_SEQUENCIAL,
-  TEMP_OUTORGANTES.ANO AS Ano,
-  TEMP_OUTORGANTES.CODENTG AS ID_Organizacao_Sindical,
-  TEMP_OUTORGANTES.CODENTE AS ID_Organizacao_Patronal,
-  CASE
-   WHEN SUBSTR(SUBSTR('000000'|| CAST(CODCAE AS INT) , -5 , 5), 0, 3) IN ('01','02','03') THEN 'AGRICULTURA, PRODUÇÃO ANIMAL, CAÇA, FLORESTA E PESCA'
-   WHEN SUBSTR(SUBSTR('000000'|| CAST(CODCAE AS INT) , -5 , 5), 0, 3) IN ('05','06','07','08','09') THEN 'INDÚSTRIAS EXTRACTIVAS'
-   WHEN SUBSTR(SUBSTR('000000'|| CAST(CODCAE AS INT) , -5 , 5), 0, 3) IN ('10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33') THEN 'INDÚSTRIAS TRANSFORMADORAS'
-   WHEN SUBSTR(SUBSTR('000000'|| CAST(CODCAE AS INT) , -5 , 5), 0, 3) IN ('35') THEN 'ELECTRICIDADE, GÁS, VAPOR, ÁGUA QUENTE E FRIA E AR FRIO'
-   WHEN SUBSTR(SUBSTR('000000'|| CAST(CODCAE AS INT) , -5 , 5), 0, 3) IN ('36','37','38','39') THEN 'CAPTAÇÃO, TRATAMENTO E DISTRIBUIÇÃO DE ÁGUA; SANEAMENTO GESTÃO DE RESÍDUOS E DESPOLUIÇÃO'
-   WHEN SUBSTR(SUBSTR('000000'|| CAST(CODCAE AS INT) , -5 , 5), 0, 3) IN ('41','42','43') THEN 'CONSTRUÇÃO'
-   WHEN SUBSTR(SUBSTR('000000'|| CAST(CODCAE AS INT) , -5 , 5), 0, 3) IN ('45','46','47') THEN 'COMÉRCIO POR GROSSO E A RETALHO; REPARAÇÃO DE VEÍCULOS AUTOMÓVEIS E MOTOCICLOS'
-   WHEN SUBSTR(SUBSTR('000000'|| CAST(CODCAE AS INT) , -5 , 5), 0, 3) IN ('49','50','51','52','53') THEN 'TRANSPORTES E ARMAZENAGEM'
-   WHEN SUBSTR(SUBSTR('000000'|| CAST(CODCAE AS INT) , -5 , 5), 0, 3) IN ('55','56') THEN 'ALOJAMENTO, RESTAURAÇÃO E SIMILARES'
-   WHEN SUBSTR(SUBSTR('000000'|| CAST(CODCAE AS INT) , -5 , 5), 0, 3) IN ('59','59','60','61','62','63') THEN 'ACTIVIDADES DE INFORMAÇÃO E DE COMUNICAÇÃO'
-   WHEN SUBSTR(SUBSTR('000000'|| CAST(CODCAE AS INT) , -5 , 5), 0, 3) IN ('64','65','66') THEN 'ACTIVIDADES FINANCEIRAS E DE SEGUROS'
-   WHEN SUBSTR(SUBSTR('000000'|| CAST(CODCAE AS INT) , -5 , 5), 0, 3) IN ('68') THEN 'ACTIVIDADES IMOBILIÁRIAS'
-   WHEN SUBSTR(SUBSTR('000000'|| CAST(CODCAE AS INT) , -5 , 5), 0, 3) IN ('69','70','71','72','73','74','75') THEN 'ACTIVIDADES DE CONSULTORIA, CIENTÍFICAS, TÉCNICAS E SIMILARES'
-   WHEN SUBSTR(SUBSTR('000000'|| CAST(CODCAE AS INT) , -5 , 5), 0, 3) IN ('77','78','79','80','81','82') THEN 'ACTIVIDADES ADMINISTRATIVAS E DOS SERVIÇOS DE APOIO'
-   WHEN SUBSTR(SUBSTR('000000'|| CAST(CODCAE AS INT) , -5 , 5), 0, 3) IN ('84') THEN 'ADMINISTRAÇÃO PÚBLICA E DEFESA; SEGURANÇA SOCIAL OBRIGATÓRIA'
-   WHEN SUBSTR(SUBSTR('000000'|| CAST(CODCAE AS INT) , -5 , 5), 0, 3) IN ('85') THEN 'EDUCAÇÃO'
-   WHEN SUBSTR(SUBSTR('000000'|| CAST(CODCAE AS INT) , -5 , 5), 0, 3) IN ('86','87','88') THEN 'ACTIVIDADES DE SAÚDE HUMANA E APOIO SOCIAL'
-   WHEN SUBSTR(SUBSTR('000000'|| CAST(CODCAE AS INT) , -5 , 5), 0, 3) IN ('90','91','92','93') THEN 'ACTIVIDADES ARTÍSTICAS, DE ESPECTÁCULOS, DESPORTIVAS E RECREATIVAS'
-   WHEN SUBSTR(SUBSTR('000000'|| CAST(CODCAE AS INT) , -5 , 5), 0, 3) IN ('94','95','96') THEN 'OUTRAS ACTIVIDADES DE SERVIÇOS'
-   WHEN SUBSTR(SUBSTR('000000'|| CAST(CODCAE AS INT) , -5 , 5), 0, 3) IN ('97','98') THEN 'ACTIVIDADES DAS FAMÍLIAS EMPREGADORAS DE PESSOAL DOMÉSTICO E ACTIVIDADES DE PRODUÇÃO DAS FAMÍLIAS PARA USO PRÓPRIO'
-   WHEN SUBSTR(SUBSTR('000000'|| CAST(CODCAE AS INT) , -5 , 5), 0, 3) IN ('99') THEN 'ACTIVIDADES DOS ORGANISMOS INTERNACIONAIS E OUTRAS INSTITUIÇÕES EXTRA-TERRITORIAIS'
-  END AS Sector
+	TEMP_OUTORGANTES.NUM AS ID,
+	TEMP_OUTORGANTES.NUMSEQ AS ID_SEQUENCIAL,
+	TEMP_OUTORGANTES.ANO AS Ano,
+	(SELECT TEMP_OUTORGANTES.CODENTG || '.' || TEMP_OUTORGANTES.CODENTE || '.' || TEMP_OUTORGANTES.NUMALT AS ID_Organizacao_Sindical FROM Org_Sindical WHERE ID_Organizacao_Sindical=Org_Sindical.ID),
+	(SELECT TEMP_OUTORGANTES.CODENTG || '.' || TEMP_OUTORGANTES.CODENTE || '.' || TEMP_OUTORGANTES.NUMALT AS ID_Organizacao_Patronal FROM Org_Patronal WHERE ID_Organizacao_Patronal=Org_Patronal.ID),
+	CASE
+	 WHEN SUBSTR(SUBSTR('000000'|| CAST(REPLACE(CODCAE,'0','') AS INT) , -5 , 5), 0, 3) IN ('01','02','03') THEN 'AGRICULTURA, PRODUÇÃO ANIMAL, CAÇA, FLORESTA E PESCA'
+	 WHEN SUBSTR(SUBSTR('000000'|| CAST(REPLACE(CODCAE,'0','') AS INT) , -5 , 5), 0, 3) IN ('05','06','07','08','09') THEN 'INDÚSTRIAS EXTRACTIVAS'
+	 WHEN SUBSTR(SUBSTR('000000'|| CAST(REPLACE(CODCAE,'0','') AS INT) , -5 , 5), 0, 3) IN ('10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33') THEN 'INDÚSTRIAS TRANSFORMADORAS'
+	 WHEN SUBSTR(SUBSTR('000000'|| CAST(REPLACE(CODCAE,'0','') AS INT) , -5 , 5), 0, 3) IN ('35') THEN 'ELECTRICIDADE, GÁS, VAPOR, ÁGUA QUENTE E FRIA E AR FRIO'
+	 WHEN SUBSTR(SUBSTR('000000'|| CAST(REPLACE(CODCAE,'0','') AS INT) , -5 , 5), 0, 3) IN ('36','37','38','39') THEN 'CAPTAÇÃO, TRATAMENTO E DISTRIBUIÇÃO DE ÁGUA; SANEAMENTO GESTÃO DE RESÍDUOS E DESPOLUIÇÃO'
+	 WHEN SUBSTR(SUBSTR('000000'|| CAST(REPLACE(CODCAE,'0','') AS INT) , -5 , 5), 0, 3) IN ('41','42','43') THEN 'CONSTRUÇÃO'
+	 WHEN SUBSTR(SUBSTR('000000'|| CAST(REPLACE(CODCAE,'0','') AS INT) , -5 , 5), 0, 3) IN ('45','46','47') THEN 'COMÉRCIO POR GROSSO E A RETALHO; REPARAÇÃO DE VEÍCULOS AUTOMÓVEIS E MOTOCICLOS'
+	 WHEN SUBSTR(SUBSTR('000000'|| CAST(REPLACE(CODCAE,'0','') AS INT) , -5 , 5), 0, 3) IN ('49','50','51','52','53') THEN 'TRANSPORTES E ARMAZENAGEM'
+	 WHEN SUBSTR(SUBSTR('000000'|| CAST(REPLACE(CODCAE,'0','') AS INT) , -5 , 5), 0, 3) IN ('55','56') THEN 'ALOJAMENTO, RESTAURAÇÃO E SIMILARES'
+	 WHEN SUBSTR(SUBSTR('000000'|| CAST(REPLACE(CODCAE,'0','') AS INT) , -5 , 5), 0, 3) IN ('59','59','60','61','62','63') THEN 'ACTIVIDADES DE INFORMAÇÃO E DE COMUNICAÇÃO'
+	 WHEN SUBSTR(SUBSTR('000000'|| CAST(REPLACE(CODCAE,'0','') AS INT) , -5 , 5), 0, 3) IN ('64','65','66') THEN 'ACTIVIDADES FINANCEIRAS E DE SEGUROS'
+	 WHEN SUBSTR(SUBSTR('000000'|| CAST(REPLACE(CODCAE,'0','') AS INT) , -5 , 5), 0, 3) IN ('68') THEN 'ACTIVIDADES IMOBILIÁRIAS'
+	 WHEN SUBSTR(SUBSTR('000000'|| CAST(REPLACE(CODCAE,'0','') AS INT) , -5 , 5), 0, 3) IN ('69','70','71','72','73','74','75') THEN 'ACTIVIDADES DE CONSULTORIA, CIENTÍFICAS, TÉCNICAS E SIMILARES'
+	 WHEN SUBSTR(SUBSTR('000000'|| CAST(REPLACE(CODCAE,'0','') AS INT) , -5 , 5), 0, 3) IN ('77','78','79','80','81','82') THEN 'ACTIVIDADES ADMINISTRATIVAS E DOS SERVIÇOS DE APOIO'
+	 WHEN SUBSTR(SUBSTR('000000'|| CAST(REPLACE(CODCAE,'0','') AS INT) , -5 , 5), 0, 3) IN ('84') THEN 'ADMINISTRAÇÃO PÚBLICA E DEFESA; SEGURANÇA SOCIAL OBRIGATÓRIA'
+	 WHEN SUBSTR(SUBSTR('000000'|| CAST(REPLACE(CODCAE,'0','') AS INT) , -5 , 5), 0, 3) IN ('85') THEN 'EDUCAÇÃO'
+	 WHEN SUBSTR(SUBSTR('000000'|| CAST(REPLACE(CODCAE,'0','') AS INT) , -5 , 5), 0, 3) IN ('86','87','88') THEN 'ACTIVIDADES DE SAÚDE HUMANA E APOIO SOCIAL'
+	 WHEN SUBSTR(SUBSTR('000000'|| CAST(REPLACE(CODCAE,'0','') AS INT) , -5 , 5), 0, 3) IN ('90','91','92','93') THEN 'ACTIVIDADES ARTÍSTICAS, DE ESPECTÁCULOS, DESPORTIVAS E RECREATIVAS'
+	 WHEN SUBSTR(SUBSTR('000000'|| CAST(REPLACE(CODCAE,'0','') AS INT) , -5 , 5), 0, 3) IN ('94','95','96') THEN 'OUTRAS ACTIVIDADES DE SERVIÇOS'
+	 WHEN SUBSTR(SUBSTR('000000'|| CAST(REPLACE(CODCAE,'0','') AS INT) , -5 , 5), 0, 3) IN ('97','98') THEN 'ACTIVIDADES DAS FAMÍLIAS EMPREGADORAS DE PESSOAL DOMÉSTICO E ACTIVIDADES DE PRODUÇÃO DAS FAMÍLIAS PARA USO PRÓPRIO'
+	 WHEN SUBSTR(SUBSTR('000000'|| CAST(REPLACE(CODCAE,'0','') AS INT) , -5 , 5), 0, 3) IN ('99') THEN 'ACTIVIDADES DOS ORGANISMOS INTERNACIONAIS E OUTRAS INSTITUIÇÕES EXTRA-TERRITORIAIS'
+	END AS Sector
 FROM TEMP_OUTORGANTES, TEMP_IRCT
-WHERE TEMP_IRCT.NUMERO=TEMP_OUTORGANTES.NUM AND TEMP_IRCT.NUMERO_SEQUENCIAL= TEMP_OUTORGANTES.NUMSEQ AND TEMP_IRCT.ANO=TEMP_OUTORGANTES.ANO;
+WHERE TEMP_IRCT.NUMERO=TEMP_OUTORGANTES.NUM AND TEMP_IRCT.NUMERO_SEQUENCIAL=TEMP_OUTORGANTES.NUMSEQ AND TEMP_IRCT.ANO=TEMP_OUTORGANTES.ANO;
 
+UPDATE Outorgantes_Actos SET ID_Organizacao_Sindical = ( SELECT ID FROM Org_Sindical WHERE ID LIKE SUBSTR(ID_Organizacao_Sindical,0,LENGTH(ID_Organizacao_Sindical)-1) ORDER BY ID DESC) WHERE ID_Organizacao_Sindical IS NULL;
+UPDATE Outorgantes_Actos SET ID_Organizacao_Patronal = ( SELECT ID FROM Org_Patronal WHERE ID LIKE SUBSTR(ID_Organizacao_Patronal,0,LENGTH(ID_Organizacao_Patronal)-1) ORDER BY ID DESC) WHERE ID_Organizacao_Patronal IS NULL;
+DELETE FROM Outorgantes_Actos WHERE rowid NOT IN (SELECT MAX(rowid) from Outorgantes_Actos group by ID, ID_SEQUENCIAL, ANO, ID_Organizacao_Sindical, ID_Organizacao_Patronal, Sector );
+
+UPDATE Outorgantes_Actos SET ID_Organizacao_Sindical = ( SELECT ID_Organizacao_Sindical FROM Outorgantes_Actos O2 WHERE O2.ID_Organizacao_Sindical IS NOT NULL AND Outorgantes_Actos.ID=O2.ID AND Outorgantes_Actos.ID_SEQUENCIAL=O2.ID_SEQUENCIAL AND Outorgantes_Actos.Ano=O2.Ano) WHERE ID_Organizacao_Sindical IS NULL;
+#UPDATE Outorgantes_Actos SET Sector=(SELECT Sector from Outorgantes_Actos O2 WHERE Sector IS NOT NULL AND Outorgantes_Actos.ID=O2.ID AND Outorgantes_Actos.ID_SEQUENCIAL=O2.ID_SEQUENCIAL AND Outorgantes_Actos.Ano=O2.Ano) WHERE Sector is NULL;
+DELETE FROM Outorgantes_Actos WHERE rowid NOT IN (SELECT MAX(rowid) from Outorgantes_Actos group by ID, ID_SEQUENCIAL, ANO, ID_Organizacao_Sindical, ID_Organizacao_Patronal, Sector );
+
+
+--Tabela temporaria para matching de mes com o numero do mes correspondente, usado na construcao das datas 
+CREATE TABLE TEMP_MESES_NUMERO(Mes_EN VARCHAR(3), Mes_PT VARCHAR(3), Numero VARCHAR(2));
+
+INSERT INTO TEMP_MESES_NUMERO (Mes_EN, Mes_PT, Numero)
+VALUES
+	("Jan", "jan", "01"),("Feb", "fev", "02"),("Mar", "mar", "03"),("Apr", "abr", "04"),("May", "mai", "05"),("Jun", "jun", "06"),("Jul", "jul", "07"),("Aug", "ago", "08"),("Sep", "set", "09"),("Oct", "out", "10"),
+	("Nov", "nov", "11"),("Dec", "dez", "12");
+
+--Popular a tabela avisos de greve com o 1º csv (avisos de greve de 2013 a 2014)
+INSERT INTO TEMP_AVISOS_GREVE SELECT DISTINCT
+	NULL,
+	CASE
+		WHEN INSTR(Início,"DIAS") > 0 AND INSTR(Início, "de") > 0 THEN CAST(SUBSTR(Início,INSTR(Início,"de")+3,4) AS INTEGER)
+		WHEN INSTR(Início,"/") > 0 THEN CAST(SUBSTR(Início,INSTR(Início,"/")+4,4) AS INTEGER)
+		WHEN LENGTH(Início) = 9 AND SUBSTR(Início,8,2)="12" THEN CAST("20" || "13" AS INTEGER)
+		WHEN LENGTH(Início) = 9 AND SUBSTR(Início,8,2)!="12" THEN CAST("20" || SUBSTR(Início,8,2) AS INTEGER)
+		ELSE ANO
+	END AS Ano_Inicio,
+	CASE
+		WHEN INSTR(Início,"/") > 0 THEN CAST(SUBSTR(Início,INSTR(Início,"/")+1,2) AS INTEGER)
+		WHEN INSTR(Início, "-") > 0 AND LENGTH(Início) > 5 THEN CAST((SELECT Numero FROM TEMP_MESES_NUMERO WHERE Mes_EN = SUBSTR(Início,4,3)) AS INTEGER)
+		ELSE MÊS
+	END AS Mes_Inicio,
+	CASE
+		WHEN [Entidade Sindical] = "0" THEN NULL
+		WHEN [Entidade Sindical] = "6 Sindicatos" THEN NULL
+		WHEN INSTR([Entidade Sindical],";") > 0 AND INSTR([Entidade Sindical], "(") = 0 THEN REPLACE([Entidade Sindical], ";", " / ")
+		ELSE [Entidade Sindical]
+	END AS Entidade_Sindical,
+	CASE
+		WHEN [Entidade Patronal] = "0" THEN NULL
+		ELSE [Entidade Patronal]
+	END AS Entidade_Patronal,
+	CASE
+		WHEN INSTR(Fim,"/") > 0 AND LENGTH(Fim) = 8 THEN CAST("20" || SUBSTR(Fim,7,2) AS INTEGER)
+		WHEN INSTR(Fim,"Empresas") = 0 AND LENGTH(Fim) = 10 THEN CAST(SUBSTR(Fim,7,4) AS INTEGER)
+		WHEN LENGTH(Fim) = 9 THEN CAST("20" || SUBSTR(Fim,8,2) AS INTEGER)
+		ELSE ANO
+	END AS Ano_Fim,
+	CASE
+		WHEN INSTR(Fim,"/") > 0 AND LENGTH(Fim) <= 6 THEN CAST((SELECT Numero FROM TEMP_MESES_NUMERO WHERE Mes_PT = SUBSTR(Fim,INSTR(Fim,"/")+1,3)) AS INTEGER)
+		WHEN INSTR(Fim,"/") > 0 AND LENGTH(Fim) > 6 THEN CAST(SUBSTR(Fim,INSTR(Fim,"/")+1,2) AS INTEGER)
+		WHEN INSTR(Fim,"-") > 0 AND LENGTH(Fim) = 10 THEN CAST(SUBSTR(Fim,INSTR(Fim,"-")+1,2) AS INTEGER)
+		WHEN INSTR(Fim,"-") > 0 AND LENGTH(Fim) <= 9 THEN CAST((SELECT Numero FROM TEMP_MESES_NUMERO WHERE Mes_EN = SUBSTR(Fim,INSTR(Fim,"-")+1,3)) AS INTEGER)
+		ELSE MÊS
+	END AS Mes_Fim,
+	CASE
+		WHEN INSTR(Início,"/") > 0 AND INSTR(Fim,"/") > 0 AND LENGTH(Fim) = 5 THEN
+				julianday(ANO || '-' || (SELECT Numero FROM TEMP_MESES_NUMERO WHERE Mes_PT = SUBSTR(Fim,INSTR(Fim,"/")+1,3)) || '-' || '0' || SUBSTR(Fim,1,1))
+				- julianday(SUBSTR(Início,INSTR(Início,"/")+4,4) || '-' || SUBSTR(Início,INSTR(Início,"/")+1,2) || '-' || SUBSTR(Início,1,2))
+
+		WHEN INSTR(Início,"/") > 0 AND INSTR(Fim,"/") > 0 AND LENGTH(Fim) = 6 THEN
+				julianday(ANO || '-' || (SELECT Numero FROM TEMP_MESES_NUMERO WHERE Mes_PT = SUBSTR(Fim,INSTR(Fim,"/")+1,3)) || '-' || SUBSTR(Fim,1,2))
+				- julianday(SUBSTR(Início,INSTR(Início,"/")+4,4) || '-' || SUBSTR(Início,INSTR(Início,"/")+1,2) || '-' || SUBSTR(Início,1,2))
+
+		WHEN INSTR(Início,"/") > 0 AND (INSTR(Fim,"/") > 0 OR INSTR(Fim, "-") > 0) AND LENGTH(Fim) = 10 THEN
+				julianday(SUBSTR(Fim,7,4) || '-' || SUBSTR(Fim,4,2) || '-' || SUBSTR(Fim,1,2))
+				- julianday(SUBSTR(Início,INSTR(Início,"/")+4,4) || '-' || SUBSTR(Início,INSTR(Início,"/")+1,2) || '-' || SUBSTR(Início,1,2))
+
+		WHEN INSTR(Início,"/") > 0 AND INSTR(Fim,"/") > 0 AND LENGTH(Fim) = 8 THEN
+				julianday("20" || SUBSTR(Fim,7,2) || '-' || SUBSTR(Fim,4,2) || '-' || SUBSTR(Fim,1,2))
+				- julianday(SUBSTR(Início,INSTR(Início,"/")+4,4) || '-' || SUBSTR(Início,INSTR(Início,"/")+1,2) || '-' || SUBSTR(Início,1,2))
+
+		WHEN INSTR(Início,"/") > 0 AND INSTR(Fim,"-") > 0 AND LENGTH(Fim) = 9 THEN
+				julianday("20" || SUBSTR(Fim,8,2) || '-' || (SELECT Numero FROM TEMP_MESES_NUMERO WHERE Mes_EN = SUBSTR(Fim,INSTR(Fim,"-")+1,3)) || '-' || SUBSTR(Fim,1,2))
+				- julianday(SUBSTR(Início,INSTR(Início,"/")+4,4) || '-' || SUBSTR(Início,INSTR(Início,"/")+1,2) || '-' || SUBSTR(Início,1,2))
+
+		WHEN INSTR(Início,"/") > 0 AND INSTR(Fim,"-") > 0 AND LENGTH(Fim) = 6 THEN
+				julianday(ANO || '-' || (SELECT Numero FROM TEMP_MESES_NUMERO WHERE Mes_EN = SUBSTR(Fim,INSTR(Fim,"-")+1,3)) || '-' || SUBSTR(Fim,1,2))
+				- julianday(SUBSTR(Início,INSTR(Início,"/")+4,4) || '-' || SUBSTR(Início,INSTR(Início,"/")+1,2) || '-' || SUBSTR(Início,1,2))
+
+		
+		WHEN INSTR(Início,"-") > 0 AND LENGTH(Início) = 6 AND INSTR(Fim,"/") > 0 AND LENGTH(Fim) = 5 THEN 
+				julianday(ANO || '-' || (SELECT Numero FROM TEMP_MESES_NUMERO WHERE Mes_PT = SUBSTR(Fim,INSTR(Fim,"/")+1,3)) || '-' || '0' || SUBSTR(Fim,1,1))
+				- julianday(ANO || '-' || (SELECT Numero FROM TEMP_MESES_NUMERO WHERE Mes_EN = SUBSTR(Início,INSTR(Início,"-")+1,3)) || '-' || SUBSTR(Início,1,2))
+
+		WHEN INSTR(Início,"-") > 0 AND LENGTH(Início) = 9 AND INSTR(Fim,"/") > 0 AND LENGTH(Fim) = 5 THEN 
+				julianday(ANO || '-' || (SELECT Numero FROM TEMP_MESES_NUMERO WHERE Mes_PT = SUBSTR(Fim,INSTR(Fim,"/")+1,3)) || '-' || '0' || SUBSTR(Fim,1,1))
+				- julianday("20" || SUBSTR(Início,8,2) || '-' || (SELECT Numero FROM TEMP_MESES_NUMERO WHERE Mes_EN = SUBSTR(Início,INSTR(Início,"-")+1,3)) || '-' || SUBSTR(Início,1,2))    
+
+		WHEN INSTR(Início,"-") > 0 AND LENGTH(Início) = 6 AND INSTR(Fim,"/") > 0 AND LENGTH(Fim) = 6 THEN 
+				julianday(ANO || '-' || (SELECT Numero FROM TEMP_MESES_NUMERO WHERE Mes_PT = SUBSTR(Fim,INSTR(Fim,"/")+1,3)) || '-' || SUBSTR(Fim,1,2))
+				- julianday(ANO || '-' || (SELECT Numero FROM TEMP_MESES_NUMERO WHERE Mes_EN = SUBSTR(Início,INSTR(Início,"-")+1,3)) || '-' || SUBSTR(Início,1,2))    
+
+		WHEN INSTR(Início,"-") > 0 AND LENGTH(Início) = 9 AND INSTR(Fim,"/") > 0 AND LENGTH(Fim) = 6 THEN 
+				julianday(ANO || '-' || (SELECT Numero FROM TEMP_MESES_NUMERO WHERE Mes_PT = SUBSTR(Fim,INSTR(Fim,"/")+1,3)) || '-' || SUBSTR(Fim,1,2))
+				- julianday("20" || SUBSTR(Início,8,2) || '-' || (SELECT Numero FROM TEMP_MESES_NUMERO WHERE Mes_EN = SUBSTR(Início,INSTR(Início,"-")+1,3)) || '-' || SUBSTR(Início,1,2))
+
+
+		WHEN INSTR(Início,"-") > 0 AND LENGTH(Início) = 6 AND (INSTR(Fim,"/") > 0 OR INSTR(Fim, "-") > 0) AND LENGTH(Fim) = 10 THEN
+				julianday(SUBSTR(Fim,7,4) || '-' || SUBSTR(Fim,4,2) || '-' || SUBSTR(Fim,1,2))
+				- julianday(ANO || '-' || (SELECT Numero FROM TEMP_MESES_NUMERO WHERE Mes_EN = SUBSTR(Início,INSTR(Início,"-")+1,3)) || '-' || SUBSTR(Início,1,2))
+
+		WHEN INSTR(Início,"-") > 0 AND LENGTH(Início) = 9 AND (INSTR(Fim,"/") > 0 OR INSTR(Fim, "-") > 0) AND LENGTH(Fim) = 10 THEN
+				julianday(SUBSTR(Fim,7,4) || '-' || SUBSTR(Fim,4,2) || '-' || SUBSTR(Fim,1,2))
+				- julianday("20" || SUBSTR(Início,8,2) || '-' || (SELECT Numero FROM TEMP_MESES_NUMERO WHERE Mes_EN = SUBSTR(Início,INSTR(Início,"-")+1,3)) || '-' || SUBSTR(Início,1,2))        
+
+
+		WHEN INSTR(Início,"-") > 0 AND LENGTH(Início) = 6 AND INSTR(Fim,"/") > 0 AND LENGTH(Fim) = 8 THEN
+				julianday("20" || SUBSTR(Fim,7,2) || '-' || SUBSTR(Fim,4,2) || '-' || SUBSTR(Fim,1,2))
+				- julianday(ANO || '-' || (SELECT Numero FROM TEMP_MESES_NUMERO WHERE Mes_EN = SUBSTR(Início,INSTR(Início,"-")+1,3)) || '-' || SUBSTR(Início,1,2))
+
+		WHEN INSTR(Início,"-") > 0 AND LENGTH(Início) = 9 AND INSTR(Fim,"/") > 0 AND LENGTH(Fim) = 8 THEN
+				julianday("20" || SUBSTR(Fim,7,2) || '-' || SUBSTR(Fim,4,2) || '-' || SUBSTR(Fim,1,2))
+				- julianday("20" || SUBSTR(Início,8,2) || '-' || (SELECT Numero FROM TEMP_MESES_NUMERO WHERE Mes_EN = SUBSTR(Início,INSTR(Início,"-")+1,3)) || '-' || SUBSTR(Início,1,2))
+
+		WHEN INSTR(Início,"-") > 0 AND LENGTH(Início) = 6 AND INSTR(Fim,"-") > 0 AND LENGTH(Fim) = 9 THEN
+				julianday("20" || SUBSTR(Fim,8,2) || '-' || (SELECT Numero FROM TEMP_MESES_NUMERO WHERE Mes_EN = SUBSTR(Fim,INSTR(Fim,"-")+1,3)) || '-' || SUBSTR(Fim,1,2))
+				- julianday(ANO || '-' || (SELECT Numero FROM TEMP_MESES_NUMERO WHERE Mes_EN = SUBSTR(Início,INSTR(Início,"-")+1,3)) || '-' || SUBSTR(Início,1,2))
+
+		WHEN INSTR(Início,"-") > 0 AND LENGTH(Início) = 9 AND INSTR(Fim,"-") > 0 AND LENGTH(Fim) = 9 THEN
+				julianday("20" || SUBSTR(Fim,8,2) || '-' || (SELECT Numero FROM TEMP_MESES_NUMERO WHERE Mes_EN = SUBSTR(Fim,INSTR(Fim,"-")+1,3)) || '-' || SUBSTR(Fim,1,2))
+				- julianday("20" || SUBSTR(Início,8,2) || '-' || (SELECT Numero FROM TEMP_MESES_NUMERO WHERE Mes_EN = SUBSTR(Início,INSTR(Início,"-")+1,3)) || '-' || SUBSTR(Início,1,2))
+
+		WHEN INSTR(Início,"-") > 0 AND LENGTH(Início) = 6 AND INSTR(Fim,"-") > 0 AND LENGTH(Fim) = 6 THEN
+				julianday(ANO || '-' || (SELECT Numero FROM TEMP_MESES_NUMERO WHERE Mes_EN = SUBSTR(Fim,INSTR(Fim,"-")+1,3)) || '-' || SUBSTR(Fim,1,2))
+				- julianday(ANO || '-' || (SELECT Numero FROM TEMP_MESES_NUMERO WHERE Mes_EN = SUBSTR(Início,INSTR(Início,"-")+1,3)) || '-' || SUBSTR(Início,1,2))
+
+		WHEN INSTR(Início,"-") > 0 AND LENGTH(Início) = 9 AND INSTR(Fim,"-") > 0 AND LENGTH(Fim) = 6 THEN
+				julianday(ANO || '-' || (SELECT Numero FROM TEMP_MESES_NUMERO WHERE Mes_EN = SUBSTR(Fim,INSTR(Fim,"-")+1,3)) || '-' || SUBSTR(Fim,1,2))
+				- julianday("20" || SUBSTR(Início,8,2) || '-' || (SELECT Numero FROM TEMP_MESES_NUMERO WHERE Mes_EN = SUBSTR(Início,INSTR(Início,"-")+1,3)) || '-' || SUBSTR(Início,1,2))
+				
+		ELSE NULL
+	END AS Duracao
+ FROM TEMP_AVISOS_GREVE1;
+
+ 	--Atualizar os registos em que a duracao < 0
+	UPDATE TEMP_AVISOS_GREVE SET Ano_Inicio = Ano_Fim, Mes_Inicio = Mes_Fim, Ano_Fim = Ano_Inicio, Mes_Fim = Mes_Inicio, Duracao = Duracao * -1 
+	WHERE Duracao < 0;
+
+	--Popular a tabela avisos de greve com o 2º csv (avisos de greve de 2015 a 2019)
+	INSERT INTO TEMP_AVISOS_GREVE SELECT DISTINCT
+		NULL, 
+		ANO AS Ano_Inicio, 
+		MÊS AS Mes_Fim, 
+		CASE 
+			WHEN SINDICATO LIKE "%2%" THEN NULL
+			WHEN INSTR(SINDICATO,";") > 0 AND INSTR(SINDICATO, "(") = 0 THEN REPLACE(SINDICATO,";", " / ")
+			ELSE SINDICATO
+		END AS Entidade_Sindical,
+		CASE
+			WHEN EMPREGADOR = "2019" OR INSTR(EMPREGADOR,"/") = 3 THEN NULL 
+			ELSE EMPREGADOR 
+		END AS Entidade_Patronal, 
+		ANO AS Ano_Fim, 
+		MÊS AS Mes_Fim,
+		CASE
+			WHEN DURAÇÃO = "Total 1 dia" OR DURAÇÃO = "Total  1 dia" THEN 1
+			WHEN (DURAÇÃO LIKE "%Parcial%" OR DURAÇÃO LIKE "%PARCIAL%") AND INSTR(DURAÇÃO,"+") = 0 AND INSTR(DURAÇÃO,"1") > 0 THEN 1
+			WHEN (DURAÇÃO LIKE "%Parcial%" OR DURAÇÃO LIKE "%PARCIAL%") AND INSTR(DURAÇÃO,"+") = 0 AND INSTR(DURAÇÃO,"3") > 0 THEN 3
+			WHEN 1 <= LENGTH(DURAÇÃO) <= 2 AND 1 <= CAST(DURAÇÃO AS INTEGER) <= 10 THEN CAST(DURAÇÃO AS INTEGER)
+			ELSE NULL
+		END AS Duracao 
+	FROM TEMP_AVISOS_GREVE2;
+
+--Separar em varios registos os registos que possuem mais do que uma entidade sindical envolvida no aviso de greve
+WITH RECURSIVE split(id, ano_in, mes_in, ent_sind, ent_pat, ano_f, mes_f, dur, rest) AS 
+(SELECT Id_Entidade_Sindical, Ano_Inicio, Mes_Inicio, '', Entidade_Patronal, Ano_Fim, Mes_Fim, Duracao, Entidade_Sindical || ' / ' FROM TEMP_AVISOS_GREVE
+	UNION ALL
+SELECT  id, ano_in, mes_in, SUBSTR(rest,0,INSTR(rest,'/')-1), ent_pat, ano_f, mes_f, dur, SUBSTR(rest, INSTR(rest,'/')+2) FROM split WHERE rest LIKE "% / %" AND INSTR(rest, "(") = 0 AND rest <> '')
+
+--Inserir na tabela Avisos de Greve
+INSERT INTO Avisos_Greve SELECT DISTINCT id, ano_in, mes_in, ent_sind, ent_pat, ano_f, mes_f, dur FROM split WHERE ent_sind <> '';
+
+--Tratamento de caracteres acentuados e abreviaturas
+UPDATE Avisos_Greve SET Entidade_Sindical = trim(UPPER(Entidade_Sindical));
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'ç', 'Ç') WHERE instr(Entidade_Sindical, 'ç') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'ã', 'Ã') WHERE instr(Entidade_Sindical, 'ã') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'â', 'Â') WHERE instr(Entidade_Sindical, 'â') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'õ', 'Õ') WHERE instr(Entidade_Sindical, 'õ') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'ú', 'Ú') WHERE instr(Entidade_Sindical, 'ú') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'í', 'Í') WHERE instr(Entidade_Sindical, 'í') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'á', 'Á') WHERE instr(Entidade_Sindical, 'á') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'é', 'É') WHERE instr(Entidade_Sindical, 'é') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'ó', 'Ó') WHERE instr(Entidade_Sindical, 'ó') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'ê', 'Ê') WHERE instr(Entidade_Sindical, 'ê') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'CGTP-IN', 'CGTPIN') WHERE instr(Entidade_Sindical, 'CGTP-IN') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, ', SA', ', S.A.') WHERE instr(Entidade_Sindical, ', SA') > 0 AND instr(Entidade_Sindical, 'UNICER BEBIDAS') = 0 AND instr(Entidade_Sindical,'LISBOA, SANTARÉM E PORTALEGRE') = 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'TRAB. ', 'TRABALHADORES ') WHERE instr(Entidade_Sindical, 'TRAB. ') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'SIND. ', 'SINDICATO ') WHERE instr(Entidade_Sindical, 'SIND. ') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'IND. ', 'INDÚSTRIA ') WHERE instr(Entidade_Sindical, 'IND. ') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'FIG. ', 'FIGUEIRA ') WHERE instr(Entidade_Sindical, 'FIG. ') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'REST. ', 'RESTAURANTES ') WHERE instr(Entidade_Sindical, 'REST. ') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'EMP. ', 'EMPRESAS ') WHERE instr(Entidade_Sindical, 'EMP. ') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, ' EPE', ' E.P.E.') WHERE instr(Entidade_Sindical, ' EPE') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, ' E.M', ' E.M.') WHERE instr(Entidade_Sindical, ' E.M') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'QUADROS TÉCNICOS', 'QUADROS E TÉCNICOS') WHERE instr(Entidade_Sindical, 'QUADROS TÉCNICOS') > 0 AND instr(Entidade_Sindical, 'SENSIQ') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'CENTRO E NORTE', 'CENTRO NORTE') WHERE instr(Entidade_Sindical, 'CENTRO E NORTE') > 0 AND instr(Entidade_Sindical, 'SITE CENTRO NORTE') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'E CURTUMES', 'E CURTUMES DO DISTRITO DO PORTO') WHERE instr(Entidade_Sindical, 'SINTEVECC -') > 0 AND instr(Entidade_Sindical, 'E CURTUMES') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'SINTEVECC SUL -', 'SINTEVECC -') WHERE instr(Entidade_Sindical, 'SINTEVECC SUL -') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'CERAMICA', 'CERÂMICA') WHERE instr(Entidade_Sindical, 'CERAMICA') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'CÊRAMICA', 'CERÂMICA') WHERE instr(Entidade_Sindical, 'CÊRAMICA') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'VOO', 'VÔO') WHERE instr(Entidade_Sindical, 'VOO') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'SIND.', 'SINDICATO ') WHERE instr(Entidade_Sindical, 'SIND.') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'TRAB.', 'TRABALHADORES ') WHERE instr(Entidade_Sindical, 'TRAB.') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'IND.', 'INDÚSTRIAS ') WHERE instr(Entidade_Sindical, 'IND.') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'TRAB ', 'TRABALHADORES ') WHERE instr(Entidade_Sindical, 'TRAB ') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'SIND ', 'SINDICATO ') WHERE instr(Entidade_Sindical, 'SIND ') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'NAC. ', 'NACIONAL ') WHERE instr(Entidade_Sindical, 'NAC. ') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'NAC.', 'NACIONAL ') WHERE instr(Entidade_Sindical, 'NAC.') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'SIN. ', 'SINDICATO ') WHERE instr(Entidade_Sindical, 'SIN. ') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'SIN.', 'SINDICATO ') WHERE instr(Entidade_Sindical, 'SIN.') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'SIN ', 'SINDICATO ') WHERE instr(Entidade_Sindical, 'SIN ') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'SINDIC. ', 'SINDICATO ') WHERE instr(Entidade_Sindical, 'SINDIC. ') > 0; 
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'ASSOC. ', 'ASSOCIAÇÃO ') WHERE instr(Entidade_Sindical, 'ASSOC. ') > 0; 
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'ASSOC.', 'ASSOCIAÇÃO ') WHERE instr(Entidade_Sindical, 'ASSOC.') > 0; 
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'ASS. ', 'ASSOCIAÇÃO ') WHERE instr(Entidade_Sindical, 'ASS. ') > 0; 
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'ASS.', 'ASSOCIAÇÃO ') WHERE instr(Entidade_Sindical, 'ASS.') > 0; 
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'SOC. ', 'SOCIEDADE ') WHERE instr(Entidade_Sindical, 'SOC. ') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'SOC.', 'SOCIEDADE ') WHERE instr(Entidade_Sindical, 'SOC.') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'ADM. ', 'ADMINISTRAÇÕES ') WHERE instr(Entidade_Sindical, 'ADM. ') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'ADM.', 'ADMINISTRAÇÕES ') WHERE instr(Entidade_Sindical, 'ADM.') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'ESP.', 'ESPECTACULOS ') WHERE instr(Entidade_Sindical, 'ESP.') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'TRANSP. ', 'TRANSPORTES ') WHERE instr(Entidade_Sindical, 'TRANSP. ') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'TRANSP.', 'TRANSPORTES ') WHERE instr(Entidade_Sindical, 'TRANSP.') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'TEC. ', 'TÉCNICOS ') WHERE instr(Entidade_Sindical, 'TEC. ') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'TÉC. ', 'TÉCNICOS ') WHERE instr(Entidade_Sindical, 'TÉC. ') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'CONF. ', 'CONFERENTES ') WHERE instr(Entidade_Sindical, 'CONF. ') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'TER. ', 'TERMINAIS ') WHERE instr(Entidade_Sindical, 'TER. ') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'CONTENT. ', 'CONTENTORIZADA ') WHERE instr(Entidade_Sindical, 'CONTENT. ') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'REST.', 'RESTAURAÇÃO, ') WHERE instr(Entidade_Sindical, 'REST.') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'UNIPESSOAL.', 'UNIPESSOAL,') WHERE instr(Entidade_Sindical, 'UNIPESSOAL.') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'PROF.', 'PROFISSIONAIS') WHERE instr(Entidade_Sindical, 'PROF.') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'STOP', 'SINDICATO DE TODOS OS PROFESSORES') WHERE instr(Entidade_Sindical, 'STOP') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'S.TO.P', 'SINDICATO DE TODOS OS PROFESSORES') WHERE instr(Entidade_Sindical, 'S.TO.P') > 0;
+UPDATE Avisos_Greve SET Entidade_Sindical = replace(Entidade_Sindical, 'ESTAB. ', 'ESTABELECIMENTOS ') WHERE instr(Entidade_Sindical, 'ESTAB. ') > 0;
+
+--atribuicao de id aos registos cuja entidade sindical satisfaz as condicoes relativas a tabela Org_Sindical
+UPDATE Avisos_Greve SET Id_Entidade_Sindical = (SELECT ID FROM Org_Sindical o WHERE 
+	(INSTR(Entidade_Sindical, " - ") = 0 AND Entidade_Sindical = TRIM(o.Acronimo)) OR 
+	(INSTR(Entidade_Sindical, " ") > 0 AND INSTR(Entidade_Sindical," - ") = 0 AND Entidade_Sindical = TRIM(o.Nome)) OR
+	(INSTR(Entidade_Sindical, " ") > 0 AND INSTR(Entidade_Sindical," - ") > 0 AND SUBSTR(Entidade_Sindical,0,INSTR(Entidade_Sindical," - ")) = TRIM(o.Acronimo))
+	OR (INSTR(Entidade_Sindical, " ") > 0 AND INSTR(Entidade_Sindical," - ") > 0 AND SUBSTR(Entidade_Sindical,INSTR(Entidade_Sindical," - ")+3) = TRIM(o.Nome))
+	OR (INSTR(Entidade_Sindical, " ") > 0 AND INSTR(Entidade_Sindical," - ") > 0 AND Entidade_Sindical = o.Nome));
+
+--troca da entidade_sindical com a entidade_patronal e vice versa nos casos em que as colunas estao trocadas
+UPDATE Avisos_Greve SET Entidade_Sindical = Entidade_Patronal, Entidade_Patronal = Entidade_Sindical WHERE (Id_Entidade_Sindical IS NULL) AND 
+(Entidade_Patronal = (SELECT TRIM(o.Acronimo) FROM Org_Sindical o WHERE INSTR(Entidade_Patronal, " - ") = 0 AND Entidade_Patronal = TRIM(o.Acronimo)) OR 
+Entidade_Patronal = (SELECT TRIM(o.Nome) FROM Org_Sindical o WHERE INSTR(Entidade_Patronal, " ") > 0 AND INSTR(Entidade_Patronal," - ") = 0 AND Entidade_Patronal = TRIM(o.Nome)) OR
+SUBSTR(Entidade_Patronal,0,INSTR(Entidade_Patronal," - ")) = (SELECT TRIM(o.Acronimo) FROM Org_Sindical o WHERE INSTR(Entidade_Patronal, " - ") > 0 AND SUBSTR(Entidade_Patronal,0,INSTR(Entidade_Patronal," - ")) = TRIM(o.Acronimo)) OR
+SUBSTR(Entidade_Patronal,INSTR(Entidade_Patronal," - ")+3) = (SELECT TRIM(o.Acronimo) FROM Org_Sindical o WHERE INSTR(Entidade_Patronal, " - ") > 0 AND SUBSTR(Entidade_Patronal,INSTR(Entidade_Patronal," - ")+3) = TRIM(o.Nome)) OR
+Entidade_Sindical = (SELECT TRIM(o.Acronimo) FROM Org_Patronal o WHERE INSTR(Entidade_Sindical, " - ") = 0 AND Entidade_Sindical = TRIM(o.Acronimo)) OR
+Entidade_Sindical = (SELECT TRIM(o.Nome) FROM Org_Patronal o WHERE INSTR(Entidade_Sindical, " ") > 0 AND INSTR(Entidade_Sindical," - ") = 0 AND Entidade_Sindical = TRIM(o.Nome)) OR
+SUBSTR(Entidade_Sindical,0,INSTR(Entidade_Sindical," - ")) = (SELECT TRIM(o.Acronimo) FROM Org_Patronal o WHERE INSTR(Entidade_Sindical, " ") > 0 AND INSTR(Entidade_Sindical," - ") > 0 AND SUBSTR(Entidade_Sindical,0,INSTR(Entidade_Sindical," - ")) = TRIM(o.Acronimo)) OR
+SUBSTR(Entidade_Sindical,INSTR(Entidade_Sindical," - ")+3) = (SELECT TRIM(o.Nome) FROM Org_Patronal o WHERE INSTR(Entidade_Sindical, " ") > 0 AND INSTR(Entidade_Sindical," - ") > 0 AND SUBSTR(Entidade_Sindical,INSTR(Entidade_Sindical," - ")+3) = TRIM(o.Nome)) OR
+Entidade_Sindical = (SELECT TRIM(o.Nome) FROM Org_Patronal o WHERE INSTR(Entidade_Sindical, " ") > 0 AND INSTR(Entidade_Sindical," - ") > 0 AND Entidade_Sindical = o.Nome));
+
+--atribuicao de id aos registos cuja entidade sindical satisfaz as condicoes relativas a tabela Org_Sindical, 
+--depois da troca efetuada e so para as entidades sindicais cujo id ainda e null
+UPDATE Avisos_Greve SET Id_Entidade_Sindical = (SELECT ID FROM Org_Sindical o WHERE 
+	(INSTR(Entidade_Sindical, " - ") = 0 AND Entidade_Sindical = TRIM(o.Acronimo)) OR 
+	(INSTR(Entidade_Sindical, " ") > 0 AND INSTR(Entidade_Sindical," - ") = 0 AND Entidade_Sindical = TRIM(o.Nome)) OR
+	(INSTR(Entidade_Sindical, " ") > 0 AND INSTR(Entidade_Sindical," - ") > 0 AND SUBSTR(Entidade_Sindical,0,INSTR(Entidade_Sindical," - ")) = TRIM(o.Acronimo))
+	OR (INSTR(Entidade_Sindical, " ") > 0 AND INSTR(Entidade_Sindical," - ") > 0 AND SUBSTR(Entidade_Sindical,INSTR(Entidade_Sindical," - ")+3) = TRIM(o.Nome))
+	OR (INSTR(Entidade_Sindical, " ") > 0 AND INSTR(Entidade_Sindical," - ") > 0 AND Entidade_Sindical = o.Nome)) WHERE Id_Entidade_Sindical IS NULL;
+	
 DROP VIEW TEMP_DATAS_ENTIDADES;
 DROP TABLE TEMP_ALTERACOES_ESTATUTOS;
 DROP TABLE TEMP_ELEICAO_CORPOS_GERENTES;
@@ -587,6 +887,8 @@ DROP TABLE TEMP_IRCT;
 DROP TABLE TEMP_OUTORGANTES;
 DROP TABLE TEMP_AVISOS_GREVE1;
 DROP TABLE TEMP_AVISOS_GREVE2;
+DROP TABLE TEMP_MESES_NUMERO;
+DROP TABLE TEMP_AVISOS_GREVE;
 
 CREATE TABLE CAE_SECCOES_TEMP( SECCAO CHAR(1) PRIMARY KEY , RANK INTEGER, TITLE VARCHAR(100) , SALARY FLOAT );
 CREATE TABLE CAE_SECCOES_KEYWORDS_TEMP( SECCAO CHAR(1) , KEYWORD VARCHAR(100) , FOREIGN KEY(SECCAO) REFERENCES CAE_SECCOES_TEMP );
@@ -636,8 +938,10 @@ INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'T' , 'PESSOAL DOMÉSTICO');
 INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'U' , 'ORGANISMOS INTERNACIONAIS'), ( 'U' , 'INSTITUIÇÕES EXTRA-TERRITORIAIS');
 
 INSERT INTO Sectores_Profissionais SELECT TITLE AS Sector, SALARY AS Salario_Medio FROM CAE_SECCOES_TEMP;
-UPDATE Org_Sindical SET Sector=(SELECT DISTINCT TITLE FROM CAE_SECCOES_TEMP NATURAL JOIN CAE_SECCOES_KEYWORDS_TEMP WHERE instr(Nome,KEYWORD) > 0) WHERE Sector IS NULL;
-UPDATE Org_Patronal SET Sector=(SELECT DISTINCT TITLE FROM CAE_SECCOES_TEMP NATURAL JOIN CAE_SECCOES_KEYWORDS_TEMP WHERE instr(Nome,KEYWORD) > 0) WHERE Sector IS NULL;
+UPDATE Org_Sindical SET Sector=(SELECT DISTINCT Sector FROM Outorgantes_Actos WHERE Outorgantes_Actos.ID_Organizacao_Sindical=Org_Sindical.ID);
+UPDATE Org_Patronal SET Sector=(SELECT DISTINCT Sector FROM Outorgantes_Actos WHERE Outorgantes_Actos.ID_Organizacao_Patronal=Org_Patronal.ID);
+-- UPDATE Org_Sindical SET Sector=(SELECT DISTINCT TITLE FROM CAE_SECCOES_TEMP NATURAL JOIN CAE_SECCOES_KEYWORDS_TEMP WHERE instr(Nome,KEYWORD) > 0) WHERE Sector IS NULL;
+-- UPDATE Org_Patronal SET Sector=(SELECT DISTINCT TITLE FROM CAE_SECCOES_TEMP NATURAL JOIN CAE_SECCOES_KEYWORDS_TEMP WHERE instr(Nome,KEYWORD) > 0) WHERE Sector IS NULL;
 
 DROP TABLE CAE_SECCOES_KEYWORDS_TEMP;
 DROP TABLE CAE_SECCOES_TEMP;
