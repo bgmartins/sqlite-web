@@ -1,3 +1,4 @@
 flask
 pygments
 -e git+git://github.com/coleifer/peewee.git#egg=peewee
+-e hg+https://bitbucket.org/openpyxl/openpyxl@3.0#egg=openpyxl
