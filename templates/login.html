@@ -7,14 +7,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex">
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/bootstrap.min.css') }}" />
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/dropdown.css') }}" />
     <!--<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/sqlbrowse.css') }}" />
     <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/syntax-highlight.css') }}" />-->
     {% block extra_head %}{% endblock %}
     <script src="{{ url_for('static', filename='js/jquery-1.11.0.min.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/Chart.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/Chart.bundle.js') }}"></script>
     <script src="{{ url_for('static', filename='js/Chart.Geo.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.base64.min.js') }}"></script>
     <script type="text/javascript">
       $(function() {
         $('a#toggle-helper-tables').on('click', function(e) {
@@ -38,6 +41,26 @@
     <div class="container">
 
       <div class="row">
+        <label for="id_password">Enter your password to login into the administration panel</label>
+        <div class="col-lg-11">
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <form action="{{ url_for('login') }}" class="form" id="form" method="post">
+                  <input class="form-control" id="id_password" name="password" type="password" value="" />
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-1">
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <button class="btn btn-primary" form="form" type="submit">Login</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
         <div class="col-lg-6">
           <div class="panel panel-default">
             <div class="panel-heading">
@@ -53,7 +76,9 @@
             <div class="panel-heading">
               <h5>Active Union Organizations per District</h5>
             </div>
+            <div class="panel-body">
               <canvas id="map" class="panel-body"></canvas>
+            </div>
           </div>
         </div>
       </div>
@@ -74,33 +99,181 @@
             <div class="panel-heading">
               <h5>Active Union Organizations per Activity Sector</h5>
             </div>
-            <div class="panel-body">
-              <canvas id="bar-chart3"></canvas>
-            </div>
+            <canvas id="bar-chart3"></canvas>
           </div>
         </div>
       </div>
 
-      <div class="row">
-        <div class="col-md-12">
-          <div class="panel panel-default">
-            <div class="panel-body">
-              <form action="{{ url_for('login') }}" class="form" id="form" method="post">
-                <div class="form-group">
-                  <label for="id_password">Enter your password to login into the administration panel</label>
-                  <input class="form-control" id="id_password" name="password" type="password" value="" />
-                  <button class="btn btn-primary" type="submit">Login</button>
-                </div> 
-              </form>
+    <div class="row">
+      <div class="col-lg-1">
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="dropdown">
+              <button id="choose_button" style="font-size: 16px;" class="btn btn-primary" onclick="myDropdown()">Choose</button>
+              <div id="myDropdown" class="dropdown-content">
+                <a class="opt_tables">Unions</a>
+                <a class="opt_tables">Employees</a>
+              </div>
             </div>
+          </div>
+        </div>  
+      </div>
+      <div class="col-lg-10">
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <form class="form" id="form1">
+              <input  class="form-control" id="org" name="organization" value="" />
+              <input type="hidden" name="table_org" id="table_org" value="" />
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-1">
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <button id="search_button" class="btn btn-primary" type="submit" onclick="searchOrgs()">Search</button>
           </div>
         </div>
       </div>
     </div>
 
-    
-    
-    <script>
+    <div class="row">
+      <div class="col-lg-12">
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <table id="my_table" border="1">
+                <thead>
+                  <th>ID</th><th>Tipo</th><th>Nome</th><th>Acronimo</th><th>Nome_Organizacao_Pai</th>
+                </thead>
+              </table>
+            </div>
+          </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <button  class="btn btn-primary" style="width: 100%;" onclick="tableToExcel()">Export to Excel File</button>
+            </div>
+        </div>
+      </div>
+    </div>          
+
+
+  </div>
+
+  <script>
+    var table = "Choose";
+    var org = "";
+    create_table({{ dataset.orgsindical1_data | safe }});
+
+    function myDropdown(){
+      document.getElementById("myDropdown").classList.toggle("show");
+    }
+
+    //listeners nas opcoes do Dropdown
+    var elements = document.getElementsByClassName('opt_tables');
+    for (var i = 0, len = elements.length; i < len; i++) {
+      elements[i].addEventListener("click", function() {
+        table = this.innerHTML;
+        document.getElementById("choose_button").innerHTML = table;
+        document.getElementById('table_org').value = table;
+        document.getElementById("myDropdown").classList.toggle("show");
+      });
+    }
+
+    function create_table(tabela){
+      var org_table;
+      var tbl = document.getElementById('my_table');
+      var tblbody = document.createElement('tbody');  
+      org_table = tabela;
+
+      for(var i=0; i < org_table.length; i++){
+        var tblrw = document.createElement('tr');
+
+        for(var j=0; j < org_table[i].length; j++){
+          var tbltd = document.createElement('td');
+          var tbldata = document.createTextNode(org_table[i][j]);
+          
+          tbltd.appendChild(tbldata);
+          tblrw.appendChild(tbltd);
+        }
+        
+        tblbody.appendChild(tblrw);
+      }
+
+      tbl.appendChild(tblbody);
+    }
+
+
+    function searchOrgs(){
+        $.ajax({
+          url:"{{ url_for('search') }}",
+          data: $("#form1").serialize(),
+          dataType: "json",
+          success:function(data){
+            console.log(data);
+            var old_tbody = document.getElementsByTagName('tbody')[0];
+            old_tbody.remove();
+            create_table(Object.values(data["tabela"]));
+            console.log("table updated");
+          
+          },
+          error:function(jqXHR, textStatus, errorThrown){
+            console.log(jqXHR.responseText);
+            console.log(textStatus);
+            console.log(errorThrown);
+          }
+        
+        });
+    }
+
+
+
+    function tableToExcel(){
+      var filename = "";
+      var table_org = document.getElementById("table_org").value;
+      var org = document.getElementById("org").value;
+
+      if ((table_org=="Unions" && org=="") || table_org==""){
+        filename = "Unions";
+      }
+      else if ((table_org=="Unions" && org!="") || (table_org=="Employees" && org!="")){
+        filename = table_org + "-" + org;
+      }
+      else if ((table_org=="Employees" && org=="")){
+        filename = table_org;
+      }
+
+      var myRequest = new XMLHttpRequest();
+      myRequest.open('GET', "{{ url_for('export') }}" + "?" + $('#form1').serialize() + "&export=1", true);
+      myRequest.responseType = "blob";
+      myRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+      myRequest.onreadystatechange = function(){
+      
+        if (this.readyState == 4 && this.status == 200){
+          var blob = new Blob([this.response], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+          var url = window.URL.createObjectURL(blob);
+
+          var link = document.createElement('a');
+          document.body.appendChild(link);
+          link.style = "display: none";
+          link.href = url;
+
+          link.download = filename + ".xlsx";
+          link.click();
+
+          setTimeout(() => {
+          window.URL.revokeObjectURL(url);
+          link.remove(); } , 100);
+          }
+      };
+
+      myRequest.send();  
+    }
+
      new Chart(document.getElementById("bar-chart"), {
      type: 'bar',
      data: {
@@ -209,8 +382,8 @@
       var value = 0;
       var j=0;
       var max = valores.reduce(function(a, b) {
-  		return Math.max(a, b);
-	  });
+  		  return Math.max(a, b);
+	    });
 
     function orgValues(district) {
 
@@ -219,9 +392,10 @@
       }
       else{
         orgValue = dict[district];
+        return orgValue;
       }
     	
-    	i = 0;
+    	/*i = 0;
 
     	for(j=10; j <= 100; j=j+10){
     	  index = j /100. * (valores.length-1);
@@ -237,22 +411,8 @@
     	  if(orgValue <= result){
     		  return result / max;
         }
-	    }
+	    }*/
 	  }
-
-
-      function orgValuess(district){
-        orgValue = dict[district];
-
-        for(j=1; j <= 100; j++){
-
-          value = percentile(j, valores);
-
-          if(orgValue <= value){
-            return j / 100;
-          }
-        }
-      }
 
       const chart = new Chart(document.getElementById("map").getContext("2d"), {
         type: 'choropleth',
@@ -261,16 +421,7 @@
           datasets: [{
             label: 'Distritos',
             outline: distritos2,
-            backgroundColor: (context) => {
-              if (context.dataIndex == null) {
-                return null;
-              }
-
-              const value = context.dataset.data[context.dataIndex];
-              return new Color('#78C2AD').blackness(value.value * 100).rgbString();
-            },
-              //data: distritos2.map((d) => ({feature: d, value: dict[d.properties.name]})),
-              data: distritosPT.map((d) => ({feature: d, value: orgValues(d.properties.name)})),
+            data: distritosPT.map((d) => ({feature: d, value: orgValues(d.properties.name)})),
           }]
         },
         options: {
@@ -281,8 +432,28 @@
           scale: {
             projection: 'mercator'
           },
+          geo: {
+            colorScale: {
+              display: true,
+              interpolate: 'YlOrRd',
+              position: 'top',
+              quantize: 10,
+              ticks: {
+                  min: 0,
+                  max: 250,
+                  stepSize: 50   
+              },
+              legend: {
+                position: 'bottom-right'
+              },
+            },
+          },
           tooltips: {
             callbacks: {
+                label: function(tooltipItem, data){
+                  var distrito = data['labels'][tooltipItem['index']];
+                  return distrito;
+                },
                 afterLabel: function(tooltipItem, data) {
                   var distrito = data['labels'][tooltipItem['index']];
                   return "Union Organizations: " + dict[distrito];
@@ -290,7 +461,6 @@
             }
           }
         }
-
       });
 
     });
@@ -328,13 +498,12 @@
     });
 
     var setores = {{ dataset.barchart3_labels | safe }};
-    var setores_red = [];
+    var setores_red = {{ dataset.barchart3_labels_red | safe }};
     var pos = 0;
     var setores_final = {};
 
 
     for(pos = 0; pos < setores.length; pos++){
-      setores_red.push(setores[pos].substring(0,20));
       setores_final[setores_red[pos]] = setores[pos];
     }
 
@@ -356,12 +525,12 @@
         xAxes: [{
           ticks: {
             beginAtZero: true,
-            stepSize: 200
+            stepSize: 10
           }
         }],
         yAxes: [{
             ticks: {
-                fontSize: 10
+                fontSize: 8
             }
         }]
       },

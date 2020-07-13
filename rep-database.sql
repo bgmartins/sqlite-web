@@ -18,6 +18,7 @@ DROP TABLE IF EXISTS Sectores_Profissionais;
 
 CREATE TABLE Sectores_Profissionais (
 	Sector         VARCHAR(100) NOT NULL PRIMARY KEY,
+	Nome_Abrev     VARCHAR(40),
 	Salario_Medio  NUMERIC
 );
 
@@ -169,19 +170,6 @@ CREATE TABLE Outorgantes_Actos (
 	FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical(ID),
 	FOREIGN KEY (ID_Organizacao_Patronal) REFERENCES Org_Patronal(ID),
 	FOREIGN KEY (Sector) REFERENCES Sectores_Profissionais(Sector)
-);
-
-CREATE TABLE TEMP_AVISOS_GREVE (
-	Id_Entidade_Sindical      VARCHAR(7),
-	Ano_Inicio                INT,
-	Mes_Inicio                INT,
-	Entidade_Sindical         VARCHAR(100),
-	Entidade_Patronal         VARCHAR(100),
-	Ano_Fim                   INT,
-	Mes_Fim                   INT,
-	Duracao                   INT,
-	PRIMARY KEY(Id_Entidade_Sindical,Ano_Inicio,Mes_Inicio,Entidade_Sindical,Entidade_Patronal,Ano_Fim,Mes_Fim,Duracao),
-  FOREIGN KEY (Id_Entidade_Sindical) REFERENCES Org_Sindical(ID)
 );
 
 CREATE TABLE Avisos_Greve (
@@ -630,6 +618,19 @@ VALUES
 	("Jan", "jan", "01"),("Feb", "fev", "02"),("Mar", "mar", "03"),("Apr", "abr", "04"),("May", "mai", "05"),("Jun", "jun", "06"),("Jul", "jul", "07"),("Aug", "ago", "08"),("Sep", "set", "09"),("Oct", "out", "10"),
 	("Nov", "nov", "11"),("Dec", "dez", "12");
 
+CREATE TABLE TEMP_AVISOS_GREVE (
+	Id_Entidade_Sindical      VARCHAR(7),
+	Ano_Inicio                INT,
+	Mes_Inicio                INT,
+	Entidade_Sindical         VARCHAR(100),
+	Entidade_Patronal         VARCHAR(100),
+	Ano_Fim                   INT,
+	Mes_Fim                   INT,
+	Duracao                   INT,
+	PRIMARY KEY(Id_Entidade_Sindical,Ano_Inicio,Mes_Inicio,Entidade_Sindical,Entidade_Patronal,Ano_Fim,Mes_Fim,Duracao),
+  FOREIGN KEY (Id_Entidade_Sindical) REFERENCES Org_Sindical(ID)
+);
+
 --Popular a tabela avisos de greve com o 1º csv (avisos de greve de 2013 a 2014)
 INSERT INTO TEMP_AVISOS_GREVE SELECT DISTINCT
 	NULL,
@@ -937,7 +938,30 @@ INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'S' , 'OUTROS SERVIÇOS');
 INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'T' , 'PESSOAL DOMÉSTICO');
 INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'U' , 'ORGANISMOS INTERNACIONAIS'), ( 'U' , 'INSTITUIÇÕES EXTRA-TERRITORIAIS');
 
-INSERT INTO Sectores_Profissionais SELECT TITLE AS Sector, SALARY AS Salario_Medio FROM CAE_SECCOES_TEMP;
+INSERT INTO Sectores_Profissionais SELECT TITLE AS Sector, NULL, SALARY AS Salario_Medio FROM CAE_SECCOES_TEMP;
+
+UPDATE Sectores_Profissionais SET Nome_Abrev="ACTIV. ADMIN. E DOS SERV. APOIO" WHERE Sector = "ACTIVIDADES ADMINISTRATIVAS E DOS SERVIÇOS DE APOIO";
+UPDATE Sectores_Profissionais SET Nome_Abrev="ACTIV. ARTIS. DE ESPECT. DESP. E RECRE." WHERE Sector = "ACTIVIDADES ARTÍSTICAS, DE ESPECTÁCULOS, DESPORTIVAS E RECREATIVAS";
+UPDATE Sectores_Profissionais SET Nome_Abrev="ACTIV. FAM. EMP. DE PESS. DOM. ACTIV. PROD. FAM. USO PRÓP." WHERE Sector = "ACTIVIDADES DAS FAMÍLIAS EMPREGADORAS DE PESSOAL DOMÉSTICO E ACTIVIDADES DE PRODUÇÃO DAS FAMÍLIAS PARA USO PRÓPRIO";
+UPDATE Sectores_Profissionais SET Nome_Abrev="ACTIV. CONSUL. CIENT. TÉC. E SIM." WHERE Sector = "ACTIVIDADES DE CONSULTORIA, CIENTÍFICAS, TÉCNICAS E SIMILARES";
+UPDATE Sectores_Profissionais SET Nome_Abrev="ACTIV. INFO. COMUNIC." WHERE Sector = "ACTIVIDADES DE INFORMAÇÃO E DE COMUNICAÇÃO";
+UPDATE Sectores_Profissionais SET Nome_Abrev="ACTIV. SAÚDE HUM. APOIO SOCIAL" WHERE Sector = "ACTIVIDADES DE SAÚDE HUMANA E APOIO SOCIAL";
+UPDATE Sectores_Profissionais SET Nome_Abrev="ACTIV. ORGAN. INTERN. E OUTR. INST. EXTRA-TERRI." WHERE Sector = "ACTIVIDADES DOS ORGANISMOS INTERNACIONAIS E OUTRAS INSTITUIÇÕES EXTRA-TERRITORIAIS";
+UPDATE Sectores_Profissionais SET Nome_Abrev="ACTIV. FIN. E SEGUROS" WHERE Sector = "ACTIVIDADES FINANCEIRAS E DE SEGUROS";
+UPDATE Sectores_Profissionais SET Nome_Abrev="ACTIV. IMOB." WHERE Sector = "ACTIVIDADES IMOBILIÁRIAS";
+UPDATE Sectores_Profissionais SET Nome_Abrev="ADMIN. PÚB. E DEF.;SEG. SOCIAL OBRIG." WHERE Sector = "ADMINISTRAÇÃO PÚBLICA E DEFESA; SEGURANÇA SOCIAL OBRIGATÓRIA";
+UPDATE Sectores_Profissionais SET Nome_Abrev="AGRIC., PROD., ANIMAL, CAÇA,FLOR. E PESCA" WHERE Sector = "AGRICULTURA, PRODUÇÃO ANIMAL, CAÇA, FLORESTA E PESCA";
+UPDATE Sectores_Profissionais SET Nome_Abrev="ALOJ. REST. E SIM." WHERE Sector = "ALOJAMENTO, RESTAURAÇÃO E SIMILARES";
+UPDATE Sectores_Profissionais SET Nome_Abrev="CAPT. TRAT. E DIST. DE ÁGUA;SANEA. GEST. DE RESÍ. E DESPOL." WHERE Sector = "CAPTAÇÃO, TRATAMENTO E DISTRIBUIÇÃO DE ÁGUA; SANEAMENTO GESTÃO DE RESÍDUOS E DESPOLUIÇÃO";
+UPDATE Sectores_Profissionais SET Nome_Abrev="COMÉ. GRO. E A RETA.; REPAR. DE VEÍC. AUTO. E MOTOC." WHERE Sector = "COMÉRCIO POR GROSSO E A RETALHO; REPARAÇÃO DE VEÍCULOS AUTOMÓVEIS E MOTOCICLOS";
+UPDATE Sectores_Profissionais SET Nome_Abrev="CONSTRUÇÃO" WHERE Sector = "CONSTRUÇÃO";
+UPDATE Sectores_Profissionais SET Nome_Abrev="EDUCAÇÃO" WHERE Sector = "EDUCAÇÃO";
+UPDATE Sectores_Profissionais SET Nome_Abrev="ELECT. GÁS VAPOR ÁGUA QUENTE E FRIA E AR FRIO" WHERE Sector = "ELECTRICIDADE, GÁS, VAPOR, ÁGUA QUENTE E FRIA E AR FRIO";
+UPDATE Sectores_Profissionais SET Nome_Abrev="IND. EXTRACT." WHERE Sector = "INDÚSTRIAS EXTRACTIVAS";
+UPDATE Sectores_Profissionais SET Nome_Abrev="IND. TRANSF." WHERE Sector = "INDÚSTRIAS TRANSFORMADORAS";
+UPDATE Sectores_Profissionais SET Nome_Abrev="OUTRAS ACTIV. DE SERV." WHERE Sector = "OUTRAS ACTIVIDADES DE SERVIÇOS";
+UPDATE Sectores_Profissionais SET Nome_Abrev="TRANSP. E ARMAZ." WHERE Sector = "TRANSPORTES E ARMAZENAGEM";
+
 UPDATE Org_Sindical SET Sector=(SELECT DISTINCT Sector FROM Outorgantes_Actos WHERE Outorgantes_Actos.ID_Organizacao_Sindical=Org_Sindical.ID);
 UPDATE Org_Patronal SET Sector=(SELECT DISTINCT Sector FROM Outorgantes_Actos WHERE Outorgantes_Actos.ID_Organizacao_Patronal=Org_Patronal.ID);
 -- UPDATE Org_Sindical SET Sector=(SELECT DISTINCT TITLE FROM CAE_SECCOES_TEMP NATURAL JOIN CAE_SECCOES_KEYWORDS_TEMP WHERE instr(Nome,KEYWORD) > 0) WHERE Sector IS NULL;

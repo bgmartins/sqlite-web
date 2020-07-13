@@ -17,6 +17,7 @@ from collections import namedtuple, OrderedDict
 from functools import wraps
 from getpass import getpass
 from io import TextIOWrapper
+from io import BytesIO
 
 # Py2k compat.
 if sys.version_info[0] == 2:
@@ -37,7 +38,7 @@ else:
 try:
     from flask import (
         Flask, abort, escape, flash, jsonify, make_response, Markup, redirect,
-        render_template, request, session, url_for)
+        render_template, request, send_file, session, url_for)
 except ImportError:
     raise RuntimeError('Unable to import flask module. Install by running '
                        'pip install flask')
@@ -73,7 +74,6 @@ from peewee import IndexMetadata
 from peewee import sqlite3
 from playhouse.dataset import DataSet
 from playhouse.migrate import migrate
-
 
 CUR_DIR = os.path.realpath(os.path.dirname(__file__))
 DEBUG = False
@@ -228,24 +228,123 @@ class SqliteDataSet(DataSet):
     #orgSindicaisAtivasPorSector
     @property
     def barchart3_labels(self):
-        cursor = self.query("SELECT Sectores_Profissionais.Sector, COUNT(DISTINCT Org_Sindical.Id) AS Num_Org FROM Org_Sindical LEFT JOIN Sectores_Profissionais ON Org_Sindical.Sector = Sectores_Profissionais.Sector GROUP BY Sectores_Profissionais.Sector UNION ALL SELECT Sectores_Profissionais.Sector, COUNT(DISTINCT Org_Sindical.ID) AS Num_Org FROM Sectores_Profissionais LEFT JOIN Org_Sindical ON Org_Sindical.Sector = Sectores_Profissionais.Sector WHERE Org_Sindical.Sector IS NULL GROUP BY Sectores_Profissionais.Sector ORDER BY Sectores_Profissionais.Sector")
-        lista = []
+        cursor = self.query("SELECT Sectores_Profissionais.Sector, COUNT(DISTINCT Org_Sindical.ID) AS Num_Org FROM Sectores_Profissionais LEFT JOIN Org_Sindical ON Org_Sindical.Sector = Sectores_Profissionais.Sector GROUP BY Sectores_Profissionais.Sector ORDER BY Sectores_Profissionais.Sector")
+        return [row[0] for row in cursor.fetchall()]
 
-        for row in cursor.fetchall():
-
-            if row[0] is None:
-                lista.append('NULL')
-            else:
-                lista.append(row[0])
-        
-        return lista
+    @property
+    def barchart3_labels_red(self):
+        cursor = self.query("SELECT Sectores_Profissionais.Sector, Sectores_Profissionais.Nome_Abrev, COUNT(DISTINCT Org_Sindical.ID) AS Num_Org FROM Sectores_Profissionais LEFT JOIN Org_Sindical ON Org_Sindical.Sector = Sectores_Profissionais.Sector GROUP BY Sectores_Profissionais.Sector, Sectores_Profissionais.Nome_Abrev ORDER BY Sectores_Profissionais.Sector")
+        return [row[1] for row in cursor.fetchall()]
 
     #sectores
     @property
     def barchart3_data(self):
-        cursor = self.query("SELECT Sectores_Profissionais.Sector, COUNT(DISTINCT Org_Sindical.Id) AS Num_Org FROM Org_Sindical LEFT JOIN Sectores_Profissionais ON Org_Sindical.Sector = Sectores_Profissionais.Sector GROUP BY Sectores_Profissionais.Sector UNION ALL SELECT Sectores_Profissionais.Sector, COUNT(DISTINCT Org_Sindical.ID) AS Num_Org FROM Sectores_Profissionais LEFT JOIN Org_Sindical ON Org_Sindical.Sector = Sectores_Profissionais.Sector WHERE Org_Sindical.Sector IS NULL GROUP BY Sectores_Profissionais.Sector ORDER BY Sectores_Profissionais.Sector")
+        cursor = self.query("SELECT Sectores_Profissionais.Sector, COUNT(DISTINCT Org_Sindical.ID) AS Num_Org FROM Sectores_Profissionais LEFT JOIN Org_Sindical ON Org_Sindical.Sector = Sectores_Profissionais.Sector GROUP BY Sectores_Profissionais.Sector ORDER BY Sectores_Profissionais.Sector")
         return [row[1] for row in cursor.fetchall()]
 
+    @property
+    def orgsindical1_data(self):
+        lista = []
+        cursor = self.query("SELECT  ID, Tipo, Nome, Acronimo, Nome_Organizacao_Pai FROM Org_Sindical")
+        for row in cursor.fetchall():
+            lista.append(list(row))
+
+        for i in range(len(lista)):
+            for j in range(len(lista[i])):
+                if lista[i][j] is None:
+                    lista[i][j] = 'NULL'
+
+        return lista
+
+    def orgsindical_data(self):
+        lista = []
+        new_dict = {}
+        cursor = self.query("SELECT  ID, Tipo, Nome, Acronimo, Nome_Organizacao_Pai FROM Org_Sindical")
+        for row in cursor.fetchall():
+            lista.append(list(row))
+
+        for i in range(len(lista)):
+            for j in range(len(lista[i])):
+                if lista[i][j] is None:
+                    lista[i][j] = 'NULL'
+        
+        for c, value in enumerate(lista):
+            new_dict[str(c)] = value
+
+        return new_dict
+
+
+    def orgpatronal_data(self):
+        lista = []
+        new_dict = {}
+        cursor = self.query("SELECT  ID, Tipo, Nome, Acronimo, Nome_Organizacao_Pai FROM Org_Patronal")
+        for row in cursor.fetchall():
+            lista.append(list(row))
+
+        for i in range(len(lista)):
+            for j in range(len(lista[i])):
+                if lista[i][j] is None:
+                    lista[i][j] = 'NULL'
+
+        for c, value in enumerate(lista):
+            new_dict[str(c)] = value
+
+        return new_dict
+
+    def searchbar_data(self, table, org):
+        lista = []
+        new_dict = {}
+
+        if table=="Unions":
+            cursor = self.query("SELECT ID, Tipo, Nome, Acronimo, Nome_Organizacao_Pai FROM Org_Sindical WHERE Nome LIKE ? OR Acronimo LIKE ?", ('%' + org + '%', '%' + org + '%'))
+        else:
+            cursor = self.query("SELECT ID, Tipo, Nome, Acronimo, Nome_Organizacao_Pai FROM Org_Patronal WHERE Nome LIKE ? OR Acronimo LIKE ?", ('%' + org + '%', '%' + org + '%'))
+
+        for row in cursor.fetchall():
+            lista.append(list(row))
+
+        for i in range(len(lista)):
+            for j in range(len(lista[i])):
+                if lista[i][j] is None:
+                    lista[i][j] = 'NULL'
+
+        for c, value in enumerate(lista):
+            new_dict[str(c)] = value
+
+        return new_dict
+
+    def table_toExcel(self, table, org):
+        colunas = []
+        linhas = []
+        
+        if table=="Unions" and org!="":
+            table = 'Org_Sindical'
+            cursor = self.query("SELECT ID, Tipo, Nome, Acronimo, Nome_Organizacao_Pai FROM Org_Sindical WHERE Nome LIKE ? OR Acronimo LIKE ?", ('%' + org + '%', '%' + org + '%'))
+        
+        elif (table=="Unions" and org=="") or table=="":
+            table = 'Org_Sindical'
+            cursor = self.query("SELECT  ID, Tipo, Nome, Acronimo, Nome_Organizacao_Pai FROM Org_Sindical")
+
+        elif table=="Employees" and org!="":
+            table = 'Org_Patronal'
+            cursor = self.query("SELECT ID, Tipo, Nome, Acronimo, Nome_Organizacao_Pai FROM Org_Patronal WHERE Nome LIKE ? OR Acronimo LIKE ?", ('%' + org + '%', '%' + org + '%'))
+
+        elif table=="Employees" and org=="": 
+            table = 'Org_Patronal'
+            cursor = self.query("SELECT  ID, Tipo, Nome, Acronimo, Nome_Organizacao_Pai FROM Org_Patronal")
+
+        for tuplo in self.get_columns(table)[0:5]:
+            colunas.append(tuplo[0])
+
+        for row in cursor.fetchall():
+            linhas.append(list(row))
+
+        for i in range(len(linhas)):
+            for j in range(len(linhas[i])):
+                if linhas[i][j] is None:
+                    linhas[i][j] = 'NULL'
+        
+        return pd.DataFrame(linhas, columns=colunas)
 
     def get_indexes(self, table):
         return dataset._database.get_indexes(table)
@@ -308,14 +407,35 @@ class SqliteDataSet(DataSet):
 def index():
     return render_template('index.html', sqlite=sqlite3)
 
+@app.route('/export/', methods=['GET'])
+def export():
+    table = request.args.get('table_org')
+    org = request.args.get('organization')
+    export = request.args.get('export')
+
+    df = dataset.table_toExcel(table, org)
+    strIO = BytesIO()
+    excel_writer = pd.ExcelWriter(strIO, engine="xlsxwriter")
+    df.to_excel(excel_writer, sheet_name="sheet1", index=False)
+    excel_writer.save()
+    excel_data = strIO.getvalue()
+    strIO.seek(0)
+
+    return send_file(strIO,
+             mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+             attachment_filename='output.xlsx',
+             as_attachment=True)
+
+
 @app.route('/login/', methods=['GET', 'POST'])
-def login():
+def login():  
     if request.method == 'POST':
         if request.form.get('password') == app.config['PASSWORD']:
             session['authorized'] = True
             return redirect(session.get('next_url') or url_for('index'))
         flash('The password you entered is incorrect.', 'danger')
     return render_template('login.html')
+
 
 @app.route('/logout/', methods=['GET'])
 def logout():
@@ -329,6 +449,19 @@ def require_table(fn):
             abort(404)
         return fn(table, *args, **kwargs)
     return inner
+
+@app.route('/search/', methods=['GET'])
+def search():
+    table = request.args.get('table_org')
+    org = request.args.get('organization')
+
+    if org != "" and table != "Choose":
+        return jsonify(tabela = dataset.searchbar_data(table, org))
+    elif org == "" and table == "Unions":
+        return jsonify(tabela = dataset.orgsindical_data())
+    elif org == "" and table == "Employees":
+        return jsonify(tabela = dataset.orgpatronal_data())
+
 
 @app.route('/create-table/', methods=['POST'])
 def table_create():
@@ -898,7 +1031,8 @@ def install_auth_handler(password):
 
     @app.before_request
     def check_password():
-        if not session.get('authorized') and request.path != '/login/' and \
+
+        if not session.get('authorized') and request.path != '/login/' and request.path != '/export/' and request.path != '/search/' and \
            not request.path.startswith(('/static/', '/favicon')):
             flash('You must log-in to view the database browser.', 'danger')
             session['next_url'] = request.base_url
@@ -959,6 +1093,7 @@ def main():
 
     if options.browser:
         open_browser_tab(options.host, options.port)
+    print(app.url_map)
     app.run(host=options.host, port=options.port, debug=options.debug)
 
 if __name__ == '__main__':
