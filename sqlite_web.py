@@ -13,11 +13,13 @@ import webbrowser
 import pandas as pd
 import numpy as np
 import json
+import rep_database
 from collections import namedtuple, OrderedDict
 from functools import wraps
 from getpass import getpass
 from io import TextIOWrapper
 from io import BytesIO
+
 
 # Py2k compat.
 if sys.version_info[0] == 2:
@@ -295,7 +297,7 @@ class SqliteDataSet(DataSet):
         lista = []
         new_dict = {}
 
-        if table=="Unions":
+        if table=="Unions" or table=="":
             cursor = self.query("SELECT ID, Tipo, Nome, Acronimo, Nome_Organizacao_Pai FROM Org_Sindical WHERE Nome LIKE ? OR Acronimo LIKE ?", ('%' + org + '%', '%' + org + '%'))
         else:
             cursor = self.query("SELECT ID, Tipo, Nome, Acronimo, Nome_Organizacao_Pai FROM Org_Patronal WHERE Nome LIKE ? OR Acronimo LIKE ?", ('%' + org + '%', '%' + org + '%'))
@@ -461,7 +463,6 @@ def search():
         return jsonify(tabela = dataset.orgsindical_data())
     elif org == "" and table == "Employees":
         return jsonify(tabela = dataset.orgpatronal_data())
-
 
 @app.route('/create-table/', methods=['POST'])
 def table_create():
@@ -734,6 +735,9 @@ def table_query(table):
             data_description = cursor.description
             row_count = cursor.rowcount
     else:
+        if request.args.get('update'):
+            return rep_database.repDatabase()
+
         if request.args.get('sql'):
             sql = request.args.get('sql')
         else:
