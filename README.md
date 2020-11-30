@@ -6,6 +6,7 @@ Project dependencies:
 * [peewee](http://docs.peewee-orm.com)
 * [pygments](http://pygments.org)
 * [regex](https://pypi.org/project/regex/)
+* [openpyxl](https://pypi.org/project/openpyxl/)
 
 ### Usage
 
