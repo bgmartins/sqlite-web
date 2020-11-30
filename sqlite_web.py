@@ -464,6 +464,11 @@ def search():
     elif org == "" and table == "Employees":
         return jsonify(tabela = dataset.orgpatronal_data())
 
+@app.route('/updateDB/', methods=['GET'])
+def updateDB():
+    return rep_database.repDatabase()
+
+
 @app.route('/create-table/', methods=['POST'])
 def table_create():
     table = (request.form.get('table_name') or '').strip()
@@ -735,9 +740,6 @@ def table_query(table):
             data_description = cursor.description
             row_count = cursor.rowcount
     else:
-        if request.args.get('update'):
-            return rep_database.repDatabase()
-
         if request.args.get('sql'):
             sql = request.args.get('sql')
         else:

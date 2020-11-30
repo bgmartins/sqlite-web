@@ -2,6 +2,9 @@
 
 {% block sidebar %}
   <input class="form-control form-control-sm" id="table-search" placeholder="table name..." type="text" />
+  <div>
+    <button class="btn btn-primary" id="update_db" onclick="updateDB()">Update DB</button>
+  </div>
   <ul class="nav flex-column nav-pills" role="tablist">
     {% set virtual_tables_corollary = dataset.get_corollary_virtual_tables() %}
     {% for table_name in dataset.tables|sort %}
@@ -28,4 +31,40 @@
       </li>
     {% endfor %}
   </ul>
+
+
+  <script type="text/javascript">
+    function updateDB(){
+
+      $.ajax({
+          url: "{{ url_for('updateDB') }}",
+          dataType: "json",
+          beforeSend:function(jqXHR, settings){
+
+            document.getElementById('update_db').style.backgroundColor ='#ff8000';
+            document.getElementById('update_db').innerHTML = "Updating...";
+            /* cor original do botao #5eb69d */
+          
+          },
+          success:function(data){
+          
+            console.log(data);
+            stats = Object.values(data);
+
+            document.getElementById('update_db').innerHTML = "Update DB";
+            document.getElementById('update_db').style.backgroundColor ='#5eb69d';
+
+            alert("Database Updated!\nOrg Sindicais: " + data['Org Sindicais'] + " rows\nOrg Patronais: " + data['Org Patronais'] + " rows\nActos Outorgantes: " + data['Actos Outorgantes'] + " rows\nActos Eleitorais Org Sindicais: " + data['Actos Eleitorais Org Sindicais'] + " rows\nActos Negociação Colectiva: " + data['Actos Negociação Colectiva'] + " rows");
+          
+          },
+          error:function(jqXHR, textStatus, errorThrown){
+          
+            console.log(jqXHR.responseText);
+            console.log(textStatus);
+            console.log(errorThrown);
+          
+          }
+        });
+    }
+  </script>
 {% endblock %}
