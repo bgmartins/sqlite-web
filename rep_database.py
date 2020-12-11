@@ -463,11 +463,11 @@ def tratarNomeDirigente(nome_dirigente):
 		nome_dirigente = nome_dirigente.replace(" ", "", 1)
 
 	nome_dirigente = nome_dirigente.replace(" — ","- ")
-
 	nome_dirigente = nome_dirigente.replace("DR.ª ", "")
 	nome_dirigente = nome_dirigente.replace("DRª ", "")
 	nome_dirigente = nome_dirigente.replace("DR. ", "")
 	nome_dirigente = nome_dirigente.replace("DR ", "")
+	nome_dirigente = nome_dirigente.replace("SR ", "")
 	nome_dirigente = nome_dirigente.replace("PROF.ª ", "")
 	nome_dirigente = nome_dirigente.replace("PROF. ", "")
 	nome_dirigente = nome_dirigente.replace("PROFESSORA ", "")
@@ -479,6 +479,12 @@ def tratarNomeDirigente(nome_dirigente):
 	nome_dirigente = nome_dirigente.replace("Mª", "MARIA")
 	nome_dirigente = nome_dirigente.replace("M. ª", "MARIA")
 	nome_dirigente = nome_dirigente.replace("ENGENHEIRO ", "")
+	nome_dirigente = nome_dirigente.replace(" (", "")
+	nome_dirigente = nome_dirigente.replace("(", "")
+	nome_dirigente = nome_dirigente.replace("SUPLENTES ", "")
+	nome_dirigente = nome_dirigente.replace("MESTRE ", "")
+	nome_dirigente = nome_dirigente.replace("JOSE ","JOSÉ ")
+	nome_dirigente = nome_dirigente.replace("CESAR ","CESÁR ")
 
 	return nome_dirigente
 
@@ -506,6 +512,13 @@ def obterGeneroDirigente(nome_dirigente, nomes_masculinos, nomes_femininos):
 	else:
 		genero = None
 
+	if genero is None:
+		if nome_proprio.endswith("A") or nome_proprio.endswith("Á"):
+			genero = "FEMININO"
+		
+		elif nome_proprio.endswith("O"):
+			genero = "MASCULINO"
+
 	return genero 
 
 
@@ -527,6 +540,7 @@ def listasDirigentes(cursor):
 		num_boletim = nome_num_ano[1]
 		ano_boletim = int(nome_num_ano[2])
 		id_org = None
+		id_nome = None
 		cargo = None
 		data_inicio = None
 		data_fim = None
@@ -538,7 +552,10 @@ def listasDirigentes(cursor):
 		#obter id associado ao nome do sindicato
 		cursor.execute("SELECT DISTINCT ID, Nome FROM Org_Sindical WHERE Nome LIKE ?", (f'%{nome_org}%',))
 		id_nome = cursor.fetchone()
-		id_org = id_nome[0]
+		if id_nome is None:
+			print(file)
+		else:
+			id_org = id_nome[0]
 
 		
 		linha_1 = f.readline()
@@ -1776,10 +1793,12 @@ def repDatabase():
 
 	#Separar em varios registos os registos que possuem mais do que uma entidade sindical envolvida no aviso de greve
 	#Inserir na tabela Avisos de Greve
+	
 	cursor.execute("""WITH RECURSIVE split(id, ano_in, mes_in, ent_sind, ent_pat, ano_f, mes_f, dur, rest) AS 
 	(SELECT Id_Entidade_Sindical, Ano_Inicio, Mes_Inicio, '', Entidade_Patronal, Ano_Fim, Mes_Fim, Duracao, Entidade_Sindical || ' / ' FROM TEMP_AVISOS_GREVE
 		UNION ALL
-	SELECT  id, ano_in, mes_in, SUBSTR(rest,0,INSTR(rest,'/')-1), ent_pat, ano_f, mes_f, dur, SUBSTR(rest, INSTR(rest,'/')+2) FROM split WHERE rest LIKE "% / %" AND INSTR(rest, "(") = 0 AND rest <> '') 
+	SELECT  id, ano_in, mes_in, SUBSTR(rest,0,INSTR(rest,'/')-1), ent_pat, ano_f, mes_f, dur, SUBSTR(rest, INSTR(rest,'/')+2) FROM split WHERE rest LIKE "% / %" 
+	AND INSTR(rest, "(") = 0 AND rest <> '')
 	INSERT INTO TEMP_AVISOS_GREVE_2 SELECT DISTINCT id, ano_in, mes_in, ent_sind, ent_pat, ano_f, mes_f, dur FROM split WHERE ent_sind <> '';""")
 
 	'''INSERT INTO Avisos_Greve SELECT DISTINCT id, ano_in, mes_in, ent_sind, ent_pat, ano_f, mes_f, dur FROM split WHERE ent_sind <> '';""")'''
@@ -1959,27 +1978,27 @@ def repDatabase():
 
 	cursor.execute("""INSERT INTO Sectores_Profissionais SELECT TITLE AS Sector, NULL, SALARY AS Salario_Medio FROM CAE_SECCOES_TEMP;""")
 
-	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="ACTIV. ADMIN. E DOS SERV. APOIO" WHERE Sector = "ACTIVIDADES ADMINISTRATIVAS E DOS SERVIÇOS DE APOIO";""")
-	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="ACTIV. ARTIS. DE ESPECT. DESP. E RECRE." WHERE Sector = "ACTIVIDADES ARTÍSTICAS, DE ESPECTÁCULOS, DESPORTIVAS E RECREATIVAS";""")
-	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="ACTIV. FAM. EMP. DE PESS. DOM. ACTIV. PROD. FAM. USO PRÓP." WHERE Sector = "ACTIVIDADES DAS FAMÍLIAS EMPREGADORAS DE PESSOAL DOMÉSTICO E ACTIVIDADES DE PRODUÇÃO DAS FAMÍLIAS PARA USO PRÓPRIO";""")
-	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="ACTIV. CONSUL. CIENT. TÉC. E SIM." WHERE Sector = "ACTIVIDADES DE CONSULTORIA, CIENTÍFICAS, TÉCNICAS E SIMILARES";""")
-	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="ACTIV. INFO. COMUNIC." WHERE Sector = "ACTIVIDADES DE INFORMAÇÃO E DE COMUNICAÇÃO";""")
-	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="ACTIV. SAÚDE HUM. APOIO SOCIAL" WHERE Sector = "ACTIVIDADES DE SAÚDE HUMANA E APOIO SOCIAL";""")
-	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="ACTIV. ORGAN. INTERN. E OUTR. INST. EXTRA-TERRI." WHERE Sector = "ACTIVIDADES DOS ORGANISMOS INTERNACIONAIS E OUTRAS INSTITUIÇÕES EXTRA-TERRITORIAIS";""")
-	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="ACTIV. FIN. E SEGUROS" WHERE Sector = "ACTIVIDADES FINANCEIRAS E DE SEGUROS";""")
-	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="ACTIV. IMOB." WHERE Sector = "ACTIVIDADES IMOBILIÁRIAS";""")
-	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="ADMIN. PÚB. E DEF.;SEG. SOCIAL OBRIG." WHERE Sector = "ADMINISTRAÇÃO PÚBLICA E DEFESA; SEGURANÇA SOCIAL OBRIGATÓRIA";""")
-	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="AGRIC., PROD., ANIMAL, CAÇA,FLOR. E PESCA" WHERE Sector = "AGRICULTURA, PRODUÇÃO ANIMAL, CAÇA, FLORESTA E PESCA";""")
-	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="ALOJ. REST. E SIM." WHERE Sector = "ALOJAMENTO, RESTAURAÇÃO E SIMILARES";""")
-	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="CAPT. TRAT. E DIST. DE ÁGUA;SANEA. GEST. DE RESÍ. E DESPOL." WHERE Sector = "CAPTAÇÃO, TRATAMENTO E DISTRIBUIÇÃO DE ÁGUA; SANEAMENTO GESTÃO DE RESÍDUOS E DESPOLUIÇÃO";""")
-	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="COMÉ. GRO. E A RETA.; REPAR. DE VEÍC. AUTO. E MOTOC." WHERE Sector = "COMÉRCIO POR GROSSO E A RETALHO; REPARAÇÃO DE VEÍCULOS AUTOMÓVEIS E MOTOCICLOS";""")
+	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="ADMINISTRATIVAS E SERVIÇOS DE APOIO" WHERE Sector = "ACTIVIDADES ADMINISTRATIVAS E DOS SERVIÇOS DE APOIO";""")
+	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="ARTÍSTICAS, ESPECTÁCULOS, DESPORTIVAS E RECREATIVAS" WHERE Sector = "ACTIVIDADES ARTÍSTICAS, DE ESPECTÁCULOS, DESPORTIVAS E RECREATIVAS";""")
+	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="FAMÍLIAS EMPREGADORAS E ACTIVIDADES DE PRODUÇÃO" WHERE Sector = "ACTIVIDADES DAS FAMÍLIAS EMPREGADORAS DE PESSOAL DOMÉSTICO E ACTIVIDADES DE PRODUÇÃO DAS FAMÍLIAS PARA USO PRÓPRIO";""")
+	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="CONSULTORIA, CIENTÍFICAS, TÉCNICAS E SIMILARES" WHERE Sector = "ACTIVIDADES DE CONSULTORIA, CIENTÍFICAS, TÉCNICAS E SIMILARES";""")
+	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="INFORMAÇÃO E DE COMUNICAÇÃO" WHERE Sector = "ACTIVIDADES DE INFORMAÇÃO E DE COMUNICAÇÃO";""")
+	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="SAÚDE HUMANA E APOIO SOCIAL" WHERE Sector = "ACTIVIDADES DE SAÚDE HUMANA E APOIO SOCIAL";""")
+	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="ORGANISMOS INTERNACIONAIS E INSTITUIÇÕES EXTRA-TERRITORIAIS" WHERE Sector = "ACTIVIDADES DOS ORGANISMOS INTERNACIONAIS E OUTRAS INSTITUIÇÕES EXTRA-TERRITORIAIS";""")
+	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="FINANCEIRAS E DE SEGUROS" WHERE Sector = "ACTIVIDADES FINANCEIRAS E DE SEGUROS";""")
+	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="IMOBILIÁRIAS" WHERE Sector = "ACTIVIDADES IMOBILIÁRIAS";""")
+	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="ADMINISTRAÇÃO PÚBLICA;SEGURANÇA SOCIAL OBRIGATÓRIA." WHERE Sector = "ADMINISTRAÇÃO PÚBLICA E DEFESA; SEGURANÇA SOCIAL OBRIGATÓRIA";""")
+	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="AGRICULTURA, CAÇA, FLORESTA E PESCA" WHERE Sector = "AGRICULTURA, PRODUÇÃO ANIMAL, CAÇA, FLORESTA E PESCA";""")
+	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="ALOJAMENTO, RESTAURAÇÃO E SIMILARES" WHERE Sector = "ALOJAMENTO, RESTAURAÇÃO E SIMILARES";""")
+	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="CAPTAÇÃO, TRATAMENTO, DISTRIBUIÇÃO E SANEAMENTO DE ÁGUA" WHERE Sector = "CAPTAÇÃO, TRATAMENTO E DISTRIBUIÇÃO DE ÁGUA; SANEAMENTO GESTÃO DE RESÍDUOS E DESPOLUIÇÃO";""")
+	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="COMÉRCIO POR GROSSO E A RETALHO; REPARAÇÃO DE VEÍCULOS" WHERE Sector = "COMÉRCIO POR GROSSO E A RETALHO; REPARAÇÃO DE VEÍCULOS AUTOMÓVEIS E MOTOCICLOS";""")
 	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="CONSTRUÇÃO" WHERE Sector = "CONSTRUÇÃO";""")
 	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="EDUCAÇÃO" WHERE Sector = "EDUCAÇÃO";""")
-	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="ELECT. GÁS VAPOR ÁGUA QUENTE E FRIA E AR FRIO" WHERE Sector = "ELECTRICIDADE, GÁS, VAPOR, ÁGUA QUENTE E FRIA E AR FRIO";""")
-	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="IND. EXTRACT." WHERE Sector = "INDÚSTRIAS EXTRACTIVAS";""")
-	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="IND. TRANSF." WHERE Sector = "INDÚSTRIAS TRANSFORMADORAS";""")
-	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="OUTRAS ACTIV. DE SERV." WHERE Sector = "OUTRAS ACTIVIDADES DE SERVIÇOS";""")
-	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="TRANSP. E ARMAZ." WHERE Sector = "TRANSPORTES E ARMAZENAGEM";""")
+	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="ELECTRICIDADE, GÁS, VAPOR, ÁGUA E AR" WHERE Sector = "ELECTRICIDADE, GÁS, VAPOR, ÁGUA QUENTE E FRIA E AR FRIO";""")
+	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="INDÚSTRIAS EXTRACTIVAS" WHERE Sector = "INDÚSTRIAS EXTRACTIVAS";""")
+	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="INDÚSTRIAS TRANSFORMADORAS" WHERE Sector = "INDÚSTRIAS TRANSFORMADORAS";""")
+	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="OUTRAS ACTIVIDADES DE SERVIÇOS" WHERE Sector = "OUTRAS ACTIVIDADES DE SERVIÇOS";""")
+	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="TRANSPORTES E ARMAZENAGEM" WHERE Sector = "TRANSPORTES E ARMAZENAGEM";""")
 
 	cursor.execute("""UPDATE Org_Sindical SET Sector=(SELECT DISTINCT Sector FROM Outorgantes_Actos WHERE Outorgantes_Actos.ID_Organizacao_Sindical=Org_Sindical.ID);""")
 	cursor.execute("""UPDATE Org_Patronal SET Sector=(SELECT DISTINCT Sector FROM Outorgantes_Actos WHERE Outorgantes_Actos.ID_Organizacao_Patronal=Org_Patronal.ID);""")

@@ -204,13 +204,23 @@ class SqliteDataSet(DataSet):
     @property
     def map_labels(self):
         cursor = self.query("SELECT Distrito_Sede, COUNT(Distinct ID) as NUM_ORG FROM Org_Sindical  WHERE Activa=1 GROUP BY Distrito_Sede")
-        return [row[0] for row in cursor.fetchall()]
+        lista = []
+        for row in cursor.fetchall():
+            if(row[0]!="" and row[0]!="REG. AUT. AÇORES" and row[0]!="REG. AUT. MADEIRA"):
+                lista.append(row[0])
+        
+        return lista
 
     #choroplethMap
     @property
     def map_data(self):
         cursor = self.query("SELECT Distrito_Sede, COUNT(Distinct ID) as NUM_ORG FROM Org_Sindical  WHERE Activa=1 GROUP BY Distrito_Sede")
-        return [row[1] for row in cursor.fetchall()]
+        lista = []
+        for row in cursor.fetchall():
+            if(row[0]!="" and row[0]!="REG. AUT. AÇORES" and row[0]!="REG. AUT. MADEIRA"):
+                lista.append(row[1])
+        
+        return lista
 
     
     #avisosGreveAnos
@@ -247,28 +257,36 @@ class SqliteDataSet(DataSet):
     @property
     def orgsindical1_data(self):
         lista = []
-        cursor = self.query("SELECT  ID, Tipo, Nome, Acronimo, Nome_Organizacao_Pai FROM Org_Sindical")
+        cursor = self.query("SELECT Tipo, Nome, Acronimo, Distrito_Sede, Activa FROM Org_Sindical")
         for row in cursor.fetchall():
             lista.append(list(row))
 
         for i in range(len(lista)):
             for j in range(len(lista[i])):
                 if lista[i][j] is None:
-                    lista[i][j] = 'NULL'
+                    lista[i][j] = ""
+                elif lista[i][j] == 1:
+                    lista[i][j] = "SIM"
+                elif lista[i][j] == 0:
+                    lista[i][j] = "NÃO"
 
         return lista
 
     def orgsindical_data(self):
         lista = []
         new_dict = {}
-        cursor = self.query("SELECT  ID, Tipo, Nome, Acronimo, Nome_Organizacao_Pai FROM Org_Sindical")
+        cursor = self.query("SELECT  Tipo, Nome, Acronimo, Distrito_Sede, Activa FROM Org_Sindical")
         for row in cursor.fetchall():
             lista.append(list(row))
 
         for i in range(len(lista)):
             for j in range(len(lista[i])):
                 if lista[i][j] is None:
-                    lista[i][j] = 'NULL'
+                    lista[i][j] = ""
+                elif lista[i][j] == 1:
+                    lista[i][j] = "SIM"
+                elif lista[i][j] == 0:
+                    lista[i][j] = "NÃO"
         
         for c, value in enumerate(lista):
             new_dict[str(c)] = value
@@ -279,14 +297,18 @@ class SqliteDataSet(DataSet):
     def orgpatronal_data(self):
         lista = []
         new_dict = {}
-        cursor = self.query("SELECT  ID, Tipo, Nome, Acronimo, Nome_Organizacao_Pai FROM Org_Patronal")
+        cursor = self.query("SELECT  Tipo, Nome, Acronimo, Distrito_Sede, Activa FROM Org_Patronal")
         for row in cursor.fetchall():
             lista.append(list(row))
 
         for i in range(len(lista)):
             for j in range(len(lista[i])):
                 if lista[i][j] is None:
-                    lista[i][j] = 'NULL'
+                    lista[i][j] = ""
+                elif lista[i][j] == 1:
+                    lista[i][j] = "SIM"
+                elif lista[i][j] == 0:
+                    lista[i][j] = "NÃO"
 
         for c, value in enumerate(lista):
             new_dict[str(c)] = value
@@ -298,9 +320,9 @@ class SqliteDataSet(DataSet):
         new_dict = {}
 
         if table=="Unions" or table=="":
-            cursor = self.query("SELECT ID, Tipo, Nome, Acronimo, Nome_Organizacao_Pai FROM Org_Sindical WHERE Nome LIKE ? OR Acronimo LIKE ?", ('%' + org + '%', '%' + org + '%'))
+            cursor = self.query("SELECT Tipo, Nome, Acronimo, Distrito_Sede, Activa FROM Org_Sindical WHERE Nome LIKE ? OR Acronimo LIKE ?", ('%' + org + '%', '%' + org + '%'))
         else:
-            cursor = self.query("SELECT ID, Tipo, Nome, Acronimo, Nome_Organizacao_Pai FROM Org_Patronal WHERE Nome LIKE ? OR Acronimo LIKE ?", ('%' + org + '%', '%' + org + '%'))
+            cursor = self.query("SELECT Tipo, Nome, Acronimo, Distrito_Sede, Activa FROM Org_Patronal WHERE Nome LIKE ? OR Acronimo LIKE ?", ('%' + org + '%', '%' + org + '%'))
 
         for row in cursor.fetchall():
             lista.append(list(row))
@@ -308,34 +330,229 @@ class SqliteDataSet(DataSet):
         for i in range(len(lista)):
             for j in range(len(lista[i])):
                 if lista[i][j] is None:
-                    lista[i][j] = 'NULL'
+                    lista[i][j] = ""
+                elif lista[i][j] == 1:
+                    lista[i][j] = "SIM"
+                elif lista[i][j] == 0:
+                    lista[i][j] = "NÃO"
 
         for c, value in enumerate(lista):
             new_dict[str(c)] = value
 
         return new_dict
 
+    def updateChart(self, table, org):
+        lista_final = []
+
+        lista_orgs_tipo_ano = self.orgs_tipo_ano(table, org)
+
+        for lista_org_tipo_ano in lista_orgs_tipo_ano:
+            lista_final.append(lista_org_tipo_ano)
+
+        org_distritos = self.orgs_por_distrito(table, org)
+        lista_greves = self.avisos_greve_ano(table, org)
+        orgs_por_sector = self.orgs_por_sector(table, org)
+
+        lista_final.append(org_distritos)
+        lista_final.append(lista_greves)
+        lista_final.append(orgs_por_sector)
+
+        return lista_final
+
+
+    def orgs_tipo_ano(self, table, org):
+        lista_orgs = []
+        orgs_tipo_ano_conf = {} #confederacao
+        orgs_tipo_ano_fed = {} #federacao
+        orgs_tipo_ano_org = {} #organizacao / associacao
+        orgs_tipo_ano_uni = {} #uniao
+        linhas = 0
+        
+        anos = self.barchart_labels
+
+        for ano in anos:
+            orgs_tipo_ano_conf[ano] = 0
+            orgs_tipo_ano_fed[ano] = 0
+            orgs_tipo_ano_org[ano] = 0
+            orgs_tipo_ano_uni[ano] = 0
+
+
+        if table == "Unions" and org !="":
+            cursor = self.query("""SELECT ANO, TIPO, COUNT(DISTINCT ID) AS NUM_ORG FROM Org_Sindical, 
+            ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical 
+            WHERE Data_Primeira_Actividade IS NOT NULL AND Ano >= 1977 UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical 
+            WHERE Data_Primeira_Actividade IS NOT NULL) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) AND 
+            ID IN (SELECT ID FROM Org_Sindical WHERE Nome LIKE ? OR Acronimo LIKE ?) GROUP BY ANO, TIPO""",('%' + org + '%', '%' + org + '%'))
+        
+        elif (table=="Unions" and org=="") or table=="":
+            cursor = self.query("""SELECT ANO, TIPO, COUNT(DISTINCT ID) AS NUM_ORG FROM Org_Sindical, 
+            ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical
+             WHERE Data_Primeira_Actividade IS NOT NULL AND Ano >= 1977 UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano
+             FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND 
+             (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) GROUP BY ANO, TIPO""")
+        
+        elif table=="Employees" and org!="":
+            cursor = self.query("""SELECT ANO, TIPO, COUNT(DISTINCT ID) AS NUM_ORG FROM Org_Patronal, 
+            ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Patronal 
+            WHERE Data_Primeira_Actividade IS NOT NULL AND Ano >= 1977 UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Patronal 
+            WHERE Data_Primeira_Actividade IS NOT NULL) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) AND 
+            ID IN (SELECT ID FROM Org_Patronal WHERE Nome LIKE ? OR Acronimo LIKE ?) AND TIPO IS NOT NULL GROUP BY ANO, TIPO""",('%' + org + '%', '%' + org + '%'))
+        
+        elif table=="Employees" and org=="":
+            cursor = self.query("""SELECT ANO, TIPO, COUNT(DISTINCT ID) AS NUM_ORG FROM Org_Patronal, 
+            ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Patronal
+             WHERE Data_Primeira_Actividade IS NOT NULL AND Ano >= 1977 UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano
+             FROM Org_Patronal WHERE Data_Primeira_Actividade IS NOT NULL) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND 
+             (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) AND TIPO IS NOT NULL GROUP BY ANO, TIPO""")
+
+        
+        for row in cursor.fetchall():
+            linhas = 1   
+            if row[1].startswith("CONF"):
+                orgs_tipo_ano_conf[row[0]] = row[2]
+            
+            elif row[1].startswith("FED"):
+                orgs_tipo_ano_fed[row[0]] = row[2]
+            
+            elif row[1].startswith("SIND") or row[1].startswith("ASSO"):
+                orgs_tipo_ano_org[row[0]] = row[2]
+            
+            elif row[1].startswith("UNI"):
+                orgs_tipo_ano_uni[row[0]] = row[2]
+
+        lista_orgs.append(list(orgs_tipo_ano_conf.values()))
+        lista_orgs.append(list(orgs_tipo_ano_fed.values()))
+        lista_orgs.append(list(orgs_tipo_ano_org.values()))
+        lista_orgs.append(list(orgs_tipo_ano_uni.values()))
+
+        return lista_orgs
+
+
+    def orgs_por_distrito(self, table, org):
+        distritos = self.map_labels
+        linhas = 0
+        org_distritos = {}
+
+        for distrito in distritos:
+            org_distritos[distrito] = 0
+
+
+        if table == "Unions" and org !="":
+            cursor = self.query("SELECT Distrito_Sede, COUNT(Distinct ID) as NUM_ORG FROM Org_Sindical WHERE ID IN (SELECT ID FROM Org_Sindical WHERE Nome LIKE ? OR Acronimo LIKE ?) AND Activa=1 GROUP BY Distrito_Sede",('%' + org + '%', '%' + org + '%'))
+        
+        elif (table=="Unions" and org=="") or table=="":
+            cursor = self.query("SELECT Distrito_Sede, COUNT(Distinct ID) as NUM_ORG FROM Org_Sindical WHERE Activa=1 GROUP BY Distrito_Sede")
+        
+        elif table=="Employees" and org!="":
+            cursor = self.query("SELECT Distrito_Sede, COUNT(Distinct ID) as NUM_ORG FROM Org_Patronal WHERE ID IN (SELECT ID FROM Org_Patronal WHERE Nome LIKE ? OR Acronimo LIKE ?) AND Activa=1 GROUP BY Distrito_Sede",('%' + org + '%', '%' + org + '%'))
+
+        elif table=="Employees" and org=="":
+            cursor = self.query("SELECT Distrito_Sede, COUNT(Distinct ID) as NUM_ORG FROM Org_Patronal WHERE Activa=1 GROUP BY Distrito_Sede")
+
+        for row in cursor.fetchall():
+            linhas = 1
+            if(row[0]!="" and row[0]!="REG. AUT. AÇORES" and row[0]!="REG. AUT. MADEIRA"):
+                org_distritos[row[0]] = row[1]
+
+
+        if linhas == 1:
+            return list(org_distritos.values())
+        else:
+            return []
+
+
+    def avisos_greve_ano(self, table, org):
+        anos_greve = self.barchart2_labels
+        avisos_greve = {}
+        linhas = 0
+        
+        for ano in anos_greve:
+            avisos_greve[ano] = 0
+
+        if table == "Unions" and org !="":
+            cursor = self.query("SELECT Ano_Inicio as Ano, COUNT(*) as NUM_GREVES FROM Avisos_Greve WHERE Entidade_Sindical IN (SELECT Nome FROM Org_Sindical WHERE Nome LIKE ? OR Acronimo LIKE ?) GROUP BY Ano_Inicio",('%' + org + '%', '%' + org + '%'))
+        
+        elif (table=="Unions" and org=="") or table=="":
+            cursor = self.query("SELECT Ano_Inicio as Ano, COUNT(*) as NUM_GREVES FROM Avisos_Greve GROUP BY Ano_Inicio")
+        
+        elif table=="Employees" and org!="":
+            cursor = self.query("SELECT Ano_Inicio as Ano, COUNT(*) as NUM_GREVES FROM Avisos_Greve WHERE Entidade_Patronal IN (SELECT Nome FROM Org_Patronal WHERE Nome LIKE ? OR Acronimo LIKE ?) GROUP BY Ano_Inicio",('%' + org + '%', '%' + org + '%'))
+
+        elif table=="Employees" and org=="":
+            cursor = self.query("SELECT Ano_Inicio as Ano, COUNT(*) as NUM_GREVES FROM Avisos_Greve GROUP BY Ano_Inicio")
+
+        
+        for row in cursor.fetchall():
+            linhas = 1
+            avisos_greve[row[0]] = row[1]
+
+
+        if linhas == 1:
+            return list(avisos_greve.values())
+        else:
+            return []
+
+    def orgs_por_sector(self, table, org):
+        sectores = self.barchart3_labels
+        orgs_por_sector = {}
+        linhas = 0
+
+        for sector in sectores:
+            orgs_por_sector[sector] = 0
+
+        if table == "Unions" and org !="":
+            cursor = self.query("""SELECT Sectores_Profissionais.Sector, COUNT(DISTINCT Org_Sindical.ID) AS Num_Org 
+                FROM Sectores_Profissionais LEFT JOIN Org_Sindical ON Org_Sindical.Sector = Sectores_Profissionais.Sector WHERE Org_Sindical.ID IN 
+             (SELECT ID FROM Org_Sindical WHERE Nome LIKE ? OR Acronimo LIKE ?) 
+             GROUP BY Sectores_Profissionais.Sector ORDER BY Sectores_Profissionais.Sector""",('%' + org + '%', '%' + org + '%'))
+
+        elif (table=="Unions" and org=="") or table=="":
+            cursor = self.query("""SELECT Sectores_Profissionais.Sector, COUNT(DISTINCT Org_Sindical.ID) AS Num_Org 
+                FROM Sectores_Profissionais LEFT JOIN Org_Sindical ON Org_Sindical.Sector = Sectores_Profissionais.Sector 
+                GROUP BY Sectores_Profissionais.Sector ORDER BY Sectores_Profissionais.Sector""")
+        
+        elif table=="Employees" and org!="":
+            cursor = self.query("""SELECT Sectores_Profissionais.Sector, COUNT(DISTINCT Org_Patronal.ID) AS Num_Org 
+                FROM Sectores_Profissionais LEFT JOIN Org_Patronal ON Org_Patronal.Sector = Sectores_Profissionais.Sector WHERE Org_Patronal.ID IN 
+                (SELECT ID FROM Org_Patronal WHERE Nome LIKE ? OR Acronimo LIKE ?)
+                 GROUP BY Sectores_Profissionais.Sector ORDER BY Sectores_Profissionais.Sector""",('%' + org + '%', '%' + org + '%'))
+
+        elif table=="Employees" and org=="":
+            cursor = self.query("""SELECT Sectores_Profissionais.Sector, COUNT(DISTINCT Org_Patronal.ID) AS Num_Org 
+                FROM Sectores_Profissionais LEFT JOIN Org_Patronal ON Org_Patronal.Sector = Sectores_Profissionais.Sector 
+                GROUP BY Sectores_Profissionais.Sector ORDER BY Sectores_Profissionais.Sector""")
+
+        for row in cursor.fetchall():
+            linhas = 1
+            orgs_por_sector[row[0]] = row[1]
+
+        if linhas == 1:
+            return list(orgs_por_sector.values())
+        else:
+            return []
+    
+
     def table_toExcel(self, table, org):
         colunas = []
         linhas = []
         
-        if table=="Unions" and org!="":
+        if (table=="Unions" and org!="") or (table=="" and org!=""):
             table = 'Org_Sindical'
-            cursor = self.query("SELECT ID, Tipo, Nome, Acronimo, Nome_Organizacao_Pai FROM Org_Sindical WHERE Nome LIKE ? OR Acronimo LIKE ?", ('%' + org + '%', '%' + org + '%'))
+            cursor = self.query("SELECT * FROM Org_Sindical WHERE Nome LIKE ? OR Acronimo LIKE ?", ('%' + org + '%', '%' + org + '%'))
         
-        elif (table=="Unions" and org=="") or table=="":
+        elif (table=="Unions" and org=="") or (table=="" and org==""):
             table = 'Org_Sindical'
-            cursor = self.query("SELECT  ID, Tipo, Nome, Acronimo, Nome_Organizacao_Pai FROM Org_Sindical")
+            cursor = self.query("SELECT * FROM Org_Sindical")
 
         elif table=="Employees" and org!="":
             table = 'Org_Patronal'
-            cursor = self.query("SELECT ID, Tipo, Nome, Acronimo, Nome_Organizacao_Pai FROM Org_Patronal WHERE Nome LIKE ? OR Acronimo LIKE ?", ('%' + org + '%', '%' + org + '%'))
+            cursor = self.query("SELECT * FROM Org_Patronal WHERE Nome LIKE ? OR Acronimo LIKE ?", ('%' + org + '%', '%' + org + '%'))
 
         elif table=="Employees" and org=="": 
             table = 'Org_Patronal'
-            cursor = self.query("SELECT  ID, Tipo, Nome, Acronimo, Nome_Organizacao_Pai FROM Org_Patronal")
+            cursor = self.query("SELECT * FROM Org_Patronal")
 
-        for tuplo in self.get_columns(table)[0:5]:
+        for tuplo in self.get_columns(table):
             colunas.append(tuplo[0])
 
         for row in cursor.fetchall():
@@ -344,7 +561,11 @@ class SqliteDataSet(DataSet):
         for i in range(len(linhas)):
             for j in range(len(linhas[i])):
                 if linhas[i][j] is None:
-                    linhas[i][j] = 'NULL'
+                    linhas[i][j] = ""
+                elif linhas[i][j] == 1:
+                    linhas[i][j] = "SIM"
+                elif linhas[i][j] == 0:
+                    linhas[i][j] = "NÃO"
         
         return pd.DataFrame(linhas, columns=colunas)
 
@@ -457,16 +678,25 @@ def search():
     table = request.args.get('table_org')
     org = request.args.get('organization')
 
-    if org != "" and table != "Choose":
+    if org != "":
         return jsonify(tabela = dataset.searchbar_data(table, org))
     elif org == "" and table == "Unions":
         return jsonify(tabela = dataset.orgsindical_data())
     elif org == "" and table == "Employees":
         return jsonify(tabela = dataset.orgpatronal_data())
+    else:
+        return jsonify(tabela = dataset.orgsindical_data())
 
 @app.route('/updateDB/', methods=['GET'])
 def updateDB():
     return rep_database.repDatabase()
+
+@app.route('/updateCharts/', methods=['GET'])
+def updateCharts():
+    table = request.args.get('table_org')
+    org = request.args.get('organization')
+
+    return jsonify(tabela = dataset.updateChart(table,org))
 
 
 @app.route('/create-table/', methods=['POST'])
@@ -1038,7 +1268,7 @@ def install_auth_handler(password):
     @app.before_request
     def check_password():
 
-        if not session.get('authorized') and request.path != '/login/' and request.path != '/export/' and request.path != '/search/' and \
+        if not session.get('authorized') and request.path != '/login/' and request.path != '/export/' and request.path != '/search/' and request.path != '/updateCharts/' and \
            not request.path.startswith(('/static/', '/favicon')):
             flash('You must log-in to view the database browser.', 'danger')
             session['next_url'] = request.base_url
