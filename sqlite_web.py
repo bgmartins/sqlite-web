@@ -203,7 +203,7 @@ class SqliteDataSet(DataSet):
     #choroplethMapDistritos
     @property
     def map_labels(self):
-        cursor = self.query("SELECT Distrito_Sede, COUNT(Distinct ID) as NUM_ORG FROM Org_Sindical  WHERE Activa=1 GROUP BY Distrito_Sede")
+        cursor = self.query("SELECT Distrito_Sede, COUNT(Distinct ID) as NUM_ORG FROM Org_Sindical WHERE Activa=1 GROUP BY Distrito_Sede")
         lista = []
         for row in cursor.fetchall():
             if(row[0]!="" and row[0]!="REG. AUT. AÇORES" and row[0]!="REG. AUT. MADEIRA"):
@@ -214,7 +214,7 @@ class SqliteDataSet(DataSet):
     #choroplethMap
     @property
     def map_data(self):
-        cursor = self.query("SELECT Distrito_Sede, COUNT(Distinct ID) as NUM_ORG FROM Org_Sindical  WHERE Activa=1 GROUP BY Distrito_Sede")
+        cursor = self.query("SELECT Distrito_Sede, COUNT(Distinct ID) as NUM_ORG FROM Org_Sindical WHERE Activa=1 GROUP BY Distrito_Sede")
         lista = []
         for row in cursor.fetchall():
             if(row[0]!="" and row[0]!="REG. AUT. AÇORES" and row[0]!="REG. AUT. MADEIRA"):
@@ -251,7 +251,7 @@ class SqliteDataSet(DataSet):
     #sectores
     @property
     def barchart3_data(self):
-        cursor = self.query("SELECT Sectores_Profissionais.Sector, COUNT(DISTINCT Org_Sindical.ID) AS Num_Org FROM Sectores_Profissionais LEFT JOIN Org_Sindical ON Org_Sindical.Sector = Sectores_Profissionais.Sector GROUP BY Sectores_Profissionais.Sector ORDER BY Sectores_Profissionais.Sector")
+        cursor = self.query("SELECT Sectores_Profissionais.Sector, COUNT(DISTINCT Org_Sindical.ID) AS Num_Org FROM Sectores_Profissionais LEFT JOIN Org_Sindical ON Org_Sindical.Sector = Sectores_Profissionais.Sector AND Activa = 1 GROUP BY Sectores_Profissionais.Sector ORDER BY Sectores_Profissionais.Sector")
         return [row[1] for row in cursor.fetchall()]
 
     @property
@@ -382,7 +382,7 @@ class SqliteDataSet(DataSet):
             ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical 
             WHERE Data_Primeira_Actividade IS NOT NULL AND Ano >= 1977 UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical 
             WHERE Data_Primeira_Actividade IS NOT NULL) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) AND 
-            ID IN (SELECT ID FROM Org_Sindical WHERE Nome LIKE ? OR Acronimo LIKE ?) GROUP BY ANO, TIPO""",('%' + org + '%', '%' + org + '%'))
+            ID IN (SELECT ID FROM Org_Sindical WHERE Nome LIKE ? OR Acronimo LIKE ? AND Activa = 1 ) GROUP BY ANO, TIPO""",('%' + org + '%', '%' + org + '%'))
         
         elif (table=="Unions" and org=="") or table=="":
             cursor = self.query("""SELECT ANO, TIPO, COUNT(DISTINCT ID) AS NUM_ORG FROM Org_Sindical, 
@@ -396,7 +396,7 @@ class SqliteDataSet(DataSet):
             ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Patronal 
             WHERE Data_Primeira_Actividade IS NOT NULL AND Ano >= 1977 UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Patronal 
             WHERE Data_Primeira_Actividade IS NOT NULL) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) AND 
-            ID IN (SELECT ID FROM Org_Patronal WHERE Nome LIKE ? OR Acronimo LIKE ?) AND TIPO IS NOT NULL GROUP BY ANO, TIPO""",('%' + org + '%', '%' + org + '%'))
+            ID IN (SELECT ID FROM Org_Patronal WHERE Nome LIKE ? OR Acronimo LIKE ? AND Activa = 1) AND TIPO IS NOT NULL GROUP BY ANO, TIPO""",('%' + org + '%', '%' + org + '%'))
         
         elif table=="Employees" and org=="":
             cursor = self.query("""SELECT ANO, TIPO, COUNT(DISTINCT ID) AS NUM_ORG FROM Org_Patronal, 
@@ -420,10 +420,13 @@ class SqliteDataSet(DataSet):
             elif row[1].startswith("UNI"):
                 orgs_tipo_ano_uni[row[0]] = row[2]
 
-        lista_orgs.append(list(orgs_tipo_ano_conf.values()))
-        lista_orgs.append(list(orgs_tipo_ano_fed.values()))
-        lista_orgs.append(list(orgs_tipo_ano_org.values()))
-        lista_orgs.append(list(orgs_tipo_ano_uni.values()))
+        if linhas == 1:
+            lista_orgs.append(list(orgs_tipo_ano_conf.values()))
+            lista_orgs.append(list(orgs_tipo_ano_fed.values()))
+            lista_orgs.append(list(orgs_tipo_ano_org.values()))
+            lista_orgs.append(list(orgs_tipo_ano_uni.values()))
+        else:
+            lista_orgs = [[] for _ in range(4)]
 
         return lista_orgs
 
@@ -470,13 +473,13 @@ class SqliteDataSet(DataSet):
             avisos_greve[ano] = 0
 
         if table == "Unions" and org !="":
-            cursor = self.query("SELECT Ano_Inicio as Ano, COUNT(*) as NUM_GREVES FROM Avisos_Greve WHERE Entidade_Sindical IN (SELECT Nome FROM Org_Sindical WHERE Nome LIKE ? OR Acronimo LIKE ?) GROUP BY Ano_Inicio",('%' + org + '%', '%' + org + '%'))
+            cursor = self.query("SELECT Ano_Inicio as Ano, COUNT(*) as NUM_GREVES FROM Avisos_Greve WHERE Entidade_Sindical IN (SELECT Nome FROM Org_Sindical WHERE Nome LIKE ? OR Acronimo LIKE ? AND Activa = 1) GROUP BY Ano_Inicio",('%' + org + '%', '%' + org + '%'))
         
         elif (table=="Unions" and org=="") or table=="":
             cursor = self.query("SELECT Ano_Inicio as Ano, COUNT(*) as NUM_GREVES FROM Avisos_Greve GROUP BY Ano_Inicio")
         
         elif table=="Employees" and org!="":
-            cursor = self.query("SELECT Ano_Inicio as Ano, COUNT(*) as NUM_GREVES FROM Avisos_Greve WHERE Entidade_Patronal IN (SELECT Nome FROM Org_Patronal WHERE Nome LIKE ? OR Acronimo LIKE ?) GROUP BY Ano_Inicio",('%' + org + '%', '%' + org + '%'))
+            cursor = self.query("SELECT Ano_Inicio as Ano, COUNT(*) as NUM_GREVES FROM Avisos_Greve WHERE Entidade_Patronal IN (SELECT Nome FROM Org_Patronal WHERE Nome LIKE ? OR Acronimo LIKE ? AND Activa = 1) GROUP BY Ano_Inicio",('%' + org + '%', '%' + org + '%'))
 
         elif table=="Employees" and org=="":
             cursor = self.query("SELECT Ano_Inicio as Ano, COUNT(*) as NUM_GREVES FROM Avisos_Greve GROUP BY Ano_Inicio")
@@ -503,23 +506,23 @@ class SqliteDataSet(DataSet):
         if table == "Unions" and org !="":
             cursor = self.query("""SELECT Sectores_Profissionais.Sector, COUNT(DISTINCT Org_Sindical.ID) AS Num_Org 
                 FROM Sectores_Profissionais LEFT JOIN Org_Sindical ON Org_Sindical.Sector = Sectores_Profissionais.Sector WHERE Org_Sindical.ID IN 
-             (SELECT ID FROM Org_Sindical WHERE Nome LIKE ? OR Acronimo LIKE ?) 
+             (SELECT ID FROM Org_Sindical WHERE Nome LIKE ? OR Acronimo LIKE ? AND Activa = 1) 
              GROUP BY Sectores_Profissionais.Sector ORDER BY Sectores_Profissionais.Sector""",('%' + org + '%', '%' + org + '%'))
 
         elif (table=="Unions" and org=="") or table=="":
             cursor = self.query("""SELECT Sectores_Profissionais.Sector, COUNT(DISTINCT Org_Sindical.ID) AS Num_Org 
                 FROM Sectores_Profissionais LEFT JOIN Org_Sindical ON Org_Sindical.Sector = Sectores_Profissionais.Sector 
-                GROUP BY Sectores_Profissionais.Sector ORDER BY Sectores_Profissionais.Sector""")
+                AND Activa = 1 GROUP BY Sectores_Profissionais.Sector ORDER BY Sectores_Profissionais.Sector""")
         
         elif table=="Employees" and org!="":
             cursor = self.query("""SELECT Sectores_Profissionais.Sector, COUNT(DISTINCT Org_Patronal.ID) AS Num_Org 
                 FROM Sectores_Profissionais LEFT JOIN Org_Patronal ON Org_Patronal.Sector = Sectores_Profissionais.Sector WHERE Org_Patronal.ID IN 
-                (SELECT ID FROM Org_Patronal WHERE Nome LIKE ? OR Acronimo LIKE ?)
+                (SELECT ID FROM Org_Patronal WHERE Nome LIKE ? OR Acronimo LIKE ? AND Activa = 1)
                  GROUP BY Sectores_Profissionais.Sector ORDER BY Sectores_Profissionais.Sector""",('%' + org + '%', '%' + org + '%'))
 
         elif table=="Employees" and org=="":
             cursor = self.query("""SELECT Sectores_Profissionais.Sector, COUNT(DISTINCT Org_Patronal.ID) AS Num_Org 
-                FROM Sectores_Profissionais LEFT JOIN Org_Patronal ON Org_Patronal.Sector = Sectores_Profissionais.Sector 
+                FROM Sectores_Profissionais LEFT JOIN Org_Patronal ON Org_Patronal.Sector = Sectores_Profissionais.Sector AND Activa = 1
                 GROUP BY Sectores_Profissionais.Sector ORDER BY Sectores_Profissionais.Sector""")
 
         for row in cursor.fetchall():
