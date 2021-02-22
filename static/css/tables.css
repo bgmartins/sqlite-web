@@ -1,3 +1,24 @@
+#loginBar{
+  margin-bottom: 20px;
+}
+
+#graphs1{
+  margin-bottom: 20px;
+}
+
+#graphs2{
+  margin-bottom: 20px;
+}
+
+#searchBar{
+  margin-bottom: 20px;
+}
+
+#searchResults{
+  margin-bottom: 10px;
+}
+
+
 #my_table {
   font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
   border-collapse: collapse;

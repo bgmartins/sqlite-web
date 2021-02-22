@@ -39,8 +39,8 @@
 
     <div class="container">
 
-      <div class="row">
-        <label for="id_password">Enter your password to login into the administration panel</label>
+      <div id="loginBar" class="row">
+        <label for="id_password">Insira a sua password para aceder ao painel administrativo</label>
         <div class="col-lg-11">
           <div class="panel panel-default">
             <div class="panel-body">
@@ -59,11 +59,11 @@
         </div>
       </div>
 
-      <div class="row row-no-gutters">
+      <div id="graphs1" class="row row-no-gutters">
         <div class="col-lg-5 col-lg-offset-1">
           <div class="panel panel-default">
             <div class="panel-heading">
-              <h6 id="orgs_type_year" class="text-center">Active Union Organizations per Type and Year</h6>
+              <h6 id="orgs_type_year" class="text-center">Organizações sindicais ativas por tipo e ano</h6>
             </div>
             <div class="panel-body">
               <canvas id="bar-chart"></canvas>
@@ -73,7 +73,7 @@
         <div class="col-lg-5 col-lg-offset-1 col-lg-5 col-lg-offset-0">
           <div class="panel panel-default">
             <div class="panel-heading">
-              <h6 id = "orgs_per_district" class="text-center">Active Union Organizations per District</h6>
+              <h6 id = "orgs_per_district" class="text-center">Organizações sindicais ativas por distrito</h6>
             </div>
             <div class="panel-body">
               <canvas id="map"></canvas>
@@ -82,11 +82,11 @@
         </div>
       </div>
 
-      <div class="row row-no-gutters">
+      <div id="graphs2" class="row row-no-gutters">
         <div class="col-lg-5 col-lg-offset-1">
           <div class="panel panel-default">
             <div class="panel-heading">
-              <h6 id="strike_notices" class="text-center">Strike Notices per Year</h6>
+              <h6 id="strike_notices" class="text-center">Pré-avisos de greve por ano</h6>
             </div>
             <div class="panel-body">
               <canvas id="bar-chart2"></canvas>
@@ -96,7 +96,7 @@
         <div class="col-lg-5 col-lg-offset-1 col-log-5 col-lg-offset-0">
           <div class="panel panel-default">
             <div class="panel-heading">
-              <h6 id = "orgs_per_sector" class="text-center">Active Union Organizations per Activity Sector</h6>
+              <h6 id = "orgs_per_sector" class="text-center">Atos de negociação coletiva por ano</h6>
             </div>
             <div class="panel-body">
               <canvas id="bar-chart3"></canvas>
@@ -105,25 +105,33 @@
         </div>
       </div>
 
-    <div class="row">
-      <div class="col-lg-1">
+    <div id="searchBar" class="row">
+      <div class="col-lg-2">
         <div class="panel panel-default">
           <div class="panel-body">
             <div class="dropdown">
-              <button id="choose_button" style="font-size: 16px;" class="btn btn-primary" onclick="myDropdown()">Choose</button>
+              <button id="choose_button" style="font-size: 16px;" class="btn btn-primary" onclick="myDropdown()">Escolher organizações</button>
               <div id="myDropdown" class="dropdown-content">
-                <a class="opt_tables">Unions</a>
-                <a class="opt_tables">Employees</a>
+                <a class="opt_tables">Sindicais</a>
+                <a class="opt_tables">Empregadores</a>
               </div>
             </div>
           </div>
         </div>  
-      </div>
-      <div class="col-lg-10">
+      </div> 
+      <div class="col-lg-9">
         <div class="panel panel-default">
           <div class="panel-body">
-            <form class="form" id="form1">
-              <input  class="form-control" id="org" name="organization" value="" />
+            <form class="form-inline" id="form1">
+              <div class="form-group mx-lg-3 mb-2">
+                <input  class="form-control" placeholder="Insira termo ou acrónimo" id="org" name="organization" value="" />
+              </div>
+              <div class="form-group mx-lg-3 mb-2">
+                <input class="form-control" placeholder="Insira distrito" id="distrito" name="distrito" value="" />
+              </div>
+              <div class="form-group mx-lg-3 mb-2">
+                <input class="form-control" placeholder="Insira setor económico" id="setor" name="setor" value="" />
+              </div>
               <input type="hidden" name="table_org" id="table_org" value="" />
             </form>
           </div>
@@ -132,19 +140,19 @@
       <div class="col-lg-1">
         <div class="panel panel-default">
           <div class="panel-body">
-            <button id="search_button" class="btn btn-primary" type="submit" onclick="searchOrgs()">Search</button>
+            <button id="search_button" class="btn btn-primary" type="submit" onclick="searchOrgs()">Pesquisar</button>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="row">
+    <div id="searchResults" class="row">
       <div class="col-lg-12">
           <div class="panel panel-default">
             <div class="panel-body">
               <table id="my_table" border="1">
                 <thead>
-                  <th>Tipo</th><th>Nome</th><th>Acronimo</th><th>Distrito_Sede</th><th>Activa</th>
+                  <th>Tipo</th><th>Nome</th><th>Acrónimo</th><th>Distrito sede</th><th>Estado</th>
                 </thead>
               </table>
             </div>
@@ -156,7 +164,7 @@
       <div class="col-lg-12">
         <div class="panel panel-default">
             <div class="panel-body">
-                <button  class="btn btn-primary" style="width: 100%;" onclick="tableToExcel()">Export to Excel File</button>
+                <button  class="btn btn-primary" style="width: 100%;" onclick="tableToExcel()">Exportar todos os atributos para ficheiro Excel</button>
             </div>
         </div>
       </div>
@@ -179,10 +187,21 @@
     var elements = document.getElementsByClassName('opt_tables');
     for (var i = 0, len = elements.length; i < len; i++) {
       elements[i].addEventListener("click", function() {
+        
         table = this.innerHTML;
+
         document.getElementById("choose_button").innerHTML = table;
-        document.getElementById('table_org').value = table;
+
+        //valor do form que é submetido quando se carrega no botao de search
+        if(table=="Sindicais"){
+          document.getElementById('table_org').value = "Unions";
+        }
+        else if(table=="Empregadores"){
+          document.getElementById('table_org').value = "Employees";
+        }  
+
         document.getElementById("myDropdown").classList.toggle("show");
+      
       });
     }
 
@@ -216,18 +235,18 @@
       if(dados[0].length != 0){
 
         if(table=="Unions" || table==""){
-          document.getElementById("orgs_type_year").innerHTML = "Active Union Organizations per Type and Year";
-          org_type_year_chart.data.datasets[0].label = "Union Confederations";
-          org_type_year_chart.data.datasets[1].label = "Union Federations";
-          org_type_year_chart.data.datasets[2].label = "Unions";
-          org_type_year_chart.data.datasets[3].label = "Union Unions";
+          document.getElementById("orgs_type_year").innerHTML = "Organizações sindicais ativas por tipo e ano";
+          org_type_year_chart.data.datasets[0].label = "Confederações";
+          org_type_year_chart.data.datasets[1].label = "Federações";
+          org_type_year_chart.data.datasets[2].label = "Sindicatos";
+          org_type_year_chart.data.datasets[3].label = "Uniões";
         }
         else{
-          document.getElementById("orgs_type_year").innerHTML = "Active Employers' Organizations per Type and Year";
-          org_type_year_chart.data.datasets[0].label = "Employers' Confederations";
-          org_type_year_chart.data.datasets[1].label = "Employers' Federations";
-          org_type_year_chart.data.datasets[2].label = "Employers' Associations";
-          org_type_year_chart.data.datasets[3].label = "Employers' Unions";
+          document.getElementById("orgs_type_year").innerHTML = "Organizações de empregadores ativas por tipo e ano";
+          org_type_year_chart.data.datasets[0].label = "Confederações";
+          org_type_year_chart.data.datasets[1].label = "Federações";
+          org_type_year_chart.data.datasets[2].label = "Associações";
+          org_type_year_chart.data.datasets[3].label = "Uniões";
 
         }
 
@@ -292,10 +311,10 @@
       
       if(dados.length != 0){
         if(table=="Unions" || table==""){
-          document.getElementById("orgs_per_district").innerHTML = "Active Union Organizations per District";
+          document.getElementById("orgs_per_district").innerHTML = "Organizações sindicais ativas por distrito";
         }
         else{
-          document.getElementById("orgs_per_district").innerHTML = "Active Employers' Organizations per District";
+          document.getElementById("orgs_per_district").innerHTML = "Organizações de empregadores ativas por distrito";
         }
 
         orgs_by_district(dados);
@@ -318,12 +337,12 @@
     function orgs_by_sector(table, dados){
       if(dados.length != 0){
         if(table=="Unions" || table==""){
-          document.getElementById("orgs_per_sector").innerHTML = "Active Union Organizations per Activity Sector";
-          org_sector_chart.data.datasets[0].label = "Active Union Organizations";
+          document.getElementById("orgs_per_sector").innerHTML = "Organizações sindicais ativas por setor económico";
+          org_sector_chart.data.datasets[0].label = "Organizações";
         }
         else{
-          document.getElementById("orgs_per_sector").innerHTML = "Active Employers' Organizations per Activity Sector";
-          org_sector_chart.data.datasets[0].label = "Active Employers' Organizations";
+          document.getElementById("orgs_per_sector").innerHTML = "Organizações de empregadores ativas por setor económico";
+          org_sector_chart.data.datasets[0].label = "Organizações";
         }
 
         org_sector_chart.data.datasets[0].data = dados;
@@ -367,7 +386,7 @@
                 orgs_by_type_year(table, dados);
                 org_district_update(table, dados[4]);
                 strike_notices_update(dados[5]);
-                orgs_by_sector(table, dados[6]);
+                //orgs_by_sector(table, dados[6]);
 
               },
               error:function(jqXHR, textStatus, errorThrown){
@@ -438,23 +457,23 @@
        labels: {{ dataset.barchart_labels | safe }},
        datasets: [
         {
-          label: "Union Confederations",
+          label: "Confederações",
           data: {{ dataset.barchart_data | safe }},
           backgroundColor: '#228B22' // green
         },
         {
-          label: "Union Federations",
+          label: "Federações",
           data: {{ dataset.barchart_data2 | safe }},
           backgroundColor: '#FFD700' // yellow
 
         },
         {
-          label: "Unions",
+          label: "Sindicatos",
           data: {{ dataset.barchart_data3 | safe }},
           backgroundColor: '#FF0000' // red
         },
         {
-          label: "Union Unions",
+          label: "Uniões",
           data: {{ dataset.barchart_data4 | safe }},
           backgroundColor: '#0000FF' // blue
         }
@@ -533,6 +552,7 @@
       distPT.sort();
 
       console.log(distPT);
+      console.log(distritosPT);
       console.log(distritos2);
 
       distPT.forEach(function(district) {
@@ -569,7 +589,8 @@
           labels: distritosPT.map((d) => d.properties.name),
           datasets: [{
             label: 'Distritos',
-            outline: distritos2,
+             //outline: distritos2,
+            outline: distritosPT,
             data: distritosPT.map((d) => ({feature: d, value: orgValues(d.properties.name)})),
           }]
         },
@@ -593,26 +614,22 @@
                   stepSize: get_stepsize_tick(valores)
               },
               legend: {
-                position: 'bottom-right'
+                //position: 'bottom-right'
+                position: 'top-right'
               },
             },
           },
           tooltips: {
             callbacks: {
-                label: function(tooltipItem, data){
-                  var distrito = data['labels'][tooltipItem['index']];
-                  return distrito;
-                },
-                afterLabel: function(tooltipItem, data) {
-                  var valor = data.datasets[0].data[tooltipItem.index]['value'];
+              label: function(tooltipItem, data){
+                var distrito = data['labels'][tooltipItem['index']];
+                return distrito;
+              },
+              afterLabel: function(tooltipItem, data) {
+                var valor = data.datasets[0].data[tooltipItem.index]['value'];
 
-                  if(document.getElementById("orgs_per_district").innerHTML == "Active Union Organizations per District"){
-                    return "Union Organizations: " + valor;  
-                  }
-                  else{
-                    return "Employers' Organizations: " + valor;
-                  }
-                }
+                return "Organizações: " + valor;  
+              }
             }
           }
         }
@@ -626,14 +643,14 @@
        labels: {{ dataset.barchart2_labels | safe }},
        datasets: [
         {
-          label: "Strike Notices",
+          label: "Pré-avisos de Greve",
           data: {{ dataset.barchart2_data | safe }},
           backgroundColor: '#228B22' // green
         }
       ]
     },
     options: {
-      legend: { display: true,
+      legend: { display: false,
                 labels: {
                   fontSize: 10
                 }
@@ -656,6 +673,44 @@
     
     });
 
+
+     var org_irct_chart = new Chart(document.getElementById("bar-chart3"), {
+      type: 'bar',
+     data: {
+       labels: {{ dataset.irctchart_labels | safe }},
+       datasets: [
+        {
+          label: "Atos de negociação coletiva",
+          data: {{ dataset.irctchart_data | safe }},
+          backgroundColor: '#0000FF' // green
+        }
+      ]
+    },
+    options: {
+      legend: { display: false,
+                labels: {
+                  fontSize: 10
+                }
+               },
+      scales: [{
+        xAxes: [{
+          scaleLabel: {
+            display: true,
+            labelString: 'year'
+          }
+        }],
+        yAxes: [{
+          scaleLabel: {
+            display: true,
+            labelString: 'ircts'
+          }
+        }]
+      }]
+    }
+    
+    });
+
+
     var setores = {{ dataset.barchart3_labels | safe }};
     var setores_red = {{ dataset.barchart3_labels_red | safe }};
     var pos = 0;
@@ -666,20 +721,20 @@
       setores_final[setores_red[pos]] = setores[pos];
     }
 
-     var org_sector_chart = new Chart(document.getElementById("bar-chart3"), {
+     /*var org_sector_chart = new Chart(document.getElementById("bar-chart3"), {
      type: 'horizontalBar',
      data: {
        labels: setores_red,
        datasets: [
         {
-          label: "Active Union Organizations",
+          label: "Organizações",
           data: {{ dataset.barchart3_data | safe }},
           backgroundColor: '#0000FF' // blue
         }
       ]
     },
     options: {
-      legend: { display: true,
+      legend: { display: false,
                 labels: {
                   fontSize: 10
                 }
@@ -708,7 +763,7 @@
         }
       }
     }
-    });
+    });*/
 
     </script>
 
