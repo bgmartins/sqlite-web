@@ -269,7 +269,7 @@ class SqliteDataSet(DataSet):
     @property
     def orgsindical1_data(self):
         lista = []
-        cursor = self.query("SELECT Tipo, Nome, Acronimo, Distrito_Sede, Activa FROM Org_Sindical")
+        cursor = self.query("SELECT Tipo, Nome, Acronimo, Distrito_Sede, Sector, Activa FROM Org_Sindical")
         for row in cursor.fetchall():
             lista.append(list(row))
 
@@ -297,7 +297,7 @@ class SqliteDataSet(DataSet):
     def orgpatronal_data(self):
         lista = []
         new_dict = {}
-        cursor = self.query("SELECT  Tipo, Nome, Acronimo, Distrito_Sede, Activa FROM Org_Patronal WHERE Tipo IS NOT NULL")
+        cursor = self.query("SELECT  Tipo, Nome, Acronimo, Distrito_Sede, Sector, Activa FROM Org_Patronal WHERE Tipo IS NOT NULL")
         
         for row in cursor.fetchall():
             lista.append(list(row))
@@ -321,9 +321,9 @@ class SqliteDataSet(DataSet):
         new_dict = {}
 
         if table=="Unions" or table=="":
-            cursor = self.query("SELECT Tipo, Nome, Acronimo, Distrito_Sede, Activa FROM Org_Sindical WHERE Nome LIKE ? OR Acronimo LIKE ?", ('%' + org + '%', '%' + org + '%'))
+            cursor = self.query("SELECT Tipo, Nome, Acronimo, Distrito_Sede, Sector, Activa FROM Org_Sindical WHERE Nome LIKE ? OR Acronimo LIKE ?", ('%' + org + '%', '%' + org + '%'))
         else:
-            cursor = self.query("SELECT Tipo, Nome, Acronimo, Distrito_Sede, Activa FROM Org_Patronal WHERE Nome LIKE ? OR Acronimo LIKE ?", ('%' + org + '%', '%' + org + '%'))
+            cursor = self.query("SELECT Tipo, Nome, Acronimo, Distrito_Sede, Sector, Activa FROM Org_Patronal WHERE Nome LIKE ? OR Acronimo LIKE ?", ('%' + org + '%', '%' + org + '%'))
 
         for row in cursor.fetchall():
             if row[0] is not None:
@@ -349,14 +349,14 @@ class SqliteDataSet(DataSet):
 
         if table=="Unions" or table=="":
             if org == "":
-                cursor = self.query("SELECT Tipo, Nome, Acronimo, Distrito_Sede, Activa FROM Org_Sindical WHERE Distrito_Sede LIKE ?", ('%' + distrito + '%',))
+                cursor = self.query("SELECT Tipo, Nome, Acronimo, Distrito_Sede, Sector, Activa FROM Org_Sindical WHERE Distrito_Sede LIKE ?", ('%' + distrito + '%',))
             else:
-                cursor = self.query("SELECT Tipo, Nome, Acronimo, Distrito_Sede, Activa FROM Org_Sindical WHERE (Nome LIKE ? OR Acronimo LIKE ?) AND Distrito_Sede LIKE ?", ('%' + org + '%', '%' + org + '%', '%' + distrito + '%'))
+                cursor = self.query("SELECT Tipo, Nome, Acronimo, Distrito_Sede, Sector, Activa FROM Org_Sindical WHERE (Nome LIKE ? OR Acronimo LIKE ?) AND Distrito_Sede LIKE ?", ('%' + org + '%', '%' + org + '%', '%' + distrito + '%'))
         else:
             if org == "":
-                cursor = self.query("SELECT Tipo, Nome, Acronimo, Distrito_Sede, Activa FROM Org_Patronal WHERE Distrito_Sede LIKE ?", ('%' + distrito + '%',))
+                cursor = self.query("SELECT Tipo, Nome, Acronimo, Distrito_Sede, Sector, Activa FROM Org_Patronal WHERE Distrito_Sede LIKE ?", ('%' + distrito + '%',))
             else:
-                cursor = self.query("SELECT Tipo, Nome, Acronimo, Distrito_Sede, Activa FROM Org_Patronal WHERE (Nome LIKE ? OR Acronimo LIKE ?) AND Distrito_Sede LIKE ?", ('%' + org + '%', '%' + org + '%', '%' + distrito + '%'))
+                cursor = self.query("SELECT Tipo, Nome, Acronimo, Distrito_Sede, Sector, Activa FROM Org_Patronal WHERE (Nome LIKE ? OR Acronimo LIKE ?) AND Distrito_Sede LIKE ?", ('%' + org + '%', '%' + org + '%', '%' + distrito + '%'))
 
         for row in cursor.fetchall():
             if row[0] is not None:
@@ -382,14 +382,14 @@ class SqliteDataSet(DataSet):
 
         if table=="Unions" or table=="":
             if org == "":
-                cursor = self.query("SELECT Tipo, Nome, Acronimo, Distrito_Sede, Activa FROM Org_Sindical WHERE Sector LIKE ?", ('%' + setor + '%',))
+                cursor = self.query("SELECT Tipo, Nome, Acronimo, Distrito_Sede, Sector, Activa FROM Org_Sindical WHERE Sector LIKE ?", ('%' + setor + '%',))
             else:
-                cursor = self.query("SELECT Tipo, Nome, Acronimo, Distrito_Sede, Activa FROM Org_Sindical WHERE (Nome LIKE ? OR Acronimo LIKE ?) AND Setor LIKE ?", ('%' + org + '%', '%' + org + '%', '%' + setor + '%'))
+                cursor = self.query("SELECT Tipo, Nome, Acronimo, Distrito_Sede, Sector, Activa FROM Org_Sindical WHERE (Nome LIKE ? OR Acronimo LIKE ?) AND Sector LIKE ?", ('%' + org + '%', '%' + org + '%', '%' + setor + '%'))
         else:
             if org == "":
-                cursor = self.query("SELECT Tipo, Nome, Acronimo, Distrito_Sede, Activa FROM Org_Patronal WHERE Sector LIKE ?", ('%' + setor + '%',))
+                cursor = self.query("SELECT Tipo, Nome, Acronimo, Distrito_Sede, Sector, Activa FROM Org_Patronal WHERE Sector LIKE ?", ('%' + setor + '%',))
             else:
-                cursor = self.query("SELECT Tipo, Nome, Acronimo, Distrito_Sede, Activa FROM Org_Patronal WHERE (Nome LIKE ? OR Acronimo LIKE ?) AND Sector LIKE ?", ('%' + org + '%', '%' + org + '%', '%' + setor + '%'))
+                cursor = self.query("SELECT Tipo, Nome, Acronimo, Distrito_Sede, Sector, Activa FROM Org_Patronal WHERE (Nome LIKE ? OR Acronimo LIKE ?) AND Sector LIKE ?", ('%' + org + '%', '%' + org + '%', '%' + setor + '%'))
 
         for row in cursor.fetchall():
             if row[0] is not None:
@@ -603,31 +603,56 @@ class SqliteDataSet(DataSet):
             return []
     
 
-    def table_toExcel(self, table, org):
+    def table_toExcel(self, table, org, setor, distrito):
         colunas = []
         linhas = []
         
         if ((table == "Unions" or table=="") and org!=""):
             table = 'Org_Sindical'
-            cursor = self.query("SELECT * FROM Org_Sindical WHERE Nome LIKE ? OR Acronimo LIKE ?", ('%' + org + '%', '%' + org + '%'))
+            if setor != "":
+                cursor = self.query("SELECT * FROM Org_Sindical WHERE (Nome LIKE ? OR Acronimo LIKE ?) AND Sector LIKE ?", ('%' + org + '%', '%' + org + '%', '%' + setor + '%'))
+            elif distrito != "":
+                cursor = self.query("SELECT * FROM Org_Sindical WHERE (Nome LIKE ? OR Acronimo LIKE ?) AND Distrito_Sede LIKE ?", ('%' + org + '%', '%' + org + '%', '%' + distrito + '%'))
+            else:
+                cursor = self.query("SELECT * FROM Org_Sindical WHERE Nome LIKE ? OR Acronimo LIKE ?", ('%' + org + '%', '%' + org + '%'))
         
         elif ((table == "Unions" or table=="") and org==""):
             table = 'Org_Sindical'
-            cursor = self.query("SELECT * FROM Org_Sindical")
+            if setor != "":
+                cursor = self.query("SELECT * FROM Org_Sindical WHERE Sector LIKE ?", ('%' + setor + '%'))
+            elif distrito != "":
+                cursor = self.query("SELECT * FROM Org_Sindical WHERE Distrito_Sede LIKE ?", ('%' + distrito + '%'))
+            else:
+                cursor = self.query("SELECT * FROM Org_Sindical")
 
         elif table=="Employees" and org!="":
             table = 'Org_Patronal'
-            cursor = self.query("SELECT * FROM Org_Patronal WHERE Nome LIKE ? OR Acronimo LIKE ?", ('%' + org + '%', '%' + org + '%'))
+            if setor != "":
+                cursor = self.query("SELECT * FROM Org_Patronal WHERE (Nome LIKE ? OR Acronimo LIKE ?) AND Sector LIKE ?", ('%' + org + '%', '%' + org + '%', '%' + setor + '%'))
+            elif distrito != "":
+                cursor = self.query("SELECT * FROM Org_Patronal WHERE (Nome LIKE ? OR Acronimo LIKE ?) AND Distrito_Sede LIKE ?", ('%' + org + '%', '%' + org + '%', '%' + distrito + '%'))
+            else:
+                cursor = self.query("SELECT * FROM Org_Patronal WHERE Nome LIKE ? OR Acronimo LIKE ?", ('%' + org + '%', '%' + org + '%'))
 
         elif table=="Employees" and org=="": 
             table = 'Org_Patronal'
-            cursor = self.query("SELECT * FROM Org_Patronal")
+            if setor != "":
+                cursor = self.query("SELECT * FROM Org_Patronal WHERE Sector LIKE ?", ('%' + setor + '%'))
+            elif distrito != "":
+                cursor = self.query("SELECT * FROM Org_Patronal WHERE Distrito_Sede LIKE ?", ('%' + distrito + '%'))
+            else:
+                cursor = self.query("SELECT * FROM Org_Patronal")
 
         for tuplo in self.get_columns(table):
-            if tuplo[0] == "Activa":
-                tuplo[0] = "Estado"
+            cols = list(tuplo)
+            if cols[0] == "Activa":
+                cols[0] = "Estado"
+            elif cols[0] == "Sector":
+                cols[0] = "Setor"
+            elif cols[0] == "Acronimo":
+                cols[0] = "Acrónimo"
 
-            colunas.append(tuplo[0])
+            colunas.append(cols[0])
 
         for row in cursor.fetchall():
             linhas.append(list(row))
@@ -709,8 +734,10 @@ def export():
     table = request.args.get('table_org')
     org = request.args.get('organization')
     export = request.args.get('export')
+    setor = request.args.get('setor')
+    distrito = request.args.get('distrito')
 
-    df = dataset.table_toExcel(table, org)
+    df = dataset.table_toExcel(table, org, setor, distrito)
     strIO = BytesIO()
     excel_writer = pd.ExcelWriter(strIO, engine="xlsxwriter")
     df.to_excel(excel_writer, sheet_name="sheet1", index=False)
@@ -754,9 +781,10 @@ def search():
     distrito  = request.args.get('distrito')
     setor = request.args.get('setor')
 
-    if distrito != "" and setor == "":
+    if distrito != "":
         return jsonify(tabela = dataset.searchbar_distrito_data(table, org, distrito))
-    elif distrito == "" and setor != "":
+    
+    if setor != "":
         return jsonify(tabela = dataset.searchbar_setor_data(table, org, setor))
 
     if org != "":

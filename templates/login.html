@@ -40,12 +40,12 @@
     <div class="container">
 
       <div id="loginBar" class="row">
-        <label for="id_password">Insira a sua password para aceder ao painel administrativo</label>
-        <div class="col-lg-11">
+        <!--<label for="id_password">Insira a sua password para aceder ao painel administrativo</label>-->
+        <div class="col-lg-4">
           <div class="panel panel-default">
             <div class="panel-body">
               <form action="{{ url_for('login') }}" class="form" id="form" method="post">
-                  <input class="form-control" id="id_password" name="password" type="password" value="" />
+                  <input class="form-control" id="id_password" name="password" type="password" placeholder="Insira password para aceder ao painel administrativo" value="" />
               </form>
             </div>
           </div>
@@ -124,12 +124,15 @@
           <div class="panel-body">
             <form class="form-inline" id="form1">
               <div class="form-group mx-lg-3 mb-2">
+                <label for="org">Termo/acrónimo: </label>
                 <input  class="form-control" placeholder="Insira termo ou acrónimo" id="org" name="organization" value="" />
               </div>
               <div class="form-group mx-lg-3 mb-2">
+                <label for="distrito">Distrito: </label>
                 <input class="form-control" placeholder="Insira distrito" id="distrito" name="distrito" value="" />
               </div>
               <div class="form-group mx-lg-3 mb-2">
+                <label for="setor">Setor: </label>
                 <input class="form-control" placeholder="Insira setor económico" id="setor" name="setor" value="" />
               </div>
               <input type="hidden" name="table_org" id="table_org" value="" />
@@ -152,7 +155,7 @@
             <div class="panel-body">
               <table id="my_table" border="1">
                 <thead>
-                  <th>Tipo</th><th>Nome</th><th>Acrónimo</th><th>Distrito sede</th><th>Estado</th>
+                  <th>Tipo</th><th>Nome</th><th>Acrónimo</th><th>Distrito sede</th><th>Setor</th><th>Estado</th>
                 </thead>
               </table>
             </div>
@@ -182,6 +185,30 @@
     function myDropdown(){
       document.getElementById("myDropdown").classList.toggle("show");
     }
+
+
+    $('#setor').on('input', function() {
+      if (this.value.length >= 1) {
+        document.getElementById('distrito').disabled = true;
+        document.getElementById("distrito").placeholder = "Filtro indisponível";
+      }
+      else {
+        document.getElementById('distrito').disabled = false;
+        document.getElementById("distrito").placeholder = "Insira distrito";
+      }
+    });
+
+
+    $('#distrito').on('input', function() {
+      if (this.value.length >= 1) {
+        document.getElementById("setor").disabled = true;
+        document.getElementById("setor").placeholder = "Filtro indisponível";
+      }
+      else {
+        document.getElementById("setor").disabled = false;
+        document.getElementById("setor").placeholder = "Insira setor económico";
+      }
+    });
 
     //listeners nas opcoes do Dropdown
     var elements = document.getElementsByClassName('opt_tables');
@@ -368,6 +395,8 @@
             console.log("table updated");
             table_do_search = document.getElementById("table_org").value;
             org_do_search = document.getElementById("org").value;
+            setor_do_search = document.getElementById("setor").value;
+            distrito_do_search = document.getElementById("distrito").value;
             $.ajax({
               url:"{{ url_for('updateCharts') }}",
               data: $("#form1").serialize(),
@@ -413,19 +442,48 @@
       var filename = "";
       var table_org = table_do_search;
       var org = org_do_search;
+      var distrito = distrito_do_search;
+      var setor = setor_do_search;
+      console.log(table_do_search);
 
-      if ((table_org=="Unions" && org=="") || table_org==""){
-        filename = "Unions";
+      if ((table_org=="Unions" || table_org == "Employees" || table_org == "") && org==""){
+        
+        if(table_org == ""){
+          table_org = "Unions";
+        }
+        
+        if(distrito == "" && setor == ""){
+          filename = table_org;  
+        }
+        else if(distrito != ""){
+          filename = table_org + "-" + distrito;
+        }
+        else if(setor != ""){
+          filename = table_org + "-" + setor;
+        }
+      
       }
-      else if ((table_org=="Unions" && org!="") || (table_org=="Employees" && org!="")){
-        filename = table_org + "-" + org;
-      }
-      else if ((table_org=="Employees" && org=="")){
-        filename = table_org;
+      else if ((table_org=="Unions" && org!="") || (table_org=="Employees" && org!="") || (table_org=="" && org!="")){
+        
+        if(table_org == ""){
+          table_org = "Unions";
+        }
+
+        if(distrito == "" && setor == ""){
+          filename = table_org + "-" + org;  
+        }
+        else if(distrito != ""){
+          filename = table_org + "-" + org + "-" + distrito;
+        }
+        else if(setor != ""){
+          filename = table_org + "-" + org + "-" +  setor;
+        }
+        
       }
 
       var myRequest = new XMLHttpRequest();
-      myRequest.open('GET', "{{ url_for('export') }}" + "?organization=" + org + "&table_org=" + table_org  + "&export=1", true);
+      parameters = "?organization=" + org + "&table_org=" + table_org + "&distrito=" + distrito + "&setor=" + setor + "&export=1";
+      myRequest.open('GET', "{{ url_for('export') }}" + parameters, true);
       myRequest.responseType = "blob";
       myRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
       myRequest.onreadystatechange = function(){
