@@ -27,6 +27,11 @@ def getResponse(tabela, ano):
 	return result
 
 
+def create_database_tables(cursor):
+	with open('rep-database.sql', 'r') as sql_file:
+		cursor.executescript(sql_file.read())
+
+
 def getTable_AlteracoesEstatutos(ano,cursor):
 	result = getResponse("alteracoesEstatutos", ano)
 	final = json.loads(result)
@@ -315,7 +320,7 @@ def municipios_codigosPostais(cursor):
 	);""")
 
 
-	f = open("./codigos-postais/concelhos.txt", "r",encoding="utf8")
+	f = open("./postal-codes/concelhos.txt", "r",encoding="utf8")
 	f.readline()
 	to_db = []
 	for line in f:
@@ -324,9 +329,9 @@ def municipios_codigosPostais(cursor):
 
 	f.close()
 
-	cursor.executemany("""INSERT INTO TEMP_MUNICIPIOS(DD,CC,DESIG) VALUES(?,?,?);""", to_db)
+	cursor.executemany("INSERT INTO TEMP_MUNICIPIOS(DD,CC,DESIG) VALUES(?,?,?);", to_db)
 
-	f = open("./codigos-postais/todos_cp.txt", "r",encoding="utf8")
+	f = open("./postal-codes/todos_cp.txt", "r",encoding="utf8")
 	f.readline()
 	to_db = []
 	for line in f:
@@ -335,7 +340,7 @@ def municipios_codigosPostais(cursor):
   	
 	f.close()
 
-	cursor.executemany("""INSERT INTO TEMP_CP(DD,CC,LLLL,LOCALIDADE,ART_COD,ART_TIPO,PRI_PREP,ART_TITULO,SEG_PREP,ART_DESIG,ART_LOCAL,TROÇO,PORTA,CLIENTE,CP4,CP3,CPALF) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);""", to_db)
+	cursor.executemany("INSERT INTO TEMP_CP(DD,CC,LLLL,LOCALIDADE,ART_COD,ART_TIPO,PRI_PREP,ART_TITULO,SEG_PREP,ART_DESIG,ART_LOCAL,TROÇO,PORTA,CLIENTE,CP4,CP3,CPALF) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);", to_db)
 
 def websites(cursor):
 
@@ -350,7 +355,7 @@ def websites(cursor):
 	);""")
 
 
-	f = open("./websites/websites_sindicais.txt", "r",encoding="utf8")
+	f = open("./institution-websites/websites_sindicais.txt", "r",encoding="utf8")
 	f.readline()
 	to_db = []
 	for line in f:
@@ -364,9 +369,9 @@ def websites(cursor):
 
 	f.close()
 
-	cursor.executemany("""INSERT INTO TEMP_WEBSITES_SINDICAIS(NOME_ORG,WEBSITE) VALUES(?,?);""", to_db)
+	cursor.executemany("INSERT INTO TEMP_WEBSITES_SINDICAIS(NOME_ORG,WEBSITE) VALUES(?,?);", to_db)
 
-	f = open("./websites/websites_patronais.txt", "r",encoding="utf8")
+	f = open("./institution-websites/websites_patronais.txt", "r",encoding="utf8")
 	f.readline()
 	to_db = []
 	for line in f:
@@ -380,7 +385,7 @@ def websites(cursor):
 		
 	f.close()
 
-	cursor.executemany("""INSERT INTO TEMP_WEBSITES_PATRONAIS(NOME_ORG,WEBSITE) VALUES(?,?);""", to_db)
+	cursor.executemany("INSERT INTO TEMP_WEBSITES_PATRONAIS(NOME_ORG,WEBSITE) VALUES(?,?);", to_db)
 
 def tratarDataEleicao(dataEleicao):
 	
@@ -427,7 +432,7 @@ def tratarDataEleicao(dataEleicao):
 
 def tratarGeneroMasculino():
 
-	with open("./nomes-proprios/nomesMasculino.csv", "r", encoding="ISO-8859-1") as f:
+	with open("./pt-person-names/nomesMasculino.csv", "r", encoding="ISO-8859-1") as f:
 		# csv.DictReader uses first line in file for column headings by default
 		dr = csv.DictReader(f, delimiter=',')
 		nomes_masculinos = []
@@ -441,7 +446,7 @@ def tratarGeneroMasculino():
 
 def tratarGeneroFeminino():
 
-	with open("./nomes-proprios/nomesFeminino.csv", "r", encoding="ISO-8859-1") as f:
+	with open("./pt-person-names/nomesFeminino.csv", "r", encoding="ISO-8859-1") as f:
 		# csv.DictReader uses first line in file for column headings by default
 		dr = csv.DictReader(f, delimiter=',')
 		nomes_femininos = []
@@ -643,7 +648,7 @@ def listasDirigentes(cursor):
 
 		f.close()
 
-	cursor.executemany("""INSERT OR IGNORE INTO Direccao_Org_Sindical(ID_Organizacao_Sindical, Nome_Pessoa, Genero_Sexo, Cargo, Data_Eleicao, Data_Inicio, Data_Fim) VALUES(?,?,?,?,?,?,?);""", to_db)
+	cursor.executemany("INSERT OR IGNORE INTO Direccao_Org_Sindical(ID_Organizacao_Sindical, Nome_Pessoa, Genero_Sexo, Cargo, Data_Eleicao, Data_Inicio, Data_Fim) VALUES(?,?,?,?,?,?,?);", to_db)
 
 	cursor.execute("""INSERT INTO Membros_Org_Sindical SELECT
 		ID_Organizacao_Sindical,
@@ -665,25 +670,27 @@ def repDatabase():
 
 	cursor = connection.cursor()
 
+	create_database_tables(cursor)
 
-	cursor.execute("""DROP VIEW IF EXISTS TEMP_DATAS_ENTIDADES;""")
-	cursor.execute("""DROP TABLE IF EXISTS TEMP_ALTERACOES_ESTATUTOS;""")
-	cursor.execute("""DROP TABLE IF EXISTS TEMP_ALTERACOES_ESTATUTOS1;""")
-	cursor.execute("""DROP TABLE IF EXISTS TEMP_ELEICAO_CORPOS_GERENTES;""")
-	cursor.execute("""DROP TABLE IF EXISTS TEMP_ELEICAO_CORPOS_GERENTES1;""")
-	cursor.execute("""DROP TABLE IF EXISTS TEMP_ENTIDADES1;""")
-	cursor.execute("""DROP TABLE IF EXISTS TEMP_ENTIDADES;""")
-	cursor.execute("""DROP TABLE IF EXISTS TEMP_PROCESSOS1;""")
-	cursor.execute("""DROP TABLE IF EXISTS TEMP_PROCESSOS;""")
-	cursor.execute("""DROP TABLE IF EXISTS TEMP_IRCT;""")
-	cursor.execute("""DROP TABLE IF EXISTS TEMP_OUTORGANTES;""")
-	cursor.execute("""DROP TABLE IF EXISTS TEMP_AVISOS_GREVE1;""")
-	cursor.execute("""DROP TABLE IF EXISTS TEMP_AVISOS_GREVE2;""")
-	cursor.execute("""DROP TABLE IF EXISTS TEMP_MESES_NUMERO;""")
-	cursor.execute("""DROP TABLE IF EXISTS TEMP_AVISOS_GREVE;""")
-	cursor.execute("""DROP TABLE IF EXISTS TEMP_AVISOS_GREVE_2;""")
-	cursor.execute("""DROP TABLE IF EXISTS TEMP_WEBSITES_SINDICAIS;""")
-	cursor.execute("""DROP TABLE IF EXISTS TEMP_WEBSITES_PATRONAIS;""")
+
+	cursor.execute("DROP VIEW IF EXISTS TEMP_DATAS_ENTIDADES;")
+	cursor.execute("DROP TABLE IF EXISTS TEMP_ALTERACOES_ESTATUTOS;")
+	cursor.execute("DROP TABLE IF EXISTS TEMP_ALTERACOES_ESTATUTOS1;")
+	cursor.execute("DROP TABLE IF EXISTS TEMP_ELEICAO_CORPOS_GERENTES;")
+	cursor.execute("DROP TABLE IF EXISTS TEMP_ELEICAO_CORPOS_GERENTES1;")
+	cursor.execute("DROP TABLE IF EXISTS TEMP_ENTIDADES1;")
+	cursor.execute("DROP TABLE IF EXISTS TEMP_ENTIDADES;")
+	cursor.execute("DROP TABLE IF EXISTS TEMP_PROCESSOS1;")
+	cursor.execute("DROP TABLE IF EXISTS TEMP_PROCESSOS;")
+	cursor.execute("DROP TABLE IF EXISTS TEMP_IRCT;")
+	cursor.execute("DROP TABLE IF EXISTS TEMP_OUTORGANTES;")
+	cursor.execute("DROP TABLE IF EXISTS TEMP_AVISOS_GREVE1;")
+	cursor.execute("DROP TABLE IF EXISTS TEMP_AVISOS_GREVE2;")
+	cursor.execute("DROP TABLE IF EXISTS TEMP_MESES_NUMERO;")
+	cursor.execute("DROP TABLE IF EXISTS TEMP_AVISOS_GREVE;")
+	cursor.execute("DROP TABLE IF EXISTS TEMP_AVISOS_GREVE_2;")
+	cursor.execute("DROP TABLE IF EXISTS TEMP_WEBSITES_SINDICAIS;")
+	cursor.execute("DROP TABLE IF EXISTS TEMP_WEBSITES_PATRONAIS;")
 
 	#create tables from importation
 	cursor.execute("""CREATE TABLE TEMP_ALTERACOES_ESTATUTOS1 ( 
@@ -817,232 +824,6 @@ def repDatabase():
 	websites(cursor)
 
 
-	#delete tables from web app
-	cursor.execute("""DROP TABLE IF EXISTS Avisos_Greve;""")
-	cursor.execute("""DROP TABLE IF EXISTS Outorgantes_Actos;""")
-	cursor.execute("""DROP TABLE IF EXISTS Actos_Negociacao_Colectiva;""")
-	cursor.execute("""DROP TABLE IF EXISTS Direccao_Org_Sindical;""")
-	cursor.execute("""DROP TABLE IF EXISTS Membros_Org_Sindical;""")
-	cursor.execute("""DROP TABLE IF EXISTS Actos_Eleitorais_Org_Sindical;""")
-	cursor.execute("""DROP TABLE IF EXISTS Relacoes_Entre_Org_Sindical;""")
-	cursor.execute("""DROP TABLE IF EXISTS Mencoes_BTE_Org_Patronal;""")
-	cursor.execute("""DROP TABLE IF EXISTS Mencoes_BTE_Org_Sindical;""")
-	cursor.execute("""DROP TABLE IF EXISTS Org_Sindical;""")
-	cursor.execute("""DROP TABLE IF EXISTS Org_Patronal;""")
-	cursor.execute("""DROP TABLE IF EXISTS Sectores_Profissionais;""")
-
-
-	#create tables from web app
-	cursor.execute("""CREATE TABLE Sectores_Profissionais (
-		Sector         VARCHAR(100) NOT NULL PRIMARY KEY,
-		Nome_Abrev     VARCHAR(40),
-		Salario_Medio  NUMERIC
-	);""")
-
-	cursor.execute("""CREATE TABLE Org_Patronal (
-		ID                       INT NOT NULL PRIMARY KEY,
-		Tipo         			 VARCHAR(100),
-		Nome                     VARCHAR(100) NOT NULL,
-		Acronimo                 VARCHAR(100),
-		Nome_Organizacao_Pai     VARCHAR(100),
-		Concelho_Sede            VARCHAR(100),
-		Distrito_Sede            VARCHAR(100),
-		Codigo_Postal            VARCHAR(8),
-		Morada_Entidade 		 VARCHAR(100),
-		Local_Morada_Entidade 	 VARCHAR(100),
-		Area_Postal_Entidade 	 VARCHAR(100),
-		Telefone_Entidade 		 VARCHAR(9),
-		Fax_Entidade 			 VARCHAR(9),
-		Ambito_Geografico        VARCHAR(100),  
-		Sector                   VARCHAR(100),
-		Numero_Membros           INT,
-		Data_Primeira_Actividade DATE,
-		Data_Ultima_Actividade   DATE,
-		Activa       BOOLEAN,
-		Website                  VARCHAR(1000), 
-		FOREIGN KEY (Nome_Organizacao_Pai) REFERENCES Org_Patronal(ID),
-		FOREIGN KEY (Sector) REFERENCES Sectores_Profissionais(Sector)
-	);""")
-		
-	cursor.execute("""CREATE TABLE Org_Sindical (
-		ID                       INT NOT NULL PRIMARY KEY,
-		Tipo                     VARCHAR(100),
-		Nome                     VARCHAR(100) NOT NULL,
-		Acronimo                 VARCHAR(100),
-		Nome_Organizacao_Pai     VARCHAR(100),
-		Concelho_Sede            VARCHAR(100),
-		Distrito_Sede            VARCHAR(100),
-		Codigo_Postal            VARCHAR(8),
-		Morada_Entidade 		 VARCHAR(100),
-		Local_Morada_Entidade 	 VARCHAR(100),
-		Area_Postal_Entidade 	 VARCHAR(100),
-		Telefone_Entidade 		 VARCHAR(9),
-		Fax_Entidade 			 VARCHAR(9),
-		Ambito_Geografico        VARCHAR(100),
-		Sector                   VARCHAR(100),
-		Numero_Membros           INT,
-		Data_Primeira_Actividade DATE,
-		Data_Ultima_Actividade   DATE,
-		Activa                   BOOLEAN,
-		Website                  VARCHAR(1000),
-		FOREIGN KEY (Nome_Organizacao_Pai) REFERENCES Org_Sindical(ID),
-		FOREIGN KEY (Sector) REFERENCES Sectores_Profissionais(Sector)
-	);""")
-
-	cursor.execute("""CREATE TABLE Mencoes_BTE_Org_Sindical (
-		ID_Organizacao_Sindical               INT,
-		URL                                   VARCHAR(100),
-		Ano                                   INT,
-		Numero                                INT,
-		Serie                                 INT,
-		Descricao                             VARCHAR(100),
-		Mudanca_Estatuto                      BOOLEAN,
-		Eleicoes                              BOOLEAN,
-		Confianca                             NUMERIC,
-		PRIMARY KEY (ID_Organizacao_Sindical,Ano,Numero,Serie),
-		FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical(ID)
-	);""")
-
-	cursor.execute("""CREATE TABLE Mencoes_BTE_Org_Patronal (
-		ID_Organizacao_Patronal         INT,
-		URL                     VARCHAR(100),
-		Ano                                   INT,
-		Numero                                INT,
-		Serie                                 INT,
-		Descricao                             VARCHAR(100),
-		Mudanca_Estatuto                      BOOLEAN,
-		Eleicoes                              BOOLEAN,
-		Confianca                             NUMERIC,
-		PRIMARY KEY (ID_Organizacao_Patronal,Ano,Numero,Serie),
-		FOREIGN KEY (ID_Organizacao_Patronal) REFERENCES Org_Patronal(ID)
-	);""")
-
-	cursor.execute("""CREATE TABLE Relacoes_Entre_Org_Sindical (
-		ID_Organizacao_Sindical_1  INT,
-		ID_Organizacao_Sindical_2  INT,
-		Tipo_de_Relacao            VARCHAR(100),
-		Data                       DATE,
-		PRIMARY KEY (ID_Organizacao_Sindical_1,ID_Organizacao_Sindical_2),
-		FOREIGN KEY (ID_Organizacao_Sindical_1) REFERENCES Org_Sindical(ID),
-		FOREIGN KEY (ID_Organizacao_Sindical_2) REFERENCES Org_Sindical(ID)
-	);""")
-
-	cursor.execute("""CREATE TABLE Actos_Eleitorais_Org_Sindical (
-		ID_Organizacao_Sindical               INT,
-		Data                                  DATE,
-		Numero_Membros_Cadernos_Eleitoriais   INT,
-		Numero_Membros_Inscritos              INT,
-		Numero_Membros_Votantes               INT,
-		Meses_de_Mandato                      INT,
-		Numero_Listas_Concorrentes            INT,
-		PRIMARY KEY (ID_Organizacao_Sindical,Data),
-		FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical(ID)
-	);""")
-
-	cursor.execute("""CREATE TABLE Membros_Org_Sindical (
-		ID_Organizacao_Sindical               INT,
-		Data_Eleicao 						  DATE,
-		Data_Inicio                           INT,
-		Data_Fim                              INT,
-		Numero_Membros                        INT,
-		PRIMARY KEY (ID_Organizacao_Sindical,Data_Eleicao,Data_Inicio,Data_Fim),
-		FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical(ID)
-	);""")
-		
-	cursor.execute("""CREATE TABLE Direccao_Org_Sindical(
-		ID_Organizacao_Sindical     INT,
-		Nome_Pessoa                 VARCHAR(100),
-		Genero_Sexo                 VARCHAR(100),
-		Cargo                       VARCHAR(100),
-		Data_Eleicao  				DATE,
-		Data_Inicio                 INT,
-		Data_Fim                    INT,
-		PRIMARY KEY (ID_Organizacao_Sindical,Nome_Pessoa,Data_Eleicao,Data_Inicio,Data_Fim),
-		FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical(ID)
-	);""")
-
-	cursor.execute("""CREATE TABLE Actos_Negociacao_Colectiva (
-		ID                         INT,
-		ID_SEQUENCIAL        	   INT,
-		Nome_Acto                  VARCHAR(100),
-		Tipo_Acto                  VARCHAR(100),
-		Natureza                   VARCHAR(100),
-		Ano                        INT,
-		Numero                     INT,
-		Serie                      INT,
-		Data                       DATE,
-		URL                        VARCHAR(100),
-		Ambito_Geografico          VARCHAR(100),
-		PRIMARY KEY (ID,ID_SEQUENCIAL,Ano,Tipo_Acto)
-	);""")
-
-	cursor.execute("""CREATE TABLE Outorgantes_Actos (
-		ID                         INT,
-		ID_SEQUENCIAL              INT,
-		Ano                        INT,
-		ID_Organizacao_Sindical    INT,
-		ID_Organizacao_Patronal    INT,
-		Sector                     VARCHAR(100),
-		PRIMARY KEY (ID,ID_SEQUENCIAL,Ano,ID_Organizacao_Sindical,ID_Organizacao_Patronal,Sector),
-		FOREIGN KEY (ID,ID_SEQUENCIAL,Ano) REFERENCES Actos_Negociacao_Colectiva(ID,ID_SEQUENCIAL,Ano),
-		FOREIGN KEY (ID_Organizacao_Sindical) REFERENCES Org_Sindical(ID),
-		FOREIGN KEY (ID_Organizacao_Patronal) REFERENCES Org_Patronal(ID),
-		FOREIGN KEY (Sector) REFERENCES Sectores_Profissionais(Sector)
-	);""")
-
-	cursor.execute("""CREATE TABLE Avisos_Greve (
-		Id_Entidade_Sindical      VARCHAR(10),
-		Ano_Inicio                INT,
-		Mes_Inicio                INT,
-		Entidade_Sindical         VARCHAR(100),
-		Entidade_Patronal         VARCHAR(100),
-		Ano_Fim                   INT,
-		Mes_Fim                   INT,
-		Duracao                   INT,
-		PRIMARY KEY(Id_Entidade_Sindical,Ano_Inicio,Mes_Inicio,Entidade_Sindical,Entidade_Patronal,Ano_Fim,Mes_Fim,Duracao),
-	  FOREIGN KEY (Id_Entidade_Sindical) REFERENCES Org_Sindical(ID)
-	);""")
-
-
-	#triggers
-	cursor.execute("""CREATE TRIGGER Mencoes_BTE_Org_Sindical_update AFTER UPDATE ON Mencoes_BTE_Org_Sindical BEGIN
-			UPDATE Mencoes_BTE_Org_Sindical
-			SET    URL = "https://github.com/bgmartins/rep-database/raw/master/BTE-data/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
-			WHERE ID_Organizacao_Sindical = [NEW].ID_Organizacao_Sindical; 
-	END;""")
-
-	cursor.execute("""CREATE TRIGGER Mencoes_BTE_Org_Sindical_insert AFTER INSERT ON Mencoes_BTE_Org_Sindical BEGIN
-			UPDATE Mencoes_BTE_Org_Sindical
-			SET    URL = "https://github.com/bgmartins/rep-database/raw/master/BTE-data/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
-			WHERE ID_Organizacao_Sindical = [NEW].ID_Organizacao_Sindical; 
-	END;""")
-
-	cursor.execute("""CREATE TRIGGER Mencoes_BTE_Org_Patronal_update AFTER UPDATE ON Mencoes_BTE_Org_Patronal BEGIN
-			UPDATE Mencoes_BTE_Org_Patronal
-			SET    URL = "https://github.com/bgmartins/rep-database/raw/master/BTE-data/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
-			WHERE ID_Organizacao_Patronal = [NEW].ID_Organizacao_Patronal; 
-	END;""")
-
-	cursor.execute("""CREATE TRIGGER Mencoes_BTE_Org_Patronal_insert AFTER INSERT ON Mencoes_BTE_Org_Patronal BEGIN
-			UPDATE Mencoes_BTE_Org_Patronal
-			SET    URL = "https://github.com/bgmartins/rep-database/raw/master/BTE-data/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
-			WHERE ID_Organizacao_Patronal = [NEW].ID_Organizacao_Patronal; 
-	END;""")
-
-	cursor.execute("""CREATE TRIGGER Actos_Negociacao_Colectiva_update AFTER UPDATE ON Actos_Negociacao_Colectiva BEGIN
-			UPDATE Actos_Negociacao_Colectiva
-			SET    URL = "https://github.com/bgmartins/rep-database/raw/master/BTE-data/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
-			WHERE ID = [NEW].ID; 
-	END;""")
-
-	cursor.execute("""CREATE TRIGGER Actos_Negociacao_Colectiva_insert AFTER INSERT ON Actos_Negociacao_Colectiva BEGIN
-			UPDATE Actos_Negociacao_Colectiva
-			SET    URL = "https://github.com/bgmartins/rep-database/raw/master/BTE-data/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
-			WHERE ID = [NEW].ID; 
-	END;""")
-
-
-
 	#some auxiliary tables to unite attributes
 	cursor.execute("""CREATE TABLE TEMP_ALTERACOES_ESTATUTOS(
 		PROCESSO VARCHAR(100),
@@ -1157,126 +938,126 @@ def repDatabase():
 
 
 
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = trim(replace(replace(replace(NOME_ENTIDADE, X'0A', ' '),'  ',' '),'  ',' '));""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET SIGLA = trim(replace(replace(replace(SIGLA, X'0A', ' '),'  ',' '),'  ',' '));""")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = trim(replace(replace(replace(NOME_ENTIDADE, X'0A', ' '),'  ',' '),'  ',' '));")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET SIGLA = trim(replace(replace(replace(SIGLA, X'0A', ' '),'  ',' '),'  ',' '));")
 
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE, 'CGTP-IN', 'CGTPIN') WHERE instr(NOME_ENTIDADE, 'CGTP-IN') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(SIGLA, 'CGTP-IN', 'CGTPIN') WHERE instr(SIGLA, 'CGTP-IN') > 0;""")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE, 'CGTP-IN', 'CGTPIN') WHERE instr(NOME_ENTIDADE, 'CGTP-IN') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(SIGLA, 'CGTP-IN', 'CGTPIN') WHERE instr(SIGLA, 'CGTP-IN') > 0;")
 
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' . ','. ')  WHERE instr(NOME_ENTIDADE, ' . ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' NAC. ',' NACIONAL ')  WHERE instr(NOME_ENTIDADE, ' NAC. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' TRAB. ',' TRABALHADORES ')  WHERE instr(NOME_ENTIDADE, ' TRAB. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' DO DIST. D',' DO DISTRITO D')  WHERE instr(NOME_ENTIDADE, ' DO DIST. D') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' DOS DIST. ',' DOS DISTRITOS ')  WHERE instr(NOME_ENTIDADE, ' DOS DIST. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' DA IND. ',' DA INDÚSTRIA ')  WHERE instr(NOME_ENTIDADE, ' DA IND. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' DAS IND. ',' DAS INDÚSTRIAS ')  WHERE instr(NOME_ENTIDADE, ' DAS IND. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' DOS IND. ',' DOS INDUSTRIAIS ')  WHERE instr(NOME_ENTIDADE, ' DOS IND. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' NA IND. ',' NA INDÚSTRIA ')  WHERE instr(NOME_ENTIDADE, ' NA IND. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' NA IND, ',' DA INDÚSTRIA ')  WHERE instr(NOME_ENTIDADE, ' NA IND, ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' NAS IND. ',' NAS INDÚSTRIAS ')  WHERE instr(NOME_ENTIDADE, ' NAS IND. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' IND. E ',' INDÚSTRIA E')  WHERE instr(NOME_ENTIDADE, ' IND. E ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' IND. ',' INDÚSTRIAS ')  WHERE instr(NOME_ENTIDADE, ' IND. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' IND.',' INDÚSTRIAS ')  WHERE instr(NOME_ENTIDADE, ' IND.') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'(IND. ','(INDÚSTRIA ')  WHERE instr(NOME_ENTIDADE, '(IND. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' DOS SIND. ',' DOS SINDICATOS ')  WHERE instr(NOME_ENTIDADE, ' DOS SIND. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'SIND. ','SINDICATO ')  WHERE instr(NOME_ENTIDADE, 'SIND. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'ASS. ','ASSOCIAÇÃO ')  WHERE instr(NOME_ENTIDADE, 'ASS. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'ASSOC. ','ASSOCIAÇÃO ')  WHERE instr(NOME_ENTIDADE, 'ASSOC. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'FED. ','FEDERAÇÃO ')  WHERE instr(NOME_ENTIDADE, 'FED. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'FEDER. ','FEDERAÇÃO ')  WHERE instr(NOME_ENTIDADE, 'FEDER. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'FEDER NACIONAL','FEDERAÇÃO NACIONAL')  WHERE instr(NOME_ENTIDADE, 'FEDER NACIONAL') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'TRTABALHADORES','TRABALHADORES')  WHERE instr(NOME_ENTIDADE, 'TRTABALHADORES') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'ASSOC.DOS ','ASSOCIAÇÃO DOS ')  WHERE instr(NOME_ENTIDADE, 'ASSOC.DOS ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'ESCRIT. ','ESCRITÓRIO ')  WHERE instr(NOME_ENTIDADE, 'ESCRIT. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'IMP.E EXP. ','IMPORT E EXPORT ')  WHERE instr(NOME_ENTIDADE, 'IMP.E EXP. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DEMOC. ','DEMOCRÁTICO ')  WHERE instr(NOME_ENTIDADE, 'DEMOC. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DIST. ','DISTRITO ')  WHERE instr(NOME_ENTIDADE, 'DIST. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'TRANSP. ','TRANSPORTES ')  WHERE instr(NOME_ENTIDADE, 'TRANSP. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DOS AGRICULT. ','DOS AGRICULTORES ')  WHERE instr(NOME_ENTIDADE, 'DOS AGRICULT. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'SOC. ','SOCIEDADE ')  WHERE instr(NOME_ENTIDADE, 'SOC. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'COOP. ','COOPERATIVA ')  WHERE instr(NOME_ENTIDADE, 'COOP. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'IMPORT. ','IMPORTAÇÃO ')  WHERE instr(NOME_ENTIDADE, 'IMPORT. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'AS PORT. ','AS PORTUGUESAS ')  WHERE instr(NOME_ENTIDADE, 'AS PORT. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'PORT. ','PORTUGUESA ')  WHERE instr(NOME_ENTIDADE, 'PORT. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' S. A. ','S.A. ')  WHERE instr(NOME_ENTIDADE, 'S.A. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' SA ',' S.A. ')  WHERE instr(NOME_ENTIDADE, ' SA ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' S. A.','S.A.')  WHERE instr(NOME_ENTIDADE, 'S. A.') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,',S.A.',', S.A.')  WHERE instr(NOME_ENTIDADE, ',S.A.') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,',I.P.',', I.P.')  WHERE instr(NOME_ENTIDADE, ',I.P.') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DOS TRANSPORTAD. ','DOS TRANSPORTADORES ')  WHERE instr(NOME_ENTIDADE, 'DOS TRANSPORTAD. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DAS TRANSPORTAD. ','DAS TRANSPORTADORAS ')  WHERE instr(NOME_ENTIDADE, 'DAS TRANSPORTAD. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'INT. ','INTERNACIONAL ')  WHERE instr(NOME_ENTIDADE, 'INT. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'LAB.FARM.,','LABORATÓRIOS FARMACÊUTICOS, ')  WHERE instr(NOME_ENTIDADE, 'LAB.FARM.,') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DE PROD. DE ','DE PRODUTORES DE ')  WHERE instr(NOME_ENTIDADE, 'DE PROD. DE ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DE PROD. QU','DE PRODUTOS QU')  WHERE instr(NOME_ENTIDADE, 'DE PROD. QU') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'PROD. E C','PRODUÇÃO E C')  WHERE instr(NOME_ENTIDADE, 'PROD. E COM') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' DIS. ',' DISTRITO ')  WHERE instr(NOME_ENTIDADE, ' DIS. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'SERV. ','SERVIÇOS ')  WHERE instr(NOME_ENTIDADE, 'SERV. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'REG. ','REGIONAL ')  WHERE instr(NOME_ENTIDADE, 'REG. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'TRABALHADORES PORTUG.','TRABALHADORES PORTUGUESES')  WHERE instr(NOME_ENTIDADE, 'TRABALHADORES PORTUG.') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'SEG. ','SEGURANÇA ')  WHERE instr(NOME_ENTIDADE, 'SEG. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DOS COM. ','DOS COMERCIANTES ')  WHERE instr(NOME_ENTIDADE, 'DOS COM. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'SOCIEDADE COM. ','SOCIEDADE COMERCIAL ')  WHERE instr(NOME_ENTIDADE, 'SOCIEDADE COM. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'TRABALHADORES AGRI. ','TRABALHADORES AGRÍCOLAS ')  WHERE instr(NOME_ENTIDADE, 'TRABALHADORES AGRI. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DOS COMER. ','DOS COMERCIANTES ')  WHERE instr(NOME_ENTIDADE, 'DOS COMER. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DOS PROF.','DOS PROFISSIONAIS')  WHERE instr(NOME_ENTIDADE, 'DOS PROF.') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'CONST. CIV.','CONSTRUÇÃO CIVIL')  WHERE instr(NOME_ENTIDADE, 'CONST. CIV.') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'TRANSP.RODOVIARIOS,','TRANSPORTES RODOVIARIOS, ')  WHERE instr(NOME_ENTIDADE, 'TRANSP.RODOVIARIOS,') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'AGRICULT, ESCRIT, COMER, SERV,','AGRICULTURA, ESCRITÓRIO, COMÉRCIO, SERVIÇOS,')  WHERE instr(NOME_ENTIDADE, 'AGRICULT, ESCRIT, COMER, SERV,') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'METALOMEC, METAL,','METALOMECÂNICA, METALURGIA,')  WHERE instr(NOME_ENTIDADE, 'METALOMEC, METAL,') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DO CONC. ','DO CONCELHO ')  WHERE instr(NOME_ENTIDADE, 'DO CONC. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DOS CONC. ','DOS CONCELHOS ')  WHERE instr(NOME_ENTIDADE, 'DOS CONC. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'MUNICÍPIOS. ','MUNICÍPIOS ')  WHERE instr(NOME_ENTIDADE, 'MUNICÍPIOS. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DOS INDÚSTRIA DE CONST. ','DOS INDUSTRIAIS DE CONSTRUÇÃO ')  WHERE instr(NOME_ENTIDADE, 'DOS INDÚSTRIA DE CONST. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DOS INDÚSTRIA REFINAD. ','DOS INDUSTRIAIS REFINADORES ')  WHERE instr(NOME_ENTIDADE, 'DOS INDÚSTRIA REFINAD. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DOS DISTRIT. ','DOS DISTRITOS ')  WHERE instr(NOME_ENTIDADE, 'DOS DISTRIT. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'TECNOLOG. ','TECNOLOGIAS ')  WHERE instr(NOME_ENTIDADE, 'TECNOLOG. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'INST. ','INSTITUTO ')  WHERE instr(NOME_ENTIDADE, 'INST. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'ASS ','ASSOCIAÇÃO ')  WHERE instr(NOME_ENTIDADE, 'ASS ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'E IMP. ','E IMPORTADORES ')  WHERE instr(NOME_ENTIDADE, 'E IMP. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'CONF. ','CONFEDERAÇÃO ')  WHERE instr(NOME_ENTIDADE, 'CONF. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DOS COMERC. ','DOS COMERCIANTES ')  WHERE instr(NOME_ENTIDADE, 'DOS COMERC. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'INDÚSTRIA EXPORTADORES ','INDXSTRIA, EXPORTADORES ')  WHERE instr(NOME_ENTIDADE, 'INDÚSTRIA EXPORTADORES ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DOS INDÚSTRIA ','DOS INDUSTRIAIS ')  WHERE instr(NOME_ENTIDADE, 'DOS INDÚSTRIA ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'REP. ','REPARAÇÃO ')  WHERE instr(NOME_ENTIDADE, 'REP. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'COM. ','COMÉRCIO ')  WHERE instr(NOME_ENTIDADE, 'COM. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'COMP. ','COMPANHIA ')  WHERE instr(NOME_ENTIDADE, 'COMP. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' LDX',' LDA')  WHERE instr(NOME_ENTIDADE, ' LDX') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,',LDX',', LDA')  WHERE instr(NOME_ENTIDADE, ',LDX') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,',LD.X',', LDA')  WHERE instr(NOME_ENTIDADE, ',LD.X') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,',LDA',', LDA')  WHERE instr(NOME_ENTIDADE, ',LDA') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' LDA',' LDA')  WHERE instr(NOME_ENTIDADE, ' LDA') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' LDA..',' LDA')  WHERE instr(NOME_ENTIDADE, ' LDA..') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'CX. ','COMPANHIA ')  WHERE instr(NOME_ENTIDADE, 'CX. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,', SA',', S.A.')  WHERE instr(NOME_ENTIDADE, ', SA') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,', S.A.RL',', SARL')  WHERE instr(NOME_ENTIDADE, ', S.A.RL') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,', S.A.N',', SAN')  WHERE instr(NOME_ENTIDADE, ', S.A.N') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'METAL., E PROJ.IND.','METALÚRGICA, E PROJECTOS INDUSTRIAIS')  WHERE instr(NOME_ENTIDADE, 'METAL., E PROJ.IND.') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DUSTRIES SA','DUSTRIES, S.A.')  WHERE instr(NOME_ENTIDADE, 'DUSTRIES SA') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'FIGUEIRA SA','FIGUEIRA, S.A.')  WHERE instr(NOME_ENTIDADE, 'FIGUEIRA SA') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'PARVALOREM SA','PARVALOREM, S.A.')  WHERE instr(NOME_ENTIDADE, 'PARVALOREM SA') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'PORTUGAL) SA','PORTUGAL), S.A.')  WHERE instr(NOME_ENTIDADE, 'PORTUGAL) SA') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'PAPEL SA','PAPEL, S.A.')  WHERE instr(NOME_ENTIDADE, 'PAPEL SA') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'ASSISTÊNCIA SA','ASSISTÊNCIA, S.A.')  WHERE instr(NOME_ENTIDADE, 'ASSISTXNCIA SA') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,', EPE',', E.P.E.')  WHERE instr(NOME_ENTIDADE, ', EPE') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' S. ',' SXO ')  WHERE instr(NOME_ENTIDADE, ' S. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' ST. ',' SANTO ')  WHERE instr(NOME_ENTIDADE, ' ST. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'E.U.A.','ESTADOS UNIDOS DA AMXRICA')  WHERE instr(NOME_ENTIDADE, 'E.U.A.') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'FÁB. ','FÁBRICA ')  WHERE instr(NOME_ENTIDADE, 'FÁB. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'NOT. ','NOTÍCIAS ')  WHERE instr(NOME_ENTIDADE, 'NOT. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'G.E. ','GENERAL ELECTRIC ')  WHERE instr(NOME_ENTIDADE, 'G.E. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'R. AUT','REGIÕES AUT')  WHERE instr(NOME_ENTIDADE, 'R. AUT') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'GAB. ','GABINETE ')  WHERE instr(NOME_ENTIDADE, 'GAB. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' R. AUTÓNOMAS ',' REGIÕES AUTÓNOMAS ')  WHERE instr(NOME_ENTIDADE, ' R. AUTÓNOMAS ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'PORTUG. ','PORTUGUESA ')  WHERE instr(NOME_ENTIDADE, 'PORTUG. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = SUBSTR(NOME_ENTIDADE,3) WHERE NOME_ENTIDADE LIKE "O %" AND instr(NOME_ENTIDADE,'ALMADA') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'.','')  WHERE NOME_ENTIDADE LIKE "%.";""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'METALOM.','METALOMECÂNICA')  WHERE instr(NOME_ENTIDADE, 'METALOM.') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'FISCALIAÇÃO.','FISCALIZAÇÃO ')  WHERE instr(NOME_ENTIDADE, 'FISCALIAÇÃO.') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'TEXTIL','TÊXTIL')  WHERE instr(NOME_ENTIDADE, 'TEXTIL') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'INDUSTRIAS','INDÚSTRIAS')  WHERE instr(NOME_ENTIDADE, 'INDUSTRIAS') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'INDUSTRIA','INDÚSTRIA')  WHERE instr(NOME_ENTIDADE, 'INDUSTRIA') > 0;""")
-	cursor.execute("""UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'CERAMICA','CERÂMICA')  WHERE instr(NOME_ENTIDADE, 'CERAMICA') > 0;""")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' . ','. ')  WHERE instr(NOME_ENTIDADE, ' . ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' NAC. ',' NACIONAL ')  WHERE instr(NOME_ENTIDADE, ' NAC. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' TRAB. ',' TRABALHADORES ')  WHERE instr(NOME_ENTIDADE, ' TRAB. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' DO DIST. D',' DO DISTRITO D')  WHERE instr(NOME_ENTIDADE, ' DO DIST. D') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' DOS DIST. ',' DOS DISTRITOS ')  WHERE instr(NOME_ENTIDADE, ' DOS DIST. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' DA IND. ',' DA INDÚSTRIA ')  WHERE instr(NOME_ENTIDADE, ' DA IND. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' DAS IND. ',' DAS INDÚSTRIAS ')  WHERE instr(NOME_ENTIDADE, ' DAS IND. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' DOS IND. ',' DOS INDUSTRIAIS ')  WHERE instr(NOME_ENTIDADE, ' DOS IND. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' NA IND. ',' NA INDÚSTRIA ')  WHERE instr(NOME_ENTIDADE, ' NA IND. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' NA IND, ',' DA INDÚSTRIA ')  WHERE instr(NOME_ENTIDADE, ' NA IND, ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' NAS IND. ',' NAS INDÚSTRIAS ')  WHERE instr(NOME_ENTIDADE, ' NAS IND. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' IND. E ',' INDÚSTRIA E')  WHERE instr(NOME_ENTIDADE, ' IND. E ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' IND. ',' INDÚSTRIAS ')  WHERE instr(NOME_ENTIDADE, ' IND. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' IND.',' INDÚSTRIAS ')  WHERE instr(NOME_ENTIDADE, ' IND.') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'(IND. ','(INDÚSTRIA ')  WHERE instr(NOME_ENTIDADE, '(IND. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' DOS SIND. ',' DOS SINDICATOS ')  WHERE instr(NOME_ENTIDADE, ' DOS SIND. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'SIND. ','SINDICATO ')  WHERE instr(NOME_ENTIDADE, 'SIND. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'ASS. ','ASSOCIAÇÃO ')  WHERE instr(NOME_ENTIDADE, 'ASS. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'ASSOC. ','ASSOCIAÇÃO ')  WHERE instr(NOME_ENTIDADE, 'ASSOC. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'FED. ','FEDERAÇÃO ')  WHERE instr(NOME_ENTIDADE, 'FED. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'FEDER. ','FEDERAÇÃO ')  WHERE instr(NOME_ENTIDADE, 'FEDER. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'FEDER NACIONAL','FEDERAÇÃO NACIONAL')  WHERE instr(NOME_ENTIDADE, 'FEDER NACIONAL') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'TRTABALHADORES','TRABALHADORES')  WHERE instr(NOME_ENTIDADE, 'TRTABALHADORES') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'ASSOC.DOS ','ASSOCIAÇÃO DOS ')  WHERE instr(NOME_ENTIDADE, 'ASSOC.DOS ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'ESCRIT. ','ESCRITÓRIO ')  WHERE instr(NOME_ENTIDADE, 'ESCRIT. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'IMP.E EXP. ','IMPORT E EXPORT ')  WHERE instr(NOME_ENTIDADE, 'IMP.E EXP. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DEMOC. ','DEMOCRÁTICO ')  WHERE instr(NOME_ENTIDADE, 'DEMOC. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DIST. ','DISTRITO ')  WHERE instr(NOME_ENTIDADE, 'DIST. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'TRANSP. ','TRANSPORTES ')  WHERE instr(NOME_ENTIDADE, 'TRANSP. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DOS AGRICULT. ','DOS AGRICULTORES ')  WHERE instr(NOME_ENTIDADE, 'DOS AGRICULT. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'SOC. ','SOCIEDADE ')  WHERE instr(NOME_ENTIDADE, 'SOC. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'COOP. ','COOPERATIVA ')  WHERE instr(NOME_ENTIDADE, 'COOP. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'IMPORT. ','IMPORTAÇÃO ')  WHERE instr(NOME_ENTIDADE, 'IMPORT. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'AS PORT. ','AS PORTUGUESAS ')  WHERE instr(NOME_ENTIDADE, 'AS PORT. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'PORT. ','PORTUGUESA ')  WHERE instr(NOME_ENTIDADE, 'PORT. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' S. A. ','S.A. ')  WHERE instr(NOME_ENTIDADE, 'S.A. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' SA ',' S.A. ')  WHERE instr(NOME_ENTIDADE, ' SA ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' S. A.','S.A.')  WHERE instr(NOME_ENTIDADE, 'S. A.') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,',S.A.',', S.A.')  WHERE instr(NOME_ENTIDADE, ',S.A.') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,',I.P.',', I.P.')  WHERE instr(NOME_ENTIDADE, ',I.P.') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DOS TRANSPORTAD. ','DOS TRANSPORTADORES ')  WHERE instr(NOME_ENTIDADE, 'DOS TRANSPORTAD. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DAS TRANSPORTAD. ','DAS TRANSPORTADORAS ')  WHERE instr(NOME_ENTIDADE, 'DAS TRANSPORTAD. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'INT. ','INTERNACIONAL ')  WHERE instr(NOME_ENTIDADE, 'INT. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'LAB.FARM.,','LABORATÓRIOS FARMACÊUTICOS, ')  WHERE instr(NOME_ENTIDADE, 'LAB.FARM.,') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DE PROD. DE ','DE PRODUTORES DE ')  WHERE instr(NOME_ENTIDADE, 'DE PROD. DE ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DE PROD. QU','DE PRODUTOS QU')  WHERE instr(NOME_ENTIDADE, 'DE PROD. QU') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'PROD. E C','PRODUÇÃO E C')  WHERE instr(NOME_ENTIDADE, 'PROD. E COM') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' DIS. ',' DISTRITO ')  WHERE instr(NOME_ENTIDADE, ' DIS. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'SERV. ','SERVIÇOS ')  WHERE instr(NOME_ENTIDADE, 'SERV. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'REG. ','REGIONAL ')  WHERE instr(NOME_ENTIDADE, 'REG. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'TRABALHADORES PORTUG.','TRABALHADORES PORTUGUESES')  WHERE instr(NOME_ENTIDADE, 'TRABALHADORES PORTUG.') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'SEG. ','SEGURANÇA ')  WHERE instr(NOME_ENTIDADE, 'SEG. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DOS COM. ','DOS COMERCIANTES ')  WHERE instr(NOME_ENTIDADE, 'DOS COM. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'SOCIEDADE COM. ','SOCIEDADE COMERCIAL ')  WHERE instr(NOME_ENTIDADE, 'SOCIEDADE COM. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'TRABALHADORES AGRI. ','TRABALHADORES AGRÍCOLAS ')  WHERE instr(NOME_ENTIDADE, 'TRABALHADORES AGRI. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DOS COMER. ','DOS COMERCIANTES ')  WHERE instr(NOME_ENTIDADE, 'DOS COMER. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DOS PROF.','DOS PROFISSIONAIS')  WHERE instr(NOME_ENTIDADE, 'DOS PROF.') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'CONST. CIV.','CONSTRUÇÃO CIVIL')  WHERE instr(NOME_ENTIDADE, 'CONST. CIV.') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'TRANSP.RODOVIARIOS,','TRANSPORTES RODOVIARIOS, ')  WHERE instr(NOME_ENTIDADE, 'TRANSP.RODOVIARIOS,') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'AGRICULT, ESCRIT, COMER, SERV,','AGRICULTURA, ESCRITÓRIO, COMÉRCIO, SERVIÇOS,')  WHERE instr(NOME_ENTIDADE, 'AGRICULT, ESCRIT, COMER, SERV,') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'METALOMEC, METAL,','METALOMECÂNICA, METALURGIA,')  WHERE instr(NOME_ENTIDADE, 'METALOMEC, METAL,') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DO CONC. ','DO CONCELHO ')  WHERE instr(NOME_ENTIDADE, 'DO CONC. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DOS CONC. ','DOS CONCELHOS ')  WHERE instr(NOME_ENTIDADE, 'DOS CONC. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'MUNICÍPIOS. ','MUNICÍPIOS ')  WHERE instr(NOME_ENTIDADE, 'MUNICÍPIOS. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DOS INDÚSTRIA DE CONST. ','DOS INDUSTRIAIS DE CONSTRUÇÃO ')  WHERE instr(NOME_ENTIDADE, 'DOS INDÚSTRIA DE CONST. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DOS INDÚSTRIA REFINAD. ','DOS INDUSTRIAIS REFINADORES ')  WHERE instr(NOME_ENTIDADE, 'DOS INDÚSTRIA REFINAD. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DOS DISTRIT. ','DOS DISTRITOS ')  WHERE instr(NOME_ENTIDADE, 'DOS DISTRIT. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'TECNOLOG. ','TECNOLOGIAS ')  WHERE instr(NOME_ENTIDADE, 'TECNOLOG. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'INST. ','INSTITUTO ')  WHERE instr(NOME_ENTIDADE, 'INST. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'ASS ','ASSOCIAÇÃO ')  WHERE instr(NOME_ENTIDADE, 'ASS ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'E IMP. ','E IMPORTADORES ')  WHERE instr(NOME_ENTIDADE, 'E IMP. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'CONF. ','CONFEDERAÇÃO ')  WHERE instr(NOME_ENTIDADE, 'CONF. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DOS COMERC. ','DOS COMERCIANTES ')  WHERE instr(NOME_ENTIDADE, 'DOS COMERC. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'INDÚSTRIA EXPORTADORES ','INDXSTRIA, EXPORTADORES ')  WHERE instr(NOME_ENTIDADE, 'INDÚSTRIA EXPORTADORES ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DOS INDÚSTRIA ','DOS INDUSTRIAIS ')  WHERE instr(NOME_ENTIDADE, 'DOS INDÚSTRIA ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'REP. ','REPARAÇÃO ')  WHERE instr(NOME_ENTIDADE, 'REP. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'COM. ','COMÉRCIO ')  WHERE instr(NOME_ENTIDADE, 'COM. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'COMP. ','COMPANHIA ')  WHERE instr(NOME_ENTIDADE, 'COMP. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' LDX',' LDA')  WHERE instr(NOME_ENTIDADE, ' LDX') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,',LDX',', LDA')  WHERE instr(NOME_ENTIDADE, ',LDX') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,',LD.X',', LDA')  WHERE instr(NOME_ENTIDADE, ',LD.X') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,',LDA',', LDA')  WHERE instr(NOME_ENTIDADE, ',LDA') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' LDA',' LDA')  WHERE instr(NOME_ENTIDADE, ' LDA') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' LDA..',' LDA')  WHERE instr(NOME_ENTIDADE, ' LDA..') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'CX. ','COMPANHIA ')  WHERE instr(NOME_ENTIDADE, 'CX. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,', SA',', S.A.')  WHERE instr(NOME_ENTIDADE, ', SA') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,', S.A.RL',', SARL')  WHERE instr(NOME_ENTIDADE, ', S.A.RL') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,', S.A.N',', SAN')  WHERE instr(NOME_ENTIDADE, ', S.A.N') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'METAL., E PROJ.IND.','METALÚRGICA, E PROJECTOS INDUSTRIAIS')  WHERE instr(NOME_ENTIDADE, 'METAL., E PROJ.IND.') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'DUSTRIES SA','DUSTRIES, S.A.')  WHERE instr(NOME_ENTIDADE, 'DUSTRIES SA') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'FIGUEIRA SA','FIGUEIRA, S.A.')  WHERE instr(NOME_ENTIDADE, 'FIGUEIRA SA') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'PARVALOREM SA','PARVALOREM, S.A.')  WHERE instr(NOME_ENTIDADE, 'PARVALOREM SA') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'PORTUGAL) SA','PORTUGAL), S.A.')  WHERE instr(NOME_ENTIDADE, 'PORTUGAL) SA') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'PAPEL SA','PAPEL, S.A.')  WHERE instr(NOME_ENTIDADE, 'PAPEL SA') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'ASSISTÊNCIA SA','ASSISTÊNCIA, S.A.')  WHERE instr(NOME_ENTIDADE, 'ASSISTXNCIA SA') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,', EPE',', E.P.E.')  WHERE instr(NOME_ENTIDADE, ', EPE') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' S. ',' SXO ')  WHERE instr(NOME_ENTIDADE, ' S. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' ST. ',' SANTO ')  WHERE instr(NOME_ENTIDADE, ' ST. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'E.U.A.','ESTADOS UNIDOS DA AMXRICA')  WHERE instr(NOME_ENTIDADE, 'E.U.A.') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'FÁB. ','FÁBRICA ')  WHERE instr(NOME_ENTIDADE, 'FÁB. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'NOT. ','NOTÍCIAS ')  WHERE instr(NOME_ENTIDADE, 'NOT. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'G.E. ','GENERAL ELECTRIC ')  WHERE instr(NOME_ENTIDADE, 'G.E. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'R. AUT','REGIÕES AUT')  WHERE instr(NOME_ENTIDADE, 'R. AUT') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'GAB. ','GABINETE ')  WHERE instr(NOME_ENTIDADE, 'GAB. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,' R. AUTÓNOMAS ',' REGIÕES AUTÓNOMAS ')  WHERE instr(NOME_ENTIDADE, ' R. AUTÓNOMAS ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'PORTUG. ','PORTUGUESA ')  WHERE instr(NOME_ENTIDADE, 'PORTUG. ') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = SUBSTR(NOME_ENTIDADE,3) WHERE NOME_ENTIDADE LIKE 'O %' AND instr(NOME_ENTIDADE,'ALMADA') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'.','')  WHERE NOME_ENTIDADE LIKE '%.';")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'METALOM.','METALOMECÂNICA')  WHERE instr(NOME_ENTIDADE, 'METALOM.') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'FISCALIAÇÃO.','FISCALIZAÇÃO ')  WHERE instr(NOME_ENTIDADE, 'FISCALIAÇÃO.') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'TEXTIL','TÊXTIL')  WHERE instr(NOME_ENTIDADE, 'TEXTIL') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'INDUSTRIAS','INDÚSTRIAS')  WHERE instr(NOME_ENTIDADE, 'INDUSTRIAS') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'INDUSTRIA','INDÚSTRIA')  WHERE instr(NOME_ENTIDADE, 'INDUSTRIA') > 0;")
+	cursor.execute("UPDATE TEMP_ENTIDADES SET NOME_ENTIDADE = replace(NOME_ENTIDADE,'CERAMICA','CERÂMICA')  WHERE instr(NOME_ENTIDADE, 'CERAMICA') > 0;")
 
 
 	cursor.execute("""UPDATE TEMP_ENTIDADES SET SIGLA = TRIM(SUBSTR(NOME_ENTIDADE,0,instr(NOME_ENTIDADE,'-'))) 
@@ -1325,7 +1106,6 @@ def repDatabase():
 				 NULL
 	FROM TEMP_ENTIDADES LEFT JOIN TEMP_DATAS_ENTIDADES ON TEMP_ENTIDADES.ID_ENTIDADE=TEMP_DATAS_ENTIDADES.ID_ENTIDADE WHERE CAST(SUBSTR(TEMP_ENTIDADES.ID_ENTIDADE,0,INSTR(TEMP_ENTIDADES.ID_ENTIDADE, '.')) AS INT) > 4;""")
 
-
 	cursor.execute("""UPDATE Org_Patronal SET TIPO = CASE 
 			 WHEN CAST(SUBSTR(ID,0,INSTR(ID, '.')) AS INT) = 1 THEN 'SINDICATO'
 			 WHEN CAST(SUBSTR(ID,0,INSTR(ID, '.')) AS INT) = 2 THEN 'FEDERAÇÃO SINDICAL'
@@ -1348,7 +1128,7 @@ def repDatabase():
 	);""")
 
 
-	cursor.execute("""UPDATE Org_Patronal SET Website = (SELECT wp.WEBSITE FROM TEMP_WEBSITES_PATRONAIS wp WHERE Org_Patronal.Nome = wp.NOME_ORG);""")
+	cursor.execute("UPDATE Org_Patronal SET Website = (SELECT wp.WEBSITE FROM TEMP_WEBSITES_PATRONAIS wp WHERE Org_Patronal.Nome = wp.NOME_ORG);")
 
 
 
@@ -1373,6 +1153,9 @@ def repDatabase():
 				 CASE lower(trim(ESTADO_ENTIDADE)) WHEN 'ativa' THEN 1 ELSE 0 END,
 				 NULL
 	FROM TEMP_ENTIDADES LEFT JOIN TEMP_DATAS_ENTIDADES ON TEMP_ENTIDADES.ID_ENTIDADE=TEMP_DATAS_ENTIDADES.ID_ENTIDADE WHERE CAST(SUBSTR(TEMP_ENTIDADES.ID_ENTIDADE,0,INSTR(TEMP_ENTIDADES.ID_ENTIDADE, '.')) AS INT) < 5;""")
+
+
+	#chamar aqui a função
 
 	cursor.execute("""UPDATE Org_Sindical SET TIPO = CASE 
 			 WHEN CAST(SUBSTR(ID,0,INSTR(ID, '.')) AS INT) = 1 THEN 'SINDICATO'
@@ -1409,18 +1192,18 @@ def repDatabase():
 	WHERE A.Nome_Organizacao_Pai IS NOT NULL AND B.NOME = A.Nome_Organizacao_Pai;""")
 
 
-	cursor.execute("""UPDATE ORG_SINDICAL SET ACRONIMO=replace(ACRONIMO, ' CGTPIN', '') WHERE instr(ACRONIMO, ' CGTPIN') > 0;""")
-	cursor.execute("""UPDATE ORG_SINDICAL SET ACRONIMO=replace(ACRONIMO, '/CGTPIN', '') WHERE instr(ACRONIMO, '/CGTPIN') > 0;""")
-	cursor.execute("""UPDATE ORG_SINDICAL SET ACRONIMO=replace(ACRONIMO, '/CGTP-I', '') WHERE instr(ACRONIMO, '/CGTP-I') > 0;""")
-	cursor.execute("""UPDATE ORG_SINDICAL SET ACRONIMO=replace(ACRONIMO, '/UGT', '') WHERE instr(ACRONIMO, '/UGT') > 0;""")
-	cursor.execute("""UPDATE ORG_SINDICAL SET ACRONIMO=replace(ACRONIMO, 'UGT/', '') WHERE instr(ACRONIMO, 'UGT/') > 0;""")
-	cursor.execute("""UPDATE ORG_SINDICAL SET ACRONIMO=replace(replace(ACRONIMO, '(', ''), ')', '') WHERE instr(ACRONIMO, '(') > 0 OR instr(ACRONIMO, ')') > 0;""")
-	cursor.execute("""UPDATE ORG_SINDICAL SET ACRONIMO=replace(ACRONIMO, '.', '') WHERE instr(ACRONIMO, '.') > 0;""")
-	cursor.execute("""UPDATE ORG_SINDICAL SET ACRONIMO=replace(ACRONIMO, ' - ', '-') WHERE instr(ACRONIMO, ' - ') > 0;""")
+	cursor.execute("UPDATE ORG_SINDICAL SET ACRONIMO=replace(ACRONIMO, ' CGTPIN', '') WHERE instr(ACRONIMO, ' CGTPIN') > 0;")
+	cursor.execute("UPDATE ORG_SINDICAL SET ACRONIMO=replace(ACRONIMO, '/CGTPIN', '') WHERE instr(ACRONIMO, '/CGTPIN') > 0;")
+	cursor.execute("UPDATE ORG_SINDICAL SET ACRONIMO=replace(ACRONIMO, '/CGTP-I', '') WHERE instr(ACRONIMO, '/CGTP-I') > 0;")
+	cursor.execute("UPDATE ORG_SINDICAL SET ACRONIMO=replace(ACRONIMO, '/UGT', '') WHERE instr(ACRONIMO, '/UGT') > 0;")
+	cursor.execute("UPDATE ORG_SINDICAL SET ACRONIMO=replace(ACRONIMO, 'UGT/', '') WHERE instr(ACRONIMO, 'UGT/') > 0;")
+	cursor.execute("UPDATE ORG_SINDICAL SET ACRONIMO=replace(replace(ACRONIMO, '(', ''), ')', '') WHERE instr(ACRONIMO, '(') > 0 OR instr(ACRONIMO, ')') > 0;")
+	cursor.execute("UPDATE ORG_SINDICAL SET ACRONIMO=replace(ACRONIMO, '.', '') WHERE instr(ACRONIMO, '.') > 0;")
+	cursor.execute("UPDATE ORG_SINDICAL SET ACRONIMO=replace(ACRONIMO, ' - ', '-') WHERE instr(ACRONIMO, ' - ') > 0;")
 	cursor.execute("""UPDATE ORG_SINDICAL SET ACRONIMO="STMTM" WHERE Acronimo = "OS-MONTES";""")
 	cursor.execute("""UPDATE ORG_SINDICAL SET Nome="SINDICATO TÊXTIL DO MINHO E TRÁS-OS-MONTES" WHERE Acronimo = "STMTM";""")
 
-	cursor.execute("""UPDATE Org_Sindical SET Website = (SELECT ws.WEBSITE FROM TEMP_WEBSITES_SINDICAIS ws WHERE Org_Sindical.Nome = ws.NOME_ORG);""")
+	cursor.execute("UPDATE Org_Sindical SET Website = (SELECT ws.WEBSITE FROM TEMP_WEBSITES_SINDICAIS ws WHERE Org_Sindical.Nome = ws.NOME_ORG);")
 
 	cursor.execute("""INSERT INTO Mencoes_BTE_Org_Sindical
 	SELECT DISTINCT TEMP_ENTIDADES.ID_ENTIDADE, NULL,
@@ -1519,7 +1302,7 @@ def repDatabase():
 
 
 
-	cursor.execute("""CREATE INDEX IDX1 ON TEMP_IRCT(NUMERO,NUMERO_SEQUENCIAL,ANO,CODCAE);""")
+	cursor.execute("CREATE INDEX IDX1 ON TEMP_IRCT(NUMERO,NUMERO_SEQUENCIAL,ANO,CODCAE);")
 
 	cursor.execute("""INSERT INTO Outorgantes_Actos
 	SELECT DISTINCT
@@ -1598,17 +1381,17 @@ def repDatabase():
 	WHERE TEMP_IRCT.NUMERO=TEMP_OUTORGANTES.NUM AND TEMP_IRCT.NUMERO_SEQUENCIAL=TEMP_OUTORGANTES.NUMSEQ AND TEMP_IRCT.ANO=TEMP_OUTORGANTES.ANO AND TEMP_IRCT.TIPO_CONVENCAO_CODIGO = TEMP_OUTORGANTES.TIPOCONV;""")
 
 
-	cursor.execute("""UPDATE Outorgantes_Actos SET ID_Organizacao_Sindical = ( SELECT ID FROM Org_Sindical WHERE ID LIKE SUBSTR(ID_Organizacao_Sindical,0,LENGTH(ID_Organizacao_Sindical)-1) ORDER BY ID DESC) WHERE ID_Organizacao_Sindical IS NULL;""")
-	cursor.execute("""UPDATE Outorgantes_Actos SET ID_Organizacao_Patronal = ( SELECT ID FROM Org_Patronal WHERE ID LIKE SUBSTR(ID_Organizacao_Patronal,0,LENGTH(ID_Organizacao_Patronal)-1) ORDER BY ID DESC) WHERE ID_Organizacao_Patronal IS NULL;""")
-	cursor.execute("""DELETE FROM Outorgantes_Actos WHERE rowid NOT IN (SELECT MAX(rowid) from Outorgantes_Actos group by ID, ID_SEQUENCIAL, ANO, ID_Organizacao_Sindical, ID_Organizacao_Patronal, Sector );""")
+	cursor.execute("UPDATE Outorgantes_Actos SET ID_Organizacao_Sindical = ( SELECT ID FROM Org_Sindical WHERE ID LIKE SUBSTR(ID_Organizacao_Sindical,0,LENGTH(ID_Organizacao_Sindical)-1) ORDER BY ID DESC) WHERE ID_Organizacao_Sindical IS NULL;")
+	cursor.execute("UPDATE Outorgantes_Actos SET ID_Organizacao_Patronal = ( SELECT ID FROM Org_Patronal WHERE ID LIKE SUBSTR(ID_Organizacao_Patronal,0,LENGTH(ID_Organizacao_Patronal)-1) ORDER BY ID DESC) WHERE ID_Organizacao_Patronal IS NULL;")
+	cursor.execute("DELETE FROM Outorgantes_Actos WHERE rowid NOT IN (SELECT MAX(rowid) from Outorgantes_Actos group by ID, ID_SEQUENCIAL, ANO, ID_Organizacao_Sindical, ID_Organizacao_Patronal, Sector );")
 
-	cursor.execute("""UPDATE Outorgantes_Actos SET ID_Organizacao_Sindical = ( SELECT ID_Organizacao_Sindical FROM Outorgantes_Actos O2 WHERE O2.ID_Organizacao_Sindical IS NOT NULL AND Outorgantes_Actos.ID=O2.ID AND Outorgantes_Actos.ID_SEQUENCIAL=O2.ID_SEQUENCIAL AND Outorgantes_Actos.Ano=O2.Ano) WHERE ID_Organizacao_Sindical IS NULL;""")
+	cursor.execute("UPDATE Outorgantes_Actos SET ID_Organizacao_Sindical = ( SELECT ID_Organizacao_Sindical FROM Outorgantes_Actos O2 WHERE O2.ID_Organizacao_Sindical IS NOT NULL AND Outorgantes_Actos.ID=O2.ID AND Outorgantes_Actos.ID_SEQUENCIAL=O2.ID_SEQUENCIAL AND Outorgantes_Actos.Ano=O2.Ano) WHERE ID_Organizacao_Sindical IS NULL;")
 
-	cursor.execute("""DELETE FROM Outorgantes_Actos WHERE rowid NOT IN (SELECT MAX(rowid) from Outorgantes_Actos group by ID, ID_SEQUENCIAL, ANO, ID_Organizacao_Sindical, ID_Organizacao_Patronal, Sector );""")
+	cursor.execute("DELETE FROM Outorgantes_Actos WHERE rowid NOT IN (SELECT MAX(rowid) from Outorgantes_Actos group by ID, ID_SEQUENCIAL, ANO, ID_Organizacao_Sindical, ID_Organizacao_Patronal, Sector );")
 
 
 	#Tabela temporaria para matching de mes com o numero do mes correspondente, usado na construcao das datas 
-	cursor.execute("""CREATE TABLE TEMP_MESES_NUMERO(Mes_EN VARCHAR(3), Mes_PT VARCHAR(3), Numero VARCHAR(2));""")
+	cursor.execute("CREATE TABLE TEMP_MESES_NUMERO(Mes_EN VARCHAR(3), Mes_PT VARCHAR(3), Numero VARCHAR(2));")
 
 	cursor.execute("""INSERT INTO TEMP_MESES_NUMERO (Mes_EN, Mes_PT, Numero)
 	VALUES
@@ -1805,67 +1588,67 @@ def repDatabase():
 
 
 	#Tratamento de caracteres acentuados e abreviaturas
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = trim(UPPER(Entidade_Sindical));""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'ç', 'Ç') WHERE instr(Entidade_Sindical, 'ç') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'ã', 'Ã') WHERE instr(Entidade_Sindical, 'ã') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'â', 'Â') WHERE instr(Entidade_Sindical, 'â') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'õ', 'Õ') WHERE instr(Entidade_Sindical, 'õ') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'ú', 'Ú') WHERE instr(Entidade_Sindical, 'ú') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'í', 'Í') WHERE instr(Entidade_Sindical, 'í') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'á', 'Á') WHERE instr(Entidade_Sindical, 'á') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'é', 'É') WHERE instr(Entidade_Sindical, 'é') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'ó', 'Ó') WHERE instr(Entidade_Sindical, 'ó') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'ê', 'Ê') WHERE instr(Entidade_Sindical, 'ê') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'CGTP-IN', 'CGTPIN') WHERE instr(Entidade_Sindical, 'CGTP-IN') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, ', SA', ', S.A.') WHERE instr(Entidade_Sindical, ', SA') > 0 AND instr(Entidade_Sindical, 'UNICER BEBIDAS') = 0 AND instr(Entidade_Sindical,'LISBOA, SANTARÉM E PORTALEGRE') = 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'TRAB. ', 'TRABALHADORES ') WHERE instr(Entidade_Sindical, 'TRAB. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'SIND. ', 'SINDICATO ') WHERE instr(Entidade_Sindical, 'SIND. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'IND. ', 'INDÚSTRIA ') WHERE instr(Entidade_Sindical, 'IND. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'FIG. ', 'FIGUEIRA ') WHERE instr(Entidade_Sindical, 'FIG. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'REST. ', 'RESTAURANTES ') WHERE instr(Entidade_Sindical, 'REST. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'EMP. ', 'EMPRESAS ') WHERE instr(Entidade_Sindical, 'EMP. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, ' EPE', ' E.P.E.') WHERE instr(Entidade_Sindical, ' EPE') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, ' E.M', ' E.M.') WHERE instr(Entidade_Sindical, ' E.M') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'QUADROS TÉCNICOS', 'QUADROS E TÉCNICOS') WHERE instr(Entidade_Sindical, 'QUADROS TÉCNICOS') > 0 AND instr(Entidade_Sindical, 'SENSIQ') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'CENTRO E NORTE', 'CENTRO NORTE') WHERE instr(Entidade_Sindical, 'CENTRO E NORTE') > 0 AND instr(Entidade_Sindical, 'SITE CENTRO NORTE') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'E CURTUMES', 'E CURTUMES DO DISTRITO DO PORTO') WHERE instr(Entidade_Sindical, 'SINTEVECC -') > 0 AND instr(Entidade_Sindical, 'E CURTUMES') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'SINTEVECC SUL -', 'SINTEVECC -') WHERE instr(Entidade_Sindical, 'SINTEVECC SUL -') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'CERAMICA', 'CERÂMICA') WHERE instr(Entidade_Sindical, 'CERAMICA') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'CÊRAMICA', 'CERÂMICA') WHERE instr(Entidade_Sindical, 'CÊRAMICA') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'VOO', 'VÔO') WHERE instr(Entidade_Sindical, 'VOO') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'SIND.', 'SINDICATO ') WHERE instr(Entidade_Sindical, 'SIND.') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'TRAB.', 'TRABALHADORES ') WHERE instr(Entidade_Sindical, 'TRAB.') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'IND.', 'INDÚSTRIAS ') WHERE instr(Entidade_Sindical, 'IND.') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'TRAB ', 'TRABALHADORES ') WHERE instr(Entidade_Sindical, 'TRAB ') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'SIND ', 'SINDICATO ') WHERE instr(Entidade_Sindical, 'SIND ') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'NAC. ', 'NACIONAL ') WHERE instr(Entidade_Sindical, 'NAC. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'NAC.', 'NACIONAL ') WHERE instr(Entidade_Sindical, 'NAC.') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'SIN. ', 'SINDICATO ') WHERE instr(Entidade_Sindical, 'SIN. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'SIN.', 'SINDICATO ') WHERE instr(Entidade_Sindical, 'SIN.') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'SIN ', 'SINDICATO ') WHERE instr(Entidade_Sindical, 'SIN ') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'SINDIC. ', 'SINDICATO ') WHERE instr(Entidade_Sindical, 'SINDIC. ') > 0;""") 
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'ASSOC. ', 'ASSOCIAÇÃO ') WHERE instr(Entidade_Sindical, 'ASSOC. ') > 0;""") 
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'ASSOC.', 'ASSOCIAÇÃO ') WHERE instr(Entidade_Sindical, 'ASSOC.') > 0;""") 
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'ASS. ', 'ASSOCIAÇÃO ') WHERE instr(Entidade_Sindical, 'ASS. ') > 0;""") 
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'ASS.', 'ASSOCIAÇÃO ') WHERE instr(Entidade_Sindical, 'ASS.') > 0;""") 
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'SOC. ', 'SOCIEDADE ') WHERE instr(Entidade_Sindical, 'SOC. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'SOC.', 'SOCIEDADE ') WHERE instr(Entidade_Sindical, 'SOC.') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'ADM. ', 'ADMINISTRAÇÕES ') WHERE instr(Entidade_Sindical, 'ADM. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'ADM.', 'ADMINISTRAÇÕES ') WHERE instr(Entidade_Sindical, 'ADM.') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'ESP.', 'ESPECTACULOS ') WHERE instr(Entidade_Sindical, 'ESP.') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'TRANSP. ', 'TRANSPORTES ') WHERE instr(Entidade_Sindical, 'TRANSP. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'TRANSP.', 'TRANSPORTES ') WHERE instr(Entidade_Sindical, 'TRANSP.') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'TEC. ', 'TÉCNICOS ') WHERE instr(Entidade_Sindical, 'TEC. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'TÉC. ', 'TÉCNICOS ') WHERE instr(Entidade_Sindical, 'TÉC. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'CONF. ', 'CONFERENTES ') WHERE instr(Entidade_Sindical, 'CONF. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'TER. ', 'TERMINAIS ') WHERE instr(Entidade_Sindical, 'TER. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'CONTENT. ', 'CONTENTORIZADA ') WHERE instr(Entidade_Sindical, 'CONTENT. ') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'REST.', 'RESTAURAÇÃO, ') WHERE instr(Entidade_Sindical, 'REST.') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'UNIPESSOAL.', 'UNIPESSOAL,') WHERE instr(Entidade_Sindical, 'UNIPESSOAL.') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'PROF.', 'PROFISSIONAIS') WHERE instr(Entidade_Sindical, 'PROF.') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'STOP', 'SINDICATO DE TODOS OS PROFESSORES') WHERE instr(Entidade_Sindical, 'STOP') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'S.TO.P', 'SINDICATO DE TODOS OS PROFESSORES') WHERE instr(Entidade_Sindical, 'S.TO.P') > 0;""")
-	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'ESTAB. ', 'ESTABELECIMENTOS ') WHERE instr(Entidade_Sindical, 'ESTAB. ') > 0;""")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = trim(UPPER(Entidade_Sindical));")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'ç', 'Ç') WHERE instr(Entidade_Sindical, 'ç') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'ã', 'Ã') WHERE instr(Entidade_Sindical, 'ã') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'â', 'Â') WHERE instr(Entidade_Sindical, 'â') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'õ', 'Õ') WHERE instr(Entidade_Sindical, 'õ') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'ú', 'Ú') WHERE instr(Entidade_Sindical, 'ú') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'í', 'Í') WHERE instr(Entidade_Sindical, 'í') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'á', 'Á') WHERE instr(Entidade_Sindical, 'á') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'é', 'É') WHERE instr(Entidade_Sindical, 'é') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'ó', 'Ó') WHERE instr(Entidade_Sindical, 'ó') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'ê', 'Ê') WHERE instr(Entidade_Sindical, 'ê') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'CGTP-IN', 'CGTPIN') WHERE instr(Entidade_Sindical, 'CGTP-IN') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, ', SA', ', S.A.') WHERE instr(Entidade_Sindical, ', SA') > 0 AND instr(Entidade_Sindical, 'UNICER BEBIDAS') = 0 AND instr(Entidade_Sindical,'LISBOA, SANTARÉM E PORTALEGRE') = 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'TRAB. ', 'TRABALHADORES ') WHERE instr(Entidade_Sindical, 'TRAB. ') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'SIND. ', 'SINDICATO ') WHERE instr(Entidade_Sindical, 'SIND. ') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'IND. ', 'INDÚSTRIA ') WHERE instr(Entidade_Sindical, 'IND. ') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'FIG. ', 'FIGUEIRA ') WHERE instr(Entidade_Sindical, 'FIG. ') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'REST. ', 'RESTAURANTES ') WHERE instr(Entidade_Sindical, 'REST. ') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'EMP. ', 'EMPRESAS ') WHERE instr(Entidade_Sindical, 'EMP. ') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, ' EPE', ' E.P.E.') WHERE instr(Entidade_Sindical, ' EPE') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, ' E.M', ' E.M.') WHERE instr(Entidade_Sindical, ' E.M') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'QUADROS TÉCNICOS', 'QUADROS E TÉCNICOS') WHERE instr(Entidade_Sindical, 'QUADROS TÉCNICOS') > 0 AND instr(Entidade_Sindical, 'SENSIQ') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'CENTRO E NORTE', 'CENTRO NORTE') WHERE instr(Entidade_Sindical, 'CENTRO E NORTE') > 0 AND instr(Entidade_Sindical, 'SITE CENTRO NORTE') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'E CURTUMES', 'E CURTUMES DO DISTRITO DO PORTO') WHERE instr(Entidade_Sindical, 'SINTEVECC -') > 0 AND instr(Entidade_Sindical, 'E CURTUMES') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'SINTEVECC SUL -', 'SINTEVECC -') WHERE instr(Entidade_Sindical, 'SINTEVECC SUL -') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'CERAMICA', 'CERÂMICA') WHERE instr(Entidade_Sindical, 'CERAMICA') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'CÊRAMICA', 'CERÂMICA') WHERE instr(Entidade_Sindical, 'CÊRAMICA') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'VOO', 'VÔO') WHERE instr(Entidade_Sindical, 'VOO') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'SIND.', 'SINDICATO ') WHERE instr(Entidade_Sindical, 'SIND.') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'TRAB.', 'TRABALHADORES ') WHERE instr(Entidade_Sindical, 'TRAB.') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'IND.', 'INDÚSTRIAS ') WHERE instr(Entidade_Sindical, 'IND.') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'TRAB ', 'TRABALHADORES ') WHERE instr(Entidade_Sindical, 'TRAB ') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'SIND ', 'SINDICATO ') WHERE instr(Entidade_Sindical, 'SIND ') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'NAC. ', 'NACIONAL ') WHERE instr(Entidade_Sindical, 'NAC. ') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'NAC.', 'NACIONAL ') WHERE instr(Entidade_Sindical, 'NAC.') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'SIN. ', 'SINDICATO ') WHERE instr(Entidade_Sindical, 'SIN. ') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'SIN.', 'SINDICATO ') WHERE instr(Entidade_Sindical, 'SIN.') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'SIN ', 'SINDICATO ') WHERE instr(Entidade_Sindical, 'SIN ') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'SINDIC. ', 'SINDICATO ') WHERE instr(Entidade_Sindical, 'SINDIC. ') > 0;") 
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'ASSOC. ', 'ASSOCIAÇÃO ') WHERE instr(Entidade_Sindical, 'ASSOC. ') > 0;") 
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'ASSOC.', 'ASSOCIAÇÃO ') WHERE instr(Entidade_Sindical, 'ASSOC.') > 0;") 
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'ASS. ', 'ASSOCIAÇÃO ') WHERE instr(Entidade_Sindical, 'ASS. ') > 0;") 
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'ASS.', 'ASSOCIAÇÃO ') WHERE instr(Entidade_Sindical, 'ASS.') > 0;") 
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'SOC. ', 'SOCIEDADE ') WHERE instr(Entidade_Sindical, 'SOC. ') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'SOC.', 'SOCIEDADE ') WHERE instr(Entidade_Sindical, 'SOC.') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'ADM. ', 'ADMINISTRAÇÕES ') WHERE instr(Entidade_Sindical, 'ADM. ') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'ADM.', 'ADMINISTRAÇÕES ') WHERE instr(Entidade_Sindical, 'ADM.') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'ESP.', 'ESPECTACULOS ') WHERE instr(Entidade_Sindical, 'ESP.') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'TRANSP. ', 'TRANSPORTES ') WHERE instr(Entidade_Sindical, 'TRANSP. ') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'TRANSP.', 'TRANSPORTES ') WHERE instr(Entidade_Sindical, 'TRANSP.') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'TEC. ', 'TÉCNICOS ') WHERE instr(Entidade_Sindical, 'TEC. ') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'TÉC. ', 'TÉCNICOS ') WHERE instr(Entidade_Sindical, 'TÉC. ') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'CONF. ', 'CONFERENTES ') WHERE instr(Entidade_Sindical, 'CONF. ') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'TER. ', 'TERMINAIS ') WHERE instr(Entidade_Sindical, 'TER. ') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'CONTENT. ', 'CONTENTORIZADA ') WHERE instr(Entidade_Sindical, 'CONTENT. ') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'REST.', 'RESTAURAÇÃO, ') WHERE instr(Entidade_Sindical, 'REST.') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'UNIPESSOAL.', 'UNIPESSOAL,') WHERE instr(Entidade_Sindical, 'UNIPESSOAL.') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'PROF.', 'PROFISSIONAIS') WHERE instr(Entidade_Sindical, 'PROF.') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'STOP', 'SINDICATO DE TODOS OS PROFESSORES') WHERE instr(Entidade_Sindical, 'STOP') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'S.TO.P', 'SINDICATO DE TODOS OS PROFESSORES') WHERE instr(Entidade_Sindical, 'S.TO.P') > 0;")
+	cursor.execute("UPDATE TEMP_AVISOS_GREVE_2 SET Entidade_Sindical = replace(Entidade_Sindical, 'ESTAB. ', 'ESTABELECIMENTOS ') WHERE instr(Entidade_Sindical, 'ESTAB. ') > 0;")
 
 	#atribuicao de id aos registos cuja entidade sindical satisfaz as condicoes relativas a tabela Org_Sindical
 	cursor.execute("""UPDATE TEMP_AVISOS_GREVE_2 SET Id_Entidade_Sindical = (SELECT ID FROM Org_Sindical o WHERE 
@@ -1910,73 +1693,73 @@ def repDatabase():
 		FROM TEMP_AVISOS_GREVE_2;""")
 
 
-	cursor.execute("""DROP VIEW TEMP_DATAS_ENTIDADES;""")
-	cursor.execute("""DROP TABLE TEMP_ALTERACOES_ESTATUTOS;""")
-	cursor.execute("""DROP TABLE TEMP_ALTERACOES_ESTATUTOS1;""")
-	cursor.execute("""DROP TABLE TEMP_ELEICAO_CORPOS_GERENTES;""")
-	cursor.execute("""DROP TABLE TEMP_ELEICAO_CORPOS_GERENTES1;""")
-	cursor.execute("""DROP TABLE TEMP_ENTIDADES1;""")
-	cursor.execute("""DROP TABLE TEMP_ENTIDADES;""")
-	cursor.execute("""DROP TABLE TEMP_PROCESSOS1;""")
-	cursor.execute("""DROP TABLE TEMP_PROCESSOS;""")
-	cursor.execute("""DROP TABLE TEMP_IRCT;""")
-	cursor.execute("""DROP TABLE TEMP_OUTORGANTES;""")
-	cursor.execute("""DROP TABLE TEMP_AVISOS_GREVE1;""")
-	cursor.execute("""DROP TABLE TEMP_AVISOS_GREVE2;""")
-	cursor.execute("""DROP TABLE TEMP_MESES_NUMERO;""")
-	cursor.execute("""DROP TABLE TEMP_AVISOS_GREVE;""")
-	cursor.execute("""DROP TABLE TEMP_AVISOS_GREVE_2;""")
-	cursor.execute("""DROP TABLE TEMP_WEBSITES_SINDICAIS;""")
-	cursor.execute("""DROP TABLE TEMP_WEBSITES_PATRONAIS;""")
+	cursor.execute("DROP VIEW TEMP_DATAS_ENTIDADES;")
+	cursor.execute("DROP TABLE TEMP_ALTERACOES_ESTATUTOS;")
+	cursor.execute("DROP TABLE TEMP_ALTERACOES_ESTATUTOS1;")
+	cursor.execute("DROP TABLE TEMP_ELEICAO_CORPOS_GERENTES;")
+	cursor.execute("DROP TABLE TEMP_ELEICAO_CORPOS_GERENTES1;")
+	cursor.execute("DROP TABLE TEMP_ENTIDADES1;")
+	cursor.execute("DROP TABLE TEMP_ENTIDADES;")
+	cursor.execute("DROP TABLE TEMP_PROCESSOS1;")
+	cursor.execute("DROP TABLE TEMP_PROCESSOS;")
+	cursor.execute("DROP TABLE TEMP_IRCT;")
+	cursor.execute("DROP TABLE TEMP_OUTORGANTES;")
+	cursor.execute("DROP TABLE TEMP_AVISOS_GREVE1;")
+	cursor.execute("DROP TABLE TEMP_AVISOS_GREVE2;")
+	cursor.execute("DROP TABLE TEMP_MESES_NUMERO;")
+	cursor.execute("DROP TABLE TEMP_AVISOS_GREVE;")
+	cursor.execute("DROP TABLE TEMP_AVISOS_GREVE_2;")
+	cursor.execute("DROP TABLE TEMP_WEBSITES_SINDICAIS;")
+	cursor.execute("DROP TABLE TEMP_WEBSITES_PATRONAIS;")
 
-	cursor.execute("""CREATE TABLE CAE_SECCOES_TEMP( SECCAO CHAR(1) PRIMARY KEY , RANK INTEGER, TITLE VARCHAR(100) , SALARY FLOAT );""")
-	cursor.execute("""CREATE TABLE CAE_SECCOES_KEYWORDS_TEMP( SECCAO CHAR(1) , KEYWORD VARCHAR(100) , FOREIGN KEY(SECCAO) REFERENCES CAE_SECCOES_TEMP );""")
+	cursor.execute("CREATE TABLE CAE_SECCOES_TEMP( SECCAO CHAR(1) PRIMARY KEY , RANK INTEGER, TITLE VARCHAR(100) , SALARY FLOAT );")
+	cursor.execute("CREATE TABLE CAE_SECCOES_KEYWORDS_TEMP( SECCAO CHAR(1) , KEYWORD VARCHAR(100) , FOREIGN KEY(SECCAO) REFERENCES CAE_SECCOES_TEMP );")
 
-	cursor.execute("""INSERT INTO CAE_SECCOES_TEMP VALUES ( 'A' , 1, 'AGRICULTURA, PRODUÇÃO ANIMAL, CAÇA, FLORESTA E PESCA', 726.3);""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_TEMP VALUES ( 'B' , 2, 'INDÚSTRIAS EXTRACTIVAS', 867.2);""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_TEMP VALUES ( 'C' , 2, 'INDÚSTRIAS TRANSFORMADORAS', 868.5);""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_TEMP VALUES ( 'D' , 2, 'ELECTRICIDADE, GÁS, VAPOR, ÁGUA QUENTE E FRIA E AR FRIO', 867.2);""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_TEMP VALUES ( 'E' , 2, 'CAPTAÇÃO, TRATAMENTO E DISTRIBUIÇÃO DE ÁGUA; SANEAMENTO GESTÃO DE RESÍDUOS E DESPOLUIÇÃO', NULL);""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_TEMP VALUES ( 'F' , 2, 'CONSTRUÇÃO', 798.3);""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_TEMP VALUES ( 'G' , 3, 'COMÉRCIO POR GROSSO E A RETALHO; REPARAÇÃO DE VEÍCULOS AUTOMÓVEIS E MOTOCICLOS', NULL);""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_TEMP VALUES ( 'H' , 2, 'TRANSPORTES E ARMAZENAGEM', NULL);""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_TEMP VALUES ( 'I' , 3, 'ALOJAMENTO, RESTAURAÇÃO E SIMILARES', NULL);""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_TEMP VALUES ( 'J' , 3, 'ACTIVIDADES DE INFORMAÇÃO E DE COMUNICAÇÃO', NULL);""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_TEMP VALUES ( 'K' , 3, 'ACTIVIDADES FINANCEIRAS E DE SEGUROS', NULL);""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_TEMP VALUES ( 'L' , 3, 'ACTIVIDADES IMOBILIÁRIAS', NULL);""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_TEMP VALUES ( 'M' , 3, 'ACTIVIDADES DE CONSULTORIA, CIENTÍFICAS, TÉCNICAS E SIMILARES', NULL);""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_TEMP VALUES ( 'N' , 3, 'ACTIVIDADES ADMINISTRATIVAS E DOS SERVIÇOS DE APOIO', 953.7);""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_TEMP VALUES ( 'O' , 3, 'ADMINISTRAÇÃO PÚBLICA E DEFESA; SEGURANÇA SOCIAL OBRIGATÓRIA', NULL);""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_TEMP VALUES ( 'P' , 3, 'EDUCAÇÃO', NULL);""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_TEMP VALUES ( 'Q' , 3, 'ACTIVIDADES DE SAÚDE HUMANA E APOIO SOCIAL', NULL);""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_TEMP VALUES ( 'R' , 3, 'ACTIVIDADES ARTÍSTICAS, DE ESPECTÁCULOS, DESPORTIVAS E RECREATIVAS', NULL);""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_TEMP VALUES ( 'S' , 3, 'OUTRAS ACTIVIDADES DE SERVIÇOS', NULL);""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_TEMP VALUES ( 'T' , 3, 'ACTIVIDADES DAS FAMÍLIAS EMPREGADORAS DE PESSOAL DOMÉSTICO E ACTIVIDADES DE PRODUÇÃO DAS FAMÍLIAS PARA USO PRÓPRIO', NULL);""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_TEMP VALUES ( 'U' , 3, 'ACTIVIDADES DOS ORGANISMOS INTERNACIONAIS E OUTRAS INSTITUIÇÕES EXTRA-TERRITORIAIS', NULL);""")
+	cursor.execute("INSERT INTO CAE_SECCOES_TEMP VALUES ( 'A' , 1, 'AGRICULTURA, PRODUÇÃO ANIMAL, CAÇA, FLORESTA E PESCA', 726.3);")
+	cursor.execute("INSERT INTO CAE_SECCOES_TEMP VALUES ( 'B' , 2, 'INDÚSTRIAS EXTRACTIVAS', 867.2);")
+	cursor.execute("INSERT INTO CAE_SECCOES_TEMP VALUES ( 'C' , 2, 'INDÚSTRIAS TRANSFORMADORAS', 868.5);")
+	cursor.execute("INSERT INTO CAE_SECCOES_TEMP VALUES ( 'D' , 2, 'ELECTRICIDADE, GÁS, VAPOR, ÁGUA QUENTE E FRIA E AR FRIO', 867.2);")
+	cursor.execute("INSERT INTO CAE_SECCOES_TEMP VALUES ( 'E' , 2, 'CAPTAÇÃO, TRATAMENTO E DISTRIBUIÇÃO DE ÁGUA; SANEAMENTO GESTÃO DE RESÍDUOS E DESPOLUIÇÃO', NULL);")
+	cursor.execute("INSERT INTO CAE_SECCOES_TEMP VALUES ( 'F' , 2, 'CONSTRUÇÃO', 798.3);")
+	cursor.execute("INSERT INTO CAE_SECCOES_TEMP VALUES ( 'G' , 3, 'COMÉRCIO POR GROSSO E A RETALHO; REPARAÇÃO DE VEÍCULOS AUTOMÓVEIS E MOTOCICLOS', NULL);")
+	cursor.execute("INSERT INTO CAE_SECCOES_TEMP VALUES ( 'H' , 2, 'TRANSPORTES E ARMAZENAGEM', NULL);")
+	cursor.execute("INSERT INTO CAE_SECCOES_TEMP VALUES ( 'I' , 3, 'ALOJAMENTO, RESTAURAÇÃO E SIMILARES', NULL);")
+	cursor.execute("INSERT INTO CAE_SECCOES_TEMP VALUES ( 'J' , 3, 'ACTIVIDADES DE INFORMAÇÃO E DE COMUNICAÇÃO', NULL);")
+	cursor.execute("INSERT INTO CAE_SECCOES_TEMP VALUES ( 'K' , 3, 'ACTIVIDADES FINANCEIRAS E DE SEGUROS', NULL);")
+	cursor.execute("INSERT INTO CAE_SECCOES_TEMP VALUES ( 'L' , 3, 'ACTIVIDADES IMOBILIÁRIAS', NULL);")
+	cursor.execute("INSERT INTO CAE_SECCOES_TEMP VALUES ( 'M' , 3, 'ACTIVIDADES DE CONSULTORIA, CIENTÍFICAS, TÉCNICAS E SIMILARES', NULL);")
+	cursor.execute("INSERT INTO CAE_SECCOES_TEMP VALUES ( 'N' , 3, 'ACTIVIDADES ADMINISTRATIVAS E DOS SERVIÇOS DE APOIO', 953.7);")
+	cursor.execute("INSERT INTO CAE_SECCOES_TEMP VALUES ( 'O' , 3, 'ADMINISTRAÇÃO PÚBLICA E DEFESA; SEGURANÇA SOCIAL OBRIGATÓRIA', NULL);")
+	cursor.execute("INSERT INTO CAE_SECCOES_TEMP VALUES ( 'P' , 3, 'EDUCAÇÃO', NULL);")
+	cursor.execute("INSERT INTO CAE_SECCOES_TEMP VALUES ( 'Q' , 3, 'ACTIVIDADES DE SAÚDE HUMANA E APOIO SOCIAL', NULL);")
+	cursor.execute("INSERT INTO CAE_SECCOES_TEMP VALUES ( 'R' , 3, 'ACTIVIDADES ARTÍSTICAS, DE ESPECTÁCULOS, DESPORTIVAS E RECREATIVAS', NULL);")
+	cursor.execute("INSERT INTO CAE_SECCOES_TEMP VALUES ( 'S' , 3, 'OUTRAS ACTIVIDADES DE SERVIÇOS', NULL);")
+	cursor.execute("INSERT INTO CAE_SECCOES_TEMP VALUES ( 'T' , 3, 'ACTIVIDADES DAS FAMÍLIAS EMPREGADORAS DE PESSOAL DOMÉSTICO E ACTIVIDADES DE PRODUÇÃO DAS FAMÍLIAS PARA USO PRÓPRIO', NULL);")
+	cursor.execute("INSERT INTO CAE_SECCOES_TEMP VALUES ( 'U' , 3, 'ACTIVIDADES DOS ORGANISMOS INTERNACIONAIS E OUTRAS INSTITUIÇÕES EXTRA-TERRITORIAIS', NULL);")
 
-	cursor.execute("""INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'A' , 'AGRICULTURA'), ( 'A' , 'PRODUÇÃO ANIMAL'), ( 'A' , 'CAÇA'), ( 'A' , 'FLORESTA'), ( 'A' , 'PESCA');""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'B' , 'INDÚSTRIAS EXTRACTIVAS'), ( 'B' , 'MINAS');""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'C' , 'INDÚSTRIAS TRANSFORMADORAS'), ( 'C' , 'TEXTEIS'), ( 'B' , 'TÊXT');""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'D' , 'ELECTRICIDADE'), ( 'D' , 'GÁS'), ( 'D' , 'VAPOR'), ( 'D' , 'ÁGUA QUENTE E FRIA'), ( 'D' , 'AR FRIO');""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'E' , 'ÁGUA'), ( 'E' , 'SANEAMENTO'), ( 'E' , 'RESÍDUOS'), ( 'E' , 'DESPOLUIÇÃO');""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'F' , 'CONSTRUÇÃO');""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'G' , 'COMÉRCIO'), ( 'G' , 'REPARAÇÃO DE VEÍCULOS AUTOMÓVEIS'), ( 'G' , 'REPARAÇÃO DE MOTOCICLOS');""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'H' , 'TRANSPORTES'), ( 'H' , 'ARMAZENAGEM');""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'I' , 'ALOJAMENTO'), ( 'I' , 'RESTAURAÇÃO'), ( 'I' , 'HOTEL');""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'J' , 'INFORMAÇÃO E COMUNICAÇÃO'), ( 'J' , 'JORNAL');""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'K' , 'FINANÇAS'), ( 'K' , 'SEGUROS');""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'L' , 'IMOBILIÁRI');""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'M' , 'CONSULTORIA TÉCNICA'), ( 'M' , 'CIENTÍ'), ( 'M' , 'CIÊNT́'), ( 'M' , 'CIÊNCIA');""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'N' , 'ACTIVIDADES ADMINISTRATIVAS'), ( 'N' , 'SERVIÇOS');""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'O' , 'ADMINISTRAÇÃO PÚBLICA'), ( 'O' , 'DEFESA'), ( 'O' , 'POLÍCIA'), ( 'O' , 'SEGURANÇA PÚBLICA'), ( 'O' , 'SEGURANÇA SOCIAL');""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'P' , 'EDUCAÇÃO'), ( 'P' , 'PROFESSORES');""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'Q' , 'SAÚDE'), ( 'Q' , 'MEDICOS'), ( 'Q' , 'ENFERMEIROS'), ( 'Q' , 'APOIO SOCIAL');""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'R' , 'ARTÍST'), ( 'R' , 'ESPECTÁCULOS'), ( 'R' , 'DESPORTI'), ( 'R' , 'RECREATIV');""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'S' , 'OUTROS SERVIÇOS');""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'T' , 'PESSOAL DOMÉSTICO');""")
-	cursor.execute("""INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'U' , 'ORGANISMOS INTERNACIONAIS'), ( 'U' , 'INSTITUIÇÕES EXTRA-TERRITORIAIS');""")
+	cursor.execute("INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'A' , 'AGRICULTURA'), ( 'A' , 'PRODUÇÃO ANIMAL'), ( 'A' , 'CAÇA'), ( 'A' , 'FLORESTA'), ( 'A' , 'PESCA');")
+	cursor.execute("INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'B' , 'INDÚSTRIAS EXTRACTIVAS'), ( 'B' , 'MINAS');")
+	cursor.execute("INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'C' , 'INDÚSTRIAS TRANSFORMADORAS'), ( 'C' , 'TEXTEIS'), ( 'B' , 'TÊXT');")
+	cursor.execute("INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'D' , 'ELECTRICIDADE'), ( 'D' , 'GÁS'), ( 'D' , 'VAPOR'), ( 'D' , 'ÁGUA QUENTE E FRIA'), ( 'D' , 'AR FRIO');")
+	cursor.execute("INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'E' , 'ÁGUA'), ( 'E' , 'SANEAMENTO'), ( 'E' , 'RESÍDUOS'), ( 'E' , 'DESPOLUIÇÃO');")
+	cursor.execute("INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'F' , 'CONSTRUÇÃO');")
+	cursor.execute("INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'G' , 'COMÉRCIO'), ( 'G' , 'REPARAÇÃO DE VEÍCULOS AUTOMÓVEIS'), ( 'G' , 'REPARAÇÃO DE MOTOCICLOS');")
+	cursor.execute("INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'H' , 'TRANSPORTES'), ( 'H' , 'ARMAZENAGEM');")
+	cursor.execute("INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'I' , 'ALOJAMENTO'), ( 'I' , 'RESTAURAÇÃO'), ( 'I' , 'HOTEL');")
+	cursor.execute("INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'J' , 'INFORMAÇÃO E COMUNICAÇÃO'), ( 'J' , 'JORNAL');")
+	cursor.execute("INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'K' , 'FINANÇAS'), ( 'K' , 'SEGUROS');")
+	cursor.execute("INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'L' , 'IMOBILIÁRI');")
+	cursor.execute("INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'M' , 'CONSULTORIA TÉCNICA'), ( 'M' , 'CIENTÍ'), ( 'M' , 'CIÊNT́'), ( 'M' , 'CIÊNCIA');")
+	cursor.execute("INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'N' , 'ACTIVIDADES ADMINISTRATIVAS'), ( 'N' , 'SERVIÇOS');")
+	cursor.execute("INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'O' , 'ADMINISTRAÇÃO PÚBLICA'), ( 'O' , 'DEFESA'), ( 'O' , 'POLÍCIA'), ( 'O' , 'SEGURANÇA PÚBLICA'), ( 'O' , 'SEGURANÇA SOCIAL');")
+	cursor.execute("INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'P' , 'EDUCAÇÃO'), ( 'P' , 'PROFESSORES');")
+	cursor.execute("INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'Q' , 'SAÚDE'), ( 'Q' , 'MEDICOS'), ( 'Q' , 'ENFERMEIROS'), ( 'Q' , 'APOIO SOCIAL');")
+	cursor.execute("INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'R' , 'ARTÍST'), ( 'R' , 'ESPECTÁCULOS'), ( 'R' , 'DESPORTI'), ( 'R' , 'RECREATIV');")
+	cursor.execute("INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'S' , 'OUTROS SERVIÇOS');")
+	cursor.execute("INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'T' , 'PESSOAL DOMÉSTICO');")
+	cursor.execute("INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'U' , 'ORGANISMOS INTERNACIONAIS'), ( 'U' , 'INSTITUIÇÕES EXTRA-TERRITORIAIS');")
 
-	cursor.execute("""INSERT INTO Sectores_Profissionais SELECT TITLE AS Sector, NULL, SALARY AS Salario_Medio FROM CAE_SECCOES_TEMP;""")
+	cursor.execute("INSERT INTO Sectores_Profissionais SELECT TITLE AS Sector, NULL, SALARY AS Salario_Medio FROM CAE_SECCOES_TEMP;")
 
 	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="ADMINISTRATIVAS E SERVIÇOS DE APOIO" WHERE Sector = "ACTIVIDADES ADMINISTRATIVAS E DOS SERVIÇOS DE APOIO";""")
 	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="ARTÍSTICAS, ESPECTÁCULOS, DESPORTIVAS E RECREATIVAS" WHERE Sector = "ACTIVIDADES ARTÍSTICAS, DE ESPECTÁCULOS, DESPORTIVAS E RECREATIVAS";""")
@@ -2000,15 +1783,15 @@ def repDatabase():
 	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="OUTRAS ACTIVIDADES DE SERVIÇOS" WHERE Sector = "OUTRAS ACTIVIDADES DE SERVIÇOS";""")
 	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="TRANSPORTES E ARMAZENAGEM" WHERE Sector = "TRANSPORTES E ARMAZENAGEM";""")
 
-	cursor.execute("""UPDATE Org_Sindical SET Sector=(SELECT DISTINCT Sector FROM Outorgantes_Actos WHERE Outorgantes_Actos.ID_Organizacao_Sindical=Org_Sindical.ID);""")
-	cursor.execute("""UPDATE Org_Patronal SET Sector=(SELECT DISTINCT Sector FROM Outorgantes_Actos WHERE Outorgantes_Actos.ID_Organizacao_Patronal=Org_Patronal.ID);""")
+	cursor.execute("UPDATE Org_Sindical SET Sector=(SELECT DISTINCT Sector FROM Outorgantes_Actos WHERE Outorgantes_Actos.ID_Organizacao_Sindical=Org_Sindical.ID);")
+	cursor.execute("UPDATE Org_Patronal SET Sector=(SELECT DISTINCT Sector FROM Outorgantes_Actos WHERE Outorgantes_Actos.ID_Organizacao_Patronal=Org_Patronal.ID);")
 
-	cursor.execute("""DROP TABLE CAE_SECCOES_KEYWORDS_TEMP;""")
-	cursor.execute("""DROP TABLE CAE_SECCOES_TEMP;""")
+	cursor.execute("DROP TABLE CAE_SECCOES_KEYWORDS_TEMP;")
+	cursor.execute("DROP TABLE CAE_SECCOES_TEMP;")
 
 	municipios_codigosPostais(cursor)
 
-	cursor.execute("""CREATE TABLE TEMP_MCP( DESIG VARCHAR(1000) , CP VARCHAR(9) );""")
+	cursor.execute("CREATE TABLE TEMP_MCP( DESIG VARCHAR(1000) , CP VARCHAR(9) );")
 
 	cursor.execute("""INSERT INTO TEMP_MCP 
 	 SELECT DESIG, CP4 || '-' || CP3 || '-' AS CP FROM TEMP_MUNICIPIOS NATURAL JOIN TEMP_CP 
@@ -2017,49 +1800,49 @@ def repDatabase():
 	UNION
 	 SELECT DESIG, CP4 || '-' AS CP FROM TEMP_MUNICIPIOS NATURAL JOIN TEMP_CP;""")
 
-	cursor.execute("""UPDATE Org_Sindical SET Codigo_Postal=Codigo_Postal || '-' WHERE Codigo_Postal IS NOT NULL AND NOT(substr(Codigo_Postal, -1)='-');""")
-	cursor.execute("""UPDATE Org_Patronal SET Codigo_Postal=Codigo_Postal || '-' WHERE Codigo_Postal IS NOT NULL AND NOT(substr(Codigo_Postal, -1)='-');""")
+	cursor.execute("UPDATE Org_Sindical SET Codigo_Postal=Codigo_Postal || '-' WHERE Codigo_Postal IS NOT NULL AND NOT(substr(Codigo_Postal, -1)='-');")
+	cursor.execute("UPDATE Org_Patronal SET Codigo_Postal=Codigo_Postal || '-' WHERE Codigo_Postal IS NOT NULL AND NOT(substr(Codigo_Postal, -1)='-');")
 
-	cursor.execute("""CREATE INDEX TMPIDX1 ON Org_Sindical(Codigo_Postal);""")
-	cursor.execute("""CREATE INDEX TMPIDX2 ON Org_Patronal(Codigo_Postal);""")
-	cursor.execute("""CREATE INDEX TMPIDX3 ON TEMP_MCP(CP);""")
+	cursor.execute("CREATE INDEX TMPIDX1 ON Org_Sindical(Codigo_Postal);")
+	cursor.execute("CREATE INDEX TMPIDX2 ON Org_Patronal(Codigo_Postal);")
+	cursor.execute("CREATE INDEX TMPIDX3 ON TEMP_MCP(CP);")
 
-	cursor.execute("""UPDATE Org_Sindical SET Concelho_Sede=(SELECT DISTINCT UPPER(DESIG) FROM TEMP_MCP WHERE Codigo_Postal = CP);""")
-	cursor.execute("""UPDATE Org_Patronal SET Concelho_Sede=(SELECT DISTINCT UPPER(DESIG) FROM TEMP_MCP WHERE Codigo_Postal = CP);""")
-	cursor.execute("""UPDATE Org_Sindical SET Codigo_Postal=SUBSTR(Codigo_Postal, 0, LENGTH(Codigo_Postal)) WHERE Codigo_Postal IS NOT NULL AND substr(Codigo_Postal, -1)='-';""")
-	cursor.execute("""UPDATE Org_Patronal SET Codigo_Postal=SUBSTR(Codigo_Postal, 0, LENGTH(Codigo_Postal)) WHERE Codigo_Postal IS NOT NULL AND substr(Codigo_Postal, -1)='-';""")
-	cursor.execute("""UPDATE Org_Sindical SET Codigo_Postal=SUBSTR(Codigo_Postal, 0, 4) || '-' || SUBSTR(Codigo_Postal, 5, 3) WHERE Codigo_Postal IS NOT NULL AND instr(Codigo_Postal,'-') <= 0 AND LENGTH(Codigo_Postal)=7;""")
-	cursor.execute("""UPDATE Org_Patronal SET Codigo_Postal=SUBSTR(Codigo_Postal, 0, 4) || '-' || SUBSTR(Codigo_Postal, 5, 3) WHERE Codigo_Postal IS NOT NULL AND instr(Codigo_Postal,'-') <= 0 AND LENGTH(Codigo_Postal)=7;""")
+	cursor.execute("UPDATE Org_Sindical SET Concelho_Sede=(SELECT DISTINCT UPPER(DESIG) FROM TEMP_MCP WHERE Codigo_Postal = CP);")
+	cursor.execute("UPDATE Org_Patronal SET Concelho_Sede=(SELECT DISTINCT UPPER(DESIG) FROM TEMP_MCP WHERE Codigo_Postal = CP);")
+	cursor.execute("UPDATE Org_Sindical SET Codigo_Postal=SUBSTR(Codigo_Postal, 0, LENGTH(Codigo_Postal)) WHERE Codigo_Postal IS NOT NULL AND substr(Codigo_Postal, -1)='-';")
+	cursor.execute("UPDATE Org_Patronal SET Codigo_Postal=SUBSTR(Codigo_Postal, 0, LENGTH(Codigo_Postal)) WHERE Codigo_Postal IS NOT NULL AND substr(Codigo_Postal, -1)='-';")
+	cursor.execute("UPDATE Org_Sindical SET Codigo_Postal=SUBSTR(Codigo_Postal, 0, 4) || '-' || SUBSTR(Codigo_Postal, 5, 3) WHERE Codigo_Postal IS NOT NULL AND instr(Codigo_Postal,'-') <= 0 AND LENGTH(Codigo_Postal)=7;")
+	cursor.execute("UPDATE Org_Patronal SET Codigo_Postal=SUBSTR(Codigo_Postal, 0, 4) || '-' || SUBSTR(Codigo_Postal, 5, 3) WHERE Codigo_Postal IS NOT NULL AND instr(Codigo_Postal,'-') <= 0 AND LENGTH(Codigo_Postal)=7;")
 
 	#PREENCHE A TABELA DA DIRECCAO_ORG_SINDICAL
 	listasDirigentes(cursor)
 
-	cursor.execute("""DROP INDEX TMPIDX1;""")
-	cursor.execute("""DROP INDEX TMPIDX2;""")
-	cursor.execute("""DROP INDEX TMPIDX3;""")
-	cursor.execute("""DROP TABLE TEMP_MCP;""")
-	cursor.execute("""DROP TABLE TEMP_MUNICIPIOS;""")
-	cursor.execute("""DROP TABLE TEMP_CP;""")
+	cursor.execute("DROP INDEX TMPIDX1;")
+	cursor.execute("DROP INDEX TMPIDX2;")
+	cursor.execute("DROP INDEX TMPIDX3;")
+	cursor.execute("DROP TABLE TEMP_MCP;")
+	cursor.execute("DROP TABLE TEMP_MUNICIPIOS;")
+	cursor.execute("DROP TABLE TEMP_CP;")
 
 	stats = {}
 
-	cursorObj = cursor.execute("""SELECT * FROM Org_Sindical;""") 
+	cursorObj = cursor.execute("SELECT * FROM Org_Sindical;") 
 
 	stats['Org Sindicais'] = len(cursorObj.fetchall())
 
-	cursorObj = cursor.execute("""SELECT * FROM Org_Patronal;""")
+	cursorObj = cursor.execute("SELECT * FROM Org_Patronal;")
 
 	stats['Org Patronais'] = len(cursorObj.fetchall())
 
-	cursorObj = cursor.execute("""SELECT * FROM Outorgantes_Actos;""")
+	cursorObj = cursor.execute("SELECT * FROM Outorgantes_Actos;")
 
 	stats['Actos Outorgantes'] = len(cursorObj.fetchall())
 
-	cursorObj = cursor.execute("""SELECT * FROM Actos_Eleitorais_Org_Sindical;""")
+	cursorObj = cursor.execute("SELECT * FROM Actos_Eleitorais_Org_Sindical;")
 
 	stats['Actos Eleitorais Org Sindicais'] = len(cursorObj.fetchall())
 
-	cursorObj = cursor.execute("""SELECT * FROM Actos_Negociacao_Colectiva;""")
+	cursorObj = cursor.execute("SELECT * FROM Actos_Negociacao_Colectiva;")
 
 	stats['Actos Negociação Colectiva'] = len(cursorObj.fetchall())
 

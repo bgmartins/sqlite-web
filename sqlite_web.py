@@ -604,6 +604,7 @@ class SqliteDataSet(DataSet):
     
 
     def table_toExcel(self, table, org, setor, distrito):
+        registos = []
         colunas = []
         linhas = []
         
@@ -654,17 +655,21 @@ class SqliteDataSet(DataSet):
 
             colunas.append(cols[0])
 
+        print(colunas[18])
+
         for row in cursor.fetchall():
             linhas.append(list(row))
 
+        # 18 é a coluna do Estado
         for i in range(len(linhas)):
             for j in range(len(linhas[i])):
-                if linhas[i][j] is None:
-                    linhas[i][j] = ""
-                elif linhas[i][j] == 1:
-                    linhas[i][j] = "Ativa"
-                elif linhas[i][j] == 0:
-                    linhas[i][j] = "Inativa"
+                if j == 18:
+                    if linhas[i][j] is None:
+                        linhas[i][j] = ""
+                    elif linhas[i][j] == 1:
+                        linhas[i][j] = "Ativa"
+                    elif linhas[i][j] == 0:
+                        linhas[i][j] = "Inativa"
         
         return pd.DataFrame(linhas, columns=colunas)
 
@@ -724,10 +729,16 @@ class SqliteDataSet(DataSet):
 #
 # Flask views.
 #
-
 @app.route('/')
-def index():
-    return render_template('index.html', sqlite=sqlite3)
+def welcome_page():
+    return render_template('welcome_page.html', sqlite=sqlite3)
+
+
+@app.route('/admin-panel/', methods=['GET'])
+def admin_panel():
+    return render_template('admin_panel.html', sqlite=sqlite3)
+
+
 
 @app.route('/export/', methods=['GET'])
 def export():
@@ -751,20 +762,21 @@ def export():
              as_attachment=True)
 
 
-@app.route('/login/', methods=['GET', 'POST'])
-def login():  
+@app.route('/dashboard/', methods=['GET', 'POST'])
+def dashboard():  
     if request.method == 'POST':
         if request.form.get('password') == app.config['PASSWORD']:
             session['authorized'] = True
-            return redirect(session.get('next_url') or url_for('index'))
+            return redirect(url_for('admin_panel'))
         flash('The password you entered is incorrect.', 'danger')
-    return render_template('login.html')
+        return render_template('welcome_page.html')
+    return render_template('dashboard.html')
 
 
 @app.route('/logout/', methods=['GET'])
 def logout():
     session.pop('authorized', None)
-    return redirect(url_for('login'))
+    return redirect(url_for('welcome_page'))
 
 def require_table(fn):
     @wraps(fn)
@@ -1374,19 +1386,19 @@ def open_browser_tab(host, port):
 def install_auth_handler(password):
     app.config['PASSWORD'] = password
 
-    @app.before_request
+    '''@app.before_request
     def check_password():
 
-        if not session.get('authorized') and request.path != '/login/' and request.path != '/export/' and request.path != '/search/' and request.path != '/updateCharts/' and \
+        if not session.get('authorized') and request.path != '/dashboard/' and request.path != '/export/' and request.path != '/search/' and request.path != '/updateCharts/' and \
            not request.path.startswith(('/static/', '/favicon')):
             flash('You must log-in to view the database browser.', 'danger')
             session['next_url'] = request.base_url
-            return redirect(url_for('login'))
+            return redirect(url_for('dashboard'))'''
 
 def initialize_app(filename, read_only=False, password=None, url_prefix=None):
     global dataset
     global migrator
-
+    
     if password:
         install_auth_handler(password)
 
