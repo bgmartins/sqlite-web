@@ -3,6 +3,7 @@ Extraction scripts and a web-based SQLite database browser written in Python.
 Project dependencies:
 
 * [flask](http://flask.pocoo.org)
+* [pandas](https://pandas.pydata.org)
 * [peewee](http://docs.peewee-orm.com)
 * [pygments](http://pygments.org)
 * [regex](https://pypi.org/project/regex/)
