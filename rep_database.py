@@ -1716,7 +1716,7 @@ def repDatabase():
 	cursor.execute("INSERT INTO CAE_SECCOES_TEMP VALUES ( 'T' , 3, 'ACTIVIDADES DAS FAMÍLIAS EMPREGADORAS DE PESSOAL DOMÉSTICO E ACTIVIDADES DE PRODUÇÃO DAS FAMÍLIAS PARA USO PRÓPRIO', NULL);")
 	cursor.execute("INSERT INTO CAE_SECCOES_TEMP VALUES ( 'U' , 3, 'ACTIVIDADES DOS ORGANISMOS INTERNACIONAIS E OUTRAS INSTITUIÇÕES EXTRA-TERRITORIAIS', NULL);")
 
-	cursor.execute("INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'A' , 'AGRICULTURA'), ( 'A' , 'PRODUÇÃO ANIMAL'), ( 'A' , 'CAÇA'), ( 'A' , 'FLORESTA'), ( 'A' , 'PESCA');")
+	cursor.execute("INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'A' , 'AGRICULTURA'), ( 'A' , 'PRODUÇÃO ANIMAL'), ( 'A' , 'CAÇA'), ( 'A' , 'FLORESTA'), ( 'A' , 'PESCA'), ( 'A' , 'AGRICULA');")
 	cursor.execute("INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'B' , 'INDÚSTRIAS EXTRACTIVAS'), ( 'B' , 'MINAS');")
 	cursor.execute("INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'C' , 'INDÚSTRIAS TRANSFORMADORAS'), ( 'C' , 'TEXTEIS'), ( 'B' , 'TÊXT');")
 	cursor.execute("INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'D' , 'ELECTRICIDADE'), ( 'D' , 'GÁS'), ( 'D' , 'VAPOR'), ( 'D' , 'ÁGUA QUENTE E FRIA'), ( 'D' , 'AR FRIO');")
@@ -1764,8 +1764,8 @@ def repDatabase():
 
 	cursor.execute("UPDATE Org_Sindical SET Sector=(SELECT DISTINCT Sector FROM Sectores_Profissionais, CAE_SECCOES_TEMP, CAE_SECCOES_KEYWORDS_TEMP WHERE Sectores_Profissionais.Sector=CAE_SECCOES_TEMP.TITLE AND CAE_SECCOES_TEMP.SECCAO=CAE_SECCOES_KEYWORDS_TEMP.SECCAO AND Org_Sindical.Nome LIKE '%' || CAE_SECCOES_KEYWORDS_TEMP.KEYWORD || '%' );")
 	cursor.execute("UPDATE Org_Patronal SET Sector=(SELECT DISTINCT Sector FROM Sectores_Profissionais, CAE_SECCOES_TEMP, CAE_SECCOES_KEYWORDS_TEMP WHERE Sectores_Profissionais.Sector=CAE_SECCOES_TEMP.TITLE AND CAE_SECCOES_TEMP.SECCAO=CAE_SECCOES_KEYWORDS_TEMP.SECCAO AND Org_Patronal.Nome LIKE '%' || CAE_SECCOES_KEYWORDS_TEMP.KEYWORD || '%' );")
-	cursor.execute("UPDATE Org_Sindical SET Sector=(SELECT DISTINCT Sector FROM Outorgantes_Actos WHERE Outorgantes_Actos.ID_Organizacao_Sindical=Org_Sindical.ID GROUP BY Sector ORDER BY COUNT(*) DESC);")
-	cursor.execute("UPDATE Org_Patronal SET Sector=(SELECT DISTINCT Sector FROM Outorgantes_Actos WHERE Outorgantes_Actos.ID_Organizacao_Patronal=Org_Patronal.ID GROUP BY Sector ORDER BY COUNT(*) DESC);")
+	#cursor.execute("UPDATE Org_Sindical SET Sector=(SELECT DISTINCT Sector FROM Outorgantes_Actos WHERE Outorgantes_Actos.ID_Organizacao_Sindical=Org_Sindical.ID GROUP BY Sector ORDER BY COUNT(*) DESC);")
+	#cursor.execute("UPDATE Org_Patronal SET Sector=(SELECT DISTINCT Sector FROM Outorgantes_Actos WHERE Outorgantes_Actos.ID_Organizacao_Patronal=Org_Patronal.ID GROUP BY Sector ORDER BY COUNT(*) DESC);")
 
 	cursor.execute("DROP TABLE CAE_SECCOES_KEYWORDS_TEMP;")
 	cursor.execute("DROP TABLE CAE_SECCOES_TEMP;")
