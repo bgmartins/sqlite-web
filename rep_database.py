@@ -1762,8 +1762,8 @@ def repDatabase():
 	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="OUTRAS ACTIVIDADES DE SERVIÇOS" WHERE Sector = "OUTRAS ACTIVIDADES DE SERVIÇOS";""")
 	cursor.execute("""UPDATE Sectores_Profissionais SET Nome_Abrev="TRANSPORTES E ARMAZENAGEM" WHERE Sector = "TRANSPORTES E ARMAZENAGEM";""")
 
-	cursor.execute("UPDATE Org_Sindical SET Sector=(SELECT DISTINCT Sector FROM Sectores_Profissionais, CAE_SECCOES_TEMP, CAE_SECCOES_KEYWORDS_TEMP WHERE Sectores_Profissionais.Sector=CAE_SECCOES_TEMP.TITLE AND CAE_SECCOES_TEMP.SECCAO=CAE_SECCOES_KEYWORDS_TEMP.SECCAO AND CAE_SECCOES_KEYWORDS_TEMP.KEYWORD IN Org_Sindical.Nome );")
-	cursor.execute("UPDATE Org_Patronal SET Sector=(SELECT DISTINCT Sector FROM Sectores_Profissionais, CAE_SECCOES_TEMP, CAE_SECCOES_KEYWORDS_TEMP WHERE Sectores_Profissionais.Sector=CAE_SECCOES_TEMP.TITLE AND CAE_SECCOES_TEMP.SECCAO=CAE_SECCOES_KEYWORDS_TEMP.SECCAO AND CAE_SECCOES_KEYWORDS_TEMP.KEYWORD IN Org_Patronal.Nome );")
+	cursor.execute("UPDATE Org_Sindical SET Sector=(SELECT DISTINCT Sector FROM Sectores_Profissionais, CAE_SECCOES_TEMP, CAE_SECCOES_KEYWORDS_TEMP WHERE Sectores_Profissionais.Sector=CAE_SECCOES_TEMP.TITLE AND CAE_SECCOES_TEMP.SECCAO=CAE_SECCOES_KEYWORDS_TEMP.SECCAO AND Org_Sindical.Nome LIKE '%' || CAE_SECCOES_KEYWORDS_TEMP.KEYWORD || '%' );")
+	cursor.execute("UPDATE Org_Patronal SET Sector=(SELECT DISTINCT Sector FROM Sectores_Profissionais, CAE_SECCOES_TEMP, CAE_SECCOES_KEYWORDS_TEMP WHERE Sectores_Profissionais.Sector=CAE_SECCOES_TEMP.TITLE AND CAE_SECCOES_TEMP.SECCAO=CAE_SECCOES_KEYWORDS_TEMP.SECCAO AND Org_Patronal.Nome LIKE '%' || CAE_SECCOES_KEYWORDS_TEMP.KEYWORD || '%' );")
 	cursor.execute("UPDATE Org_Sindical SET Sector=(SELECT DISTINCT Sector FROM Outorgantes_Actos WHERE Outorgantes_Actos.ID_Organizacao_Sindical=Org_Sindical.ID GROUP BY Sector ORDER BY COUNT(*) DESC);")
 	cursor.execute("UPDATE Org_Patronal SET Sector=(SELECT DISTINCT Sector FROM Outorgantes_Actos WHERE Outorgantes_Actos.ID_Organizacao_Patronal=Org_Patronal.ID GROUP BY Sector ORDER BY COUNT(*) DESC);")
 
