@@ -21,28 +21,28 @@ CREATE TABLE Sectores_Profissionais (
 		Sector         VARCHAR(100) NOT NULL PRIMARY KEY,
 		Nome_Abrev     VARCHAR(40),
 		Salario_Medio  NUMERIC
-	);
+);
 
 CREATE TABLE Org_Patronal (
 	ID                       INT NOT NULL PRIMARY KEY,
-	Tipo         			 VARCHAR(100),
+	Tipo         		 VARCHAR(100),
 	Nome                     VARCHAR(100) NOT NULL,
 	Acronimo                 VARCHAR(100),
 	Nome_Organizacao_Pai     VARCHAR(100),
 	Concelho_Sede            VARCHAR(100),
 	Distrito_Sede            VARCHAR(100),
 	Codigo_Postal            VARCHAR(8),
-	Morada_Entidade 		 VARCHAR(100),
+	Morada_Entidade 	 VARCHAR(100),
 	Local_Morada_Entidade 	 VARCHAR(100),
 	Area_Postal_Entidade 	 VARCHAR(100),
-	Telefone_Entidade 		 VARCHAR(9),
-	Fax_Entidade 			 VARCHAR(9),
+	Telefone_Entidade 	 VARCHAR(9),
+	Fax_Entidade 		 VARCHAR(9),
 	Ambito_Geografico        VARCHAR(100),  
 	Sector                   VARCHAR(100),
 	Numero_Membros           INT,
 	Data_Primeira_Actividade DATE,
 	Data_Ultima_Actividade   DATE,
-	Activa       BOOLEAN,
+	Activa       		 BOOLEAN,
 	Website                  VARCHAR(1000), 
 	FOREIGN KEY (Nome_Organizacao_Pai) REFERENCES Org_Patronal(ID),
 	FOREIGN KEY (Sector) REFERENCES Sectores_Profissionais(Sector)
@@ -57,11 +57,11 @@ CREATE TABLE Org_Sindical (
 	Concelho_Sede            VARCHAR(100),
 	Distrito_Sede            VARCHAR(100),
 	Codigo_Postal            VARCHAR(8),
-	Morada_Entidade 		 VARCHAR(100),
+	Morada_Entidade 	 VARCHAR(100),
 	Local_Morada_Entidade 	 VARCHAR(100),
 	Area_Postal_Entidade 	 VARCHAR(100),
-	Telefone_Entidade 		 VARCHAR(9),
-	Fax_Entidade 			 VARCHAR(9),
+	Telefone_Entidade 	 VARCHAR(9),
+	Fax_Entidade 		 VARCHAR(9),
 	Ambito_Geografico        VARCHAR(100),
 	Sector                   VARCHAR(100),
 	Numero_Membros           INT,
@@ -88,8 +88,8 @@ CREATE TABLE Mencoes_BTE_Org_Sindical (
 );
 
 CREATE TABLE Mencoes_BTE_Org_Patronal (
-	ID_Organizacao_Patronal         INT,
-	URL                     VARCHAR(100),
+	ID_Organizacao_Patronal               INT,
+	URL                     	      VARCHAR(100),
 	Ano                                   INT,
 	Numero                                INT,
 	Serie                                 INT,
@@ -125,7 +125,7 @@ CREATE TABLE Actos_Eleitorais_Org_Sindical (
 
 CREATE TABLE Membros_Org_Sindical (
 	ID_Organizacao_Sindical               INT,
-	Data_Eleicao 						  DATE,
+	Data_Eleicao 			      DATE,
 	Data_Inicio                           INT,
 	Data_Fim                              INT,
 	Numero_Membros                        INT,
@@ -138,7 +138,7 @@ CREATE TABLE Direccao_Org_Sindical(
 	Nome_Pessoa                 VARCHAR(100),
 	Genero_Sexo                 VARCHAR(100),
 	Cargo                       VARCHAR(100),
-	Data_Eleicao  				DATE,
+	Data_Eleicao  		    DATE,
 	Data_Inicio                 INT,
 	Data_Fim                    INT,
 	PRIMARY KEY (ID_Organizacao_Sindical,Nome_Pessoa,Data_Eleicao,Data_Inicio,Data_Fim),
@@ -184,42 +184,42 @@ CREATE TABLE Avisos_Greve (
 	Mes_Fim                   INT,
 	Duracao                   INT,
 	PRIMARY KEY(Id_Entidade_Sindical,Ano_Inicio,Mes_Inicio,Entidade_Sindical,Entidade_Patronal,Ano_Fim,Mes_Fim,Duracao),
-  FOREIGN KEY (Id_Entidade_Sindical) REFERENCES Org_Sindical(ID)
+        FOREIGN KEY (Id_Entidade_Sindical) REFERENCES Org_Sindical(ID)
 );
 
 
 CREATE TRIGGER Mencoes_BTE_Org_Sindical_update AFTER UPDATE ON Mencoes_BTE_Org_Sindical BEGIN
 		UPDATE Mencoes_BTE_Org_Sindical
-		SET    URL = "https://github.com/bgmartins/rep-database/raw/master/BTE-data/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
+		SET    URL = "http://bte.gep.msess.gov.pt/completos/" [NEW].Ano || "/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
 		WHERE ID_Organizacao_Sindical = [NEW].ID_Organizacao_Sindical; 
 END;
 
 CREATE TRIGGER Mencoes_BTE_Org_Sindical_insert AFTER INSERT ON Mencoes_BTE_Org_Sindical BEGIN
 		UPDATE Mencoes_BTE_Org_Sindical
-		SET    URL = "https://github.com/bgmartins/rep-database/raw/master/BTE-data/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
+		SET    URL = "http://bte.gep.msess.gov.pt/completos/" [NEW].Ano || "/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
 		WHERE ID_Organizacao_Sindical = [NEW].ID_Organizacao_Sindical; 
 END;
 
 CREATE TRIGGER Mencoes_BTE_Org_Patronal_update AFTER UPDATE ON Mencoes_BTE_Org_Patronal BEGIN
 		UPDATE Mencoes_BTE_Org_Patronal
-		SET    URL = "https://github.com/bgmartins/rep-database/raw/master/BTE-data/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
+		SET    URL = "http://bte.gep.msess.gov.pt/completos/" [NEW].Ano || "/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
 		WHERE ID_Organizacao_Patronal = [NEW].ID_Organizacao_Patronal; 
 END;
 
 CREATE TRIGGER Mencoes_BTE_Org_Patronal_insert AFTER INSERT ON Mencoes_BTE_Org_Patronal BEGIN
 		UPDATE Mencoes_BTE_Org_Patronal
-		SET    URL = "https://github.com/bgmartins/rep-database/raw/master/BTE-data/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
+		SET    URL = "http://bte.gep.msess.gov.pt/completos/" [NEW].Ano || "/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
 		WHERE ID_Organizacao_Patronal = [NEW].ID_Organizacao_Patronal; 
 END;
 
 CREATE TRIGGER Actos_Negociacao_Colectiva_update AFTER UPDATE ON Actos_Negociacao_Colectiva BEGIN
 		UPDATE Actos_Negociacao_Colectiva
-		SET    URL = "https://github.com/bgmartins/rep-database/raw/master/BTE-data/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
+		SET    URL = "http://bte.gep.msess.gov.pt/completos/" [NEW].Ano || "/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
 		WHERE ID = [NEW].ID; 
 END;
 
 CREATE TRIGGER Actos_Negociacao_Colectiva_insert AFTER INSERT ON Actos_Negociacao_Colectiva BEGIN
 		UPDATE Actos_Negociacao_Colectiva
-		SET    URL = "https://github.com/bgmartins/rep-database/raw/master/BTE-data/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
+		SET    URL = "http://bte.gep.msess.gov.pt/completos/" [NEW].Ano || "/bte" || [NEW].Numero || "_" || [NEW].Ano || ".pdf"
 		WHERE ID = [NEW].ID; 
 END;

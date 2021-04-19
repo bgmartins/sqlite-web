@@ -1,5 +1,4 @@
 import sys
-#sys.stdout.reconfigure(encoding='utf-8')
 import urllib.request
 import json
 import csv
@@ -8,6 +7,8 @@ import sqlite3
 import os, glob
 import re
 from datetime import datetime
+
+#sys.stdout.reconfigure(encoding='utf-8')
 
 today = datetime.today()
 today_year = today.year + 1
@@ -26,11 +27,9 @@ def getResponse(tabela, ano):
 	response.close()
 	return result
 
-
 def create_database_tables(cursor):
 	with open('rep-database.sql', 'r') as sql_file:
 		cursor.executescript(sql_file.read())
-
 
 def getTable_AlteracoesEstatutos(ano,cursor):
 	result = getResponse("alteracoesEstatutos", ano)
