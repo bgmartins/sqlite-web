@@ -1723,7 +1723,7 @@ def repDatabase():
 	cursor.execute("INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'E' , 'ÁGUA'), ( 'E' , 'SANEAMENTO'), ( 'E' , 'RESÍDUOS'), ( 'E' , 'DESPOLUIÇÃO');")
 	cursor.execute("INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'F' , 'CONSTRUÇÃO');")
 	cursor.execute("INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'G' , 'COMÉRCIO'), ( 'G' , 'REPARAÇÃO DE VEÍCULOS AUTOMÓVEIS'), ( 'G' , 'REPARAÇÃO DE MOTOCICLOS');")
-	cursor.execute("INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'H' , 'TRANSPORTES'), ( 'H' , 'ARMAZENAGEM'), ( 'H' , 'CARGAS'), ( 'H' , 'MERCANTE'), ( 'H' , 'METRO'), ( 'H' , 'FERREA'), , ( 'H' , 'FERROVIÁRI'), ( 'H' , 'ESTIVADOR'), ( 'H' , 'PORTUARIO'), ( 'H' , 'PORTUÁRIO');")
+	cursor.execute("INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'H' , 'TRANSPORTES'), ( 'H' , 'ARMAZENAGEM'), ( 'H' , 'CARGAS'), ( 'H' , 'MERCANTE'), ( 'H' , 'METRO'), ( 'H' , 'FERREA'), ( 'H' , 'FERROVIÁRI'), ( 'H' , 'ESTIVADOR'), ( 'H' , 'PORTUARIO'), ( 'H' , 'PORTUÁRIO');")
 	cursor.execute("INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'I' , 'ALOJAMENTO'), ( 'I' , 'RESTAURAÇÃO'), ( 'I' , 'HOTEL');")
 	cursor.execute("INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'J' , 'INFORMAÇÃO E COMUNICAÇÃO'), ( 'J' , 'JORNAL'), ( 'J' , 'TELECOM');")
 	cursor.execute("INSERT INTO CAE_SECCOES_KEYWORDS_TEMP VALUES ( 'K' , 'FINANÇAS'), ( 'K' , 'SEGUROS'), ( 'K' , 'BANCA'), ( 'K' , 'SEGURADOR');")
