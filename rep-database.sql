@@ -166,6 +166,7 @@ CREATE TABLE Outorgantes_Actos (
 	Ano                        INT,
 	ID_Organizacao_Sindical    INT,
 	ID_Organizacao_Patronal    INT,
+	CAE                        VARCHAR(10),
 	Sector                     VARCHAR(100),
 	PRIMARY KEY (ID,ID_SEQUENCIAL,Ano,ID_Organizacao_Sindical,ID_Organizacao_Patronal,Sector),
 	FOREIGN KEY (ID,ID_SEQUENCIAL,Ano) REFERENCES Actos_Negociacao_Colectiva(ID,ID_SEQUENCIAL,Ano),
