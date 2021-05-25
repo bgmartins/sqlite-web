@@ -444,28 +444,28 @@ class SqliteDataSet(DataSet):
             ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical 
             WHERE Data_Primeira_Actividade IS NOT NULL AND Ano >= 1977 UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical 
             WHERE Data_Primeira_Actividade IS NOT NULL) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) AND 
-            ID IN (SELECT ID FROM Org_Sindical WHERE Nome LIKE ? OR Acronimo LIKE ? AND Activa = 1 ) AND ANO >= 1996 GROUP BY ANO, TIPO""",('%' + org + '%', '%' + org + '%'))
+            ID IN (SELECT ID FROM Org_Sindical WHERE Nome LIKE ? OR Acronimo LIKE ? AND Activa = 1 ) GROUP BY ANO, TIPO HAVING ANO >= 1996""",('%' + org + '%', '%' + org + '%')) 
         
         elif ((table=="Unions" or table=="") and org==""):
             cursor = self.query("""SELECT ANO, TIPO, COUNT(DISTINCT ID) AS NUM_ORG FROM Org_Sindical, 
             ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical
              WHERE Data_Primeira_Actividade IS NOT NULL AND Ano >= 1977 UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano
              FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND 
-             (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) AND ANO >= 1996 GROUP BY ANO, TIPO""")
+             (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) GROUP BY ANO, TIPO HAVING ANO >= 1996""")
         
         elif table=="Employees" and org!="":
             cursor = self.query("""SELECT ANO, TIPO, COUNT(DISTINCT ID) AS NUM_ORG FROM Org_Patronal, 
             ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Patronal 
             WHERE Data_Primeira_Actividade IS NOT NULL AND Ano >= 1977 UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Patronal 
             WHERE Data_Primeira_Actividade IS NOT NULL) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) AND 
-            ID IN (SELECT ID FROM Org_Patronal WHERE Nome LIKE ? OR Acronimo LIKE ? AND Activa = 1) AND TIPO IS NOT NULL AND ANO >= 1996 GROUP BY ANO, TIPO""",('%' + org + '%', '%' + org + '%'))
+            ID IN (SELECT ID FROM Org_Patronal WHERE Nome LIKE ? OR Acronimo LIKE ? AND Activa = 1) AND TIPO IS NOT NULL GROUP BY ANO, TIPO HAVING ANO >= 1996""",('%' + org + '%', '%' + org + '%'))
         
         elif table=="Employees" and org=="":
             cursor = self.query("""SELECT ANO, TIPO, COUNT(DISTINCT ID) AS NUM_ORG FROM Org_Patronal, 
             ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Patronal
              WHERE Data_Primeira_Actividade IS NOT NULL AND Ano >= 1977 UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano
              FROM Org_Patronal WHERE Data_Primeira_Actividade IS NOT NULL) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND 
-             (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) AND TIPO IS NOT NULL AND ANO >= 1996 GROUP BY ANO, TIPO""")
+             (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) AND TIPO IS NOT NULL GROUP BY ANO, TIPO HAVING ANO >= 1996""")
 
         
         for row in cursor.fetchall():
