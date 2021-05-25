@@ -24,7 +24,7 @@ CREATE TABLE Sectores_Profissionais (
 );
 
 CREATE TABLE Org_Patronal (
-	ID                       INT NOT NULL PRIMARY KEY,
+	ID                       VARCHAR(10) PRIMARY KEY,
 	Tipo         		 VARCHAR(100),
 	Nome                     VARCHAR(100) NOT NULL,
 	Acronimo                 VARCHAR(100),
@@ -49,7 +49,7 @@ CREATE TABLE Org_Patronal (
 );
 	
 CREATE TABLE Org_Sindical (
-	ID                       INT NOT NULL PRIMARY KEY,
+	ID                       VARCHAR(10) PRIMARY KEY,
 	Tipo                     VARCHAR(100),
 	Nome                     VARCHAR(100) NOT NULL,
 	Acronimo                 VARCHAR(100),
@@ -74,7 +74,7 @@ CREATE TABLE Org_Sindical (
 );
 
 CREATE TABLE Mencoes_BTE_Org_Sindical (
-	ID_Organizacao_Sindical               INT,
+	ID_Organizacao_Sindical               VARCHAR(10),
 	URL                                   VARCHAR(100),
 	Ano                                   INT,
 	Numero                                INT,
@@ -88,7 +88,7 @@ CREATE TABLE Mencoes_BTE_Org_Sindical (
 );
 
 CREATE TABLE Mencoes_BTE_Org_Patronal (
-	ID_Organizacao_Patronal               INT,
+	ID_Organizacao_Patronal               VARCHAR(10),
 	URL                     	      VARCHAR(100),
 	Ano                                   INT,
 	Numero                                INT,
@@ -102,8 +102,8 @@ CREATE TABLE Mencoes_BTE_Org_Patronal (
 );
 
 CREATE TABLE Relacoes_Entre_Org_Sindical (
-	ID_Organizacao_Sindical_1  INT,
-	ID_Organizacao_Sindical_2  INT,
+	ID_Organizacao_Sindical_1  VARCHAR(10),
+	ID_Organizacao_Sindical_2  VARCHAR(10),
 	Tipo_de_Relacao            VARCHAR(100),
 	Data                       DATE,
 	PRIMARY KEY (ID_Organizacao_Sindical_1,ID_Organizacao_Sindical_2),
@@ -112,7 +112,7 @@ CREATE TABLE Relacoes_Entre_Org_Sindical (
 );
 
 CREATE TABLE Actos_Eleitorais_Org_Sindical (
-	ID_Organizacao_Sindical               INT,
+	ID_Organizacao_Sindical               VARCHAR(10),
 	Data                                  DATE,
 	Numero_Membros_Cadernos_Eleitoriais   INT,
 	Numero_Membros_Inscritos              INT,
@@ -124,7 +124,7 @@ CREATE TABLE Actos_Eleitorais_Org_Sindical (
 );
 
 CREATE TABLE Membros_Org_Sindical (
-	ID_Organizacao_Sindical               INT,
+	ID_Organizacao_Sindical               VARCHAR(10),
 	Data_Eleicao 			      DATE,
 	Data_Inicio                           INT,
 	Data_Fim                              INT,
@@ -134,7 +134,7 @@ CREATE TABLE Membros_Org_Sindical (
 );
 	
 CREATE TABLE Direccao_Org_Sindical(
-	ID_Organizacao_Sindical     INT,
+	ID_Organizacao_Sindical     VARCHAR(10),
 	Nome_Pessoa                 VARCHAR(100),
 	Genero_Sexo                 VARCHAR(100),
 	Cargo                       VARCHAR(100),
@@ -164,8 +164,8 @@ CREATE TABLE Outorgantes_Actos (
 	ID                         INT,
 	ID_SEQUENCIAL              INT,
 	Ano                        INT,
-	ID_Organizacao_Sindical    INT,
-	ID_Organizacao_Patronal    INT,
+	ID_Organizacao_Sindical    VARCHAR(10),
+	ID_Organizacao_Patronal    VARCHAR(10),
 	CAE                        VARCHAR(10),
 	Sector                     VARCHAR(100),
 	PRIMARY KEY (ID,ID_SEQUENCIAL,Ano,ID_Organizacao_Sindical,ID_Organizacao_Patronal,Sector),

@@ -197,7 +197,7 @@ def getTable_Outorgantes(ano,cursor):
 			siglaEntE = ""
 		else:
 			siglaEntE = linha["siglaEntE"]
-
+		
 		sql_command = format_str.format(numero=linha["numero"],numSeq=linha["numSeq"],ano=linha["ano"],tipoConv=linha["tipoConv"],CodEntG=linha["CodEntG"],CodEntE=linha["CondEntE"],
 			numAlt=linha["numAlt"],siglaEntE=siglaEntE,nomeEntE=nomeEntE)
 
@@ -1307,10 +1307,11 @@ def repDatabase():
 		TEMP_OUTORGANTES.NUM AS ID,
 		TEMP_OUTORGANTES.NUMSEQ AS ID_SEQUENCIAL,
 		TEMP_OUTORGANTES.ANO AS Ano,
-		TEMP_IRCT.codCAE AS CAE,
-		(SELECT TEMP_OUTORGANTES.CODENTG || '.' || TEMP_OUTORGANTES.CODENTE || '.' || TEMP_OUTORGANTES.NUMALT AS ID_Organizacao_Sindical FROM Org_Sindical WHERE ID_Organizacao_Sindical=Org_Sindical.ID),
-		(SELECT TEMP_OUTORGANTES.CODENTG || '.' || TEMP_OUTORGANTES.CODENTE || '.' || TEMP_OUTORGANTES.NUMALT AS ID_Organizacao_Patronal FROM Org_Patronal WHERE ID_Organizacao_Patronal=Org_Patronal.ID),
+		(SELECT TEMP_OUTORGANTES.CODENTG || '.' || TEMP_OUTORGANTES.CODENTE || '.' || TEMP_OUTORGANTES.NUMALT AS ID_Organizacao_Sindical FROM Org_Sindical WHERE ID_Organizacao_Sindical=Org_Sindical.ID) as ID_Organizacao_Sindical,
+		(SELECT TEMP_OUTORGANTES.CODENTG || '.' || TEMP_OUTORGANTES.CODENTE || '.' || TEMP_OUTORGANTES.NUMALT AS ID_Organizacao_Patronal FROM Org_Patronal WHERE ID_Organizacao_Patronal=Org_Patronal.ID) as ID_Organizacao_Patronal,
+		CODCAE AS CAE,
 		CASE
+			WHEN CODCAE IS NULL THEN NULL
 			WHEN TEMP_IRCT.REVCAE = '2.0' OR TEMP_IRCT.REVCAE = '2.1' THEN
 				CASE
 					WHEN SUBSTR(CODCAE, 0, 3) IN ('01','02','05') THEN 'AGRICULTURA, PRODUÇÃO ANIMAL, CAÇA, FLORESTA E PESCA'
