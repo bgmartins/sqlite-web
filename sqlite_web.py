@@ -140,19 +140,13 @@ class SqliteDataSet(DataSet):
 
     @property
     def barchart_labels(self):
-        cursor = self.query("SELECT ANO, COUNT(DISTINCT ID) AS NUM_ORG FROM Org_Sindical, ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL AND Ano >= 1977 UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) AND ANO >= 1996 GROUP BY ANO")
+        cursor = self.query("SELECT ANO, COUNT(DISTINCT ID) AS NUM_ORG FROM Org_Sindical, ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL AND Ano >= 1977 UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) GROUP BY ANO HAVING ANO >= 1996")
         return [row[0] for row in cursor.fetchall()]
-
-    '''@property
-    def barchart_data(self):
-        cursor = self.query("SELECT ANO, COUNT(DISTINCT ID) FROM Org_Sindical, ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL ) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO ) AND ANO >= 1996 GROUP BY ANO")
-        return [row[1] for row in cursor.fetchall()]
-    '''
 
     #confederacoes
     @property
     def barchart_data(self):
-        cursor = self.query("SELECT ANO, TIPO, COUNT(DISTINCT ID) AS NUM_ORG FROM Org_Sindical, ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL AND Ano >= 1977 UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) AND ANO >= 1996 GROUP BY ANO, TIPO")
+        cursor = self.query("SELECT ANO, TIPO, COUNT(DISTINCT ID) AS NUM_ORG FROM Org_Sindical, ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL AND Ano >= 1977 UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) GROUP BY ANO, TIPO HAVING ANO >= 1996")
         lista = []
 
         for i in range(0,7):
@@ -167,7 +161,7 @@ class SqliteDataSet(DataSet):
     #federacoes
     @property
     def barchart_data2(self):
-        cursor = self.query("SELECT ANO, TIPO, COUNT(DISTINCT ID) AS NUM_ORG FROM Org_Sindical, ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL AND Ano >= 1977 UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) AND ANO >= 1996 GROUP BY ANO, TIPO")
+        cursor = self.query("SELECT ANO, TIPO, COUNT(DISTINCT ID) AS NUM_ORG FROM Org_Sindical, ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL AND Ano >= 1977 UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) GROUP BY ANO, TIPO HAVING ANO >= 1996")
         lista = []
 
         for i in range(0,7):
@@ -182,13 +176,13 @@ class SqliteDataSet(DataSet):
     #sindicatos
     @property
     def barchart_data3(self):
-    	cursor = self.query("SELECT ANO, TIPO, COUNT(DISTINCT ID) AS NUM_ORG FROM Org_Sindical, ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL AND Ano >= 1977 UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) AND ANO > 1996 GROUP BY ANO, TIPO")
+    	cursor = self.query("SELECT ANO, TIPO, COUNT(DISTINCT ID) AS NUM_ORG FROM Org_Sindical, ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL AND Ano >= 1977 UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) GROUP BY ANO, TIPO HAVING ANO >= 1996")
     	return [row[2] for row in cursor.fetchall() if row[1].startswith('SIND') and row[0] >= 1977]
 
     #unioes
     @property
     def barchart_data4(self):
-    	cursor = self.query("SELECT ANO, TIPO, COUNT(DISTINCT ID) AS NUM_ORG FROM Org_Sindical, ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL AND Ano >= 1977 UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) AND ANO >= 1996 GROUP BY ANO, TIPO")
+    	cursor = self.query("SELECT ANO, TIPO, COUNT(DISTINCT ID) AS NUM_ORG FROM Org_Sindical, ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL AND Ano >= 1977 UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) GROUP BY ANO, TIPO HAVING ANO >= 1996")
     	lista = []
 
     	for i in range(0,7):
