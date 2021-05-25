@@ -140,19 +140,19 @@ class SqliteDataSet(DataSet):
 
     @property
     def barchart_labels(self):
-        cursor = self.query("SELECT ANO, COUNT(DISTINCT ID) AS NUM_ORG FROM Org_Sindical, ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL AND Ano >= 1977 UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) AND ANO > 1996 GROUP BY ANO")
+        cursor = self.query("SELECT ANO, COUNT(DISTINCT ID) AS NUM_ORG FROM Org_Sindical, ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL AND Ano >= 1977 UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) AND ANO >= 1996 GROUP BY ANO")
         return [row[0] for row in cursor.fetchall()]
 
     '''@property
     def barchart_data(self):
-        cursor = self.query("SELECT ANO, COUNT(DISTINCT ID) FROM Org_Sindical, ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL ) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO ) AND ANO > 1996 GROUP BY ANO")
+        cursor = self.query("SELECT ANO, COUNT(DISTINCT ID) FROM Org_Sindical, ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL ) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO ) AND ANO >= 1996 GROUP BY ANO")
         return [row[1] for row in cursor.fetchall()]
     '''
 
     #confederacoes
     @property
     def barchart_data(self):
-        cursor = self.query("SELECT ANO, TIPO, COUNT(DISTINCT ID) AS NUM_ORG FROM Org_Sindical, ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL AND Ano >= 1977 UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) AND ANO > 1996 GROUP BY ANO, TIPO")
+        cursor = self.query("SELECT ANO, TIPO, COUNT(DISTINCT ID) AS NUM_ORG FROM Org_Sindical, ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL AND Ano >= 1977 UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) AND ANO >= 1996 GROUP BY ANO, TIPO")
         lista = []
 
         for i in range(0,7):
@@ -167,7 +167,7 @@ class SqliteDataSet(DataSet):
     #federacoes
     @property
     def barchart_data2(self):
-        cursor = self.query("SELECT ANO, TIPO, COUNT(DISTINCT ID) AS NUM_ORG FROM Org_Sindical, ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL AND Ano >= 1977 UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) AND ANO > 1996 GROUP BY ANO, TIPO")
+        cursor = self.query("SELECT ANO, TIPO, COUNT(DISTINCT ID) AS NUM_ORG FROM Org_Sindical, ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL AND Ano >= 1977 UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) AND ANO >= 1996 GROUP BY ANO, TIPO")
         lista = []
 
         for i in range(0,7):
@@ -188,7 +188,7 @@ class SqliteDataSet(DataSet):
     #unioes
     @property
     def barchart_data4(self):
-    	cursor = self.query("SELECT ANO, TIPO, COUNT(DISTINCT ID) AS NUM_ORG FROM Org_Sindical, ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL AND Ano >= 1977 UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) AND ANO > 1996 GROUP BY ANO, TIPO")
+    	cursor = self.query("SELECT ANO, TIPO, COUNT(DISTINCT ID) AS NUM_ORG FROM Org_Sindical, ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL AND Ano >= 1977 UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) AND ANO >= 1996 GROUP BY ANO, TIPO")
     	lista = []
 
     	for i in range(0,7):
@@ -226,14 +226,14 @@ class SqliteDataSet(DataSet):
     #avisosGreveAnos
     @property
     def barchart2_labels(self):
-        cursor = self.query("SELECT Ano_Inicio as Ano, COUNT(*) as NUM_GREVES FROM Avisos_Greve WHERE ANO > 1996 GROUP BY Ano_Inicio")
+        cursor = self.query("SELECT Ano_Inicio as Ano, COUNT(*) as NUM_GREVES FROM Avisos_Greve WHERE ANO >= 1996 GROUP BY Ano_Inicio")
         return [row[0] for row in cursor.fetchall()]
 
 
     #avisosGreve
     @property
     def barchart2_data(self):
-        cursor = self.query("SELECT Ano_Inicio as Ano, COUNT(*) as NUM_GREVES FROM Avisos_Greve WHERE ANO > 1996 GROUP BY Ano_Inicio")
+        cursor = self.query("SELECT Ano_Inicio as Ano, COUNT(*) as NUM_GREVES FROM Avisos_Greve WHERE ANO >= 1996 GROUP BY Ano_Inicio")
         return [row[1] for row in cursor.fetchall()]
 
     
@@ -258,12 +258,12 @@ class SqliteDataSet(DataSet):
     #ircts por ano
     @property
     def irctchart_labels(self):
-        cursor = self.query("SELECT Ano, COUNT(*) AS Num_IRCT FROM Actos_Negociacao_Colectiva WHERE ANO > 1996 GROUP BY Ano")
+        cursor = self.query("SELECT Ano, COUNT(*) AS Num_IRCT FROM Actos_Negociacao_Colectiva WHERE ANO >= 1996 GROUP BY Ano")
         return [row[0] for row in cursor.fetchall()]
 
     @property
     def irctchart_data(self):
-        cursor = self.query("SELECT Ano, COUNT(*) AS Num_IRCT FROM Actos_Negociacao_Colectiva WHERE ANO > 1996 GROUP BY Ano")
+        cursor = self.query("SELECT Ano, COUNT(*) AS Num_IRCT FROM Actos_Negociacao_Colectiva WHERE ANO >= 1996 GROUP BY Ano")
         return [row[1] for row in cursor.fetchall()]
 
     @property
@@ -450,28 +450,28 @@ class SqliteDataSet(DataSet):
             ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical 
             WHERE Data_Primeira_Actividade IS NOT NULL AND Ano >= 1977 UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical 
             WHERE Data_Primeira_Actividade IS NOT NULL) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) AND 
-            ID IN (SELECT ID FROM Org_Sindical WHERE Nome LIKE ? OR Acronimo LIKE ? AND Activa = 1 ) AND ANO > 1996 GROUP BY ANO, TIPO""",('%' + org + '%', '%' + org + '%'))
+            ID IN (SELECT ID FROM Org_Sindical WHERE Nome LIKE ? OR Acronimo LIKE ? AND Activa = 1 ) AND ANO >= 1996 GROUP BY ANO, TIPO""",('%' + org + '%', '%' + org + '%'))
         
         elif ((table=="Unions" or table=="") and org==""):
             cursor = self.query("""SELECT ANO, TIPO, COUNT(DISTINCT ID) AS NUM_ORG FROM Org_Sindical, 
             ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical
              WHERE Data_Primeira_Actividade IS NOT NULL AND Ano >= 1977 UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano
              FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND 
-             (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) AND ANO > 1996 GROUP BY ANO, TIPO""")
+             (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) AND ANO >= 1996 GROUP BY ANO, TIPO""")
         
         elif table=="Employees" and org!="":
             cursor = self.query("""SELECT ANO, TIPO, COUNT(DISTINCT ID) AS NUM_ORG FROM Org_Patronal, 
             ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Patronal 
             WHERE Data_Primeira_Actividade IS NOT NULL AND Ano >= 1977 UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Patronal 
             WHERE Data_Primeira_Actividade IS NOT NULL) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) AND 
-            ID IN (SELECT ID FROM Org_Patronal WHERE Nome LIKE ? OR Acronimo LIKE ? AND Activa = 1) AND TIPO IS NOT NULL AND ANO > 1996 GROUP BY ANO, TIPO""",('%' + org + '%', '%' + org + '%'))
+            ID IN (SELECT ID FROM Org_Patronal WHERE Nome LIKE ? OR Acronimo LIKE ? AND Activa = 1) AND TIPO IS NOT NULL AND ANO >= 1996 GROUP BY ANO, TIPO""",('%' + org + '%', '%' + org + '%'))
         
         elif table=="Employees" and org=="":
             cursor = self.query("""SELECT ANO, TIPO, COUNT(DISTINCT ID) AS NUM_ORG FROM Org_Patronal, 
             ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Patronal
              WHERE Data_Primeira_Actividade IS NOT NULL AND Ano >= 1977 UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano
              FROM Org_Patronal WHERE Data_Primeira_Actividade IS NOT NULL) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND 
-             (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) AND TIPO IS NOT NULL AND ANO > 1996 GROUP BY ANO, TIPO""")
+             (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) AND TIPO IS NOT NULL AND ANO >= 1996 GROUP BY ANO, TIPO""")
 
         
         for row in cursor.fetchall():
@@ -541,16 +541,16 @@ class SqliteDataSet(DataSet):
             avisos_greve[ano] = 0
 
         if ((table == "Unions" or table=="") and org!=""):
-            cursor = self.query("SELECT Ano_Inicio as Ano, COUNT(*) as NUM_GREVES FROM Avisos_Greve WHERE Entidade_Sindical IN (SELECT Nome FROM Org_Sindical WHERE Nome LIKE ? OR Acronimo LIKE ? AND Activa = 1) AND ANO > 1996 GROUP BY Ano_Inicio",('%' + org + '%', '%' + org + '%'))
+            cursor = self.query("SELECT Ano_Inicio as Ano, COUNT(*) as NUM_GREVES FROM Avisos_Greve WHERE Entidade_Sindical IN (SELECT Nome FROM Org_Sindical WHERE Nome LIKE ? OR Acronimo LIKE ? AND Activa = 1) AND ANO >= 1996 GROUP BY Ano_Inicio",('%' + org + '%', '%' + org + '%'))
         
         elif ((table=="Unions" or table=="") and org==""):
-            cursor = self.query("SELECT Ano_Inicio as Ano, COUNT(*) as NUM_GREVES FROM Avisos_Greve WHERE ANO > 1996 GROUP BY Ano_Inicio")
+            cursor = self.query("SELECT Ano_Inicio as Ano, COUNT(*) as NUM_GREVES FROM Avisos_Greve WHERE ANO >= 1996 GROUP BY Ano_Inicio")
         
         elif table=="Employees" and org!="":
-            cursor = self.query("SELECT Ano_Inicio as Ano, COUNT(*) as NUM_GREVES FROM Avisos_Greve WHERE Entidade_Patronal IN (SELECT Nome FROM Org_Patronal WHERE Nome LIKE ? OR Acronimo LIKE ? AND Activa = 1) AND ANO > 1996 GROUP BY Ano_Inicio",('%' + org + '%', '%' + org + '%'))
+            cursor = self.query("SELECT Ano_Inicio as Ano, COUNT(*) as NUM_GREVES FROM Avisos_Greve WHERE Entidade_Patronal IN (SELECT Nome FROM Org_Patronal WHERE Nome LIKE ? OR Acronimo LIKE ? AND Activa = 1) AND ANO >= 1996 GROUP BY Ano_Inicio",('%' + org + '%', '%' + org + '%'))
 
         elif table=="Employees" and org=="":
-            cursor = self.query("SELECT Ano_Inicio as Ano, COUNT(*) as NUM_GREVES FROM Avisos_Greve WHERE ANO > 1996 GROUP BY Ano_Inicio")
+            cursor = self.query("SELECT Ano_Inicio as Ano, COUNT(*) as NUM_GREVES FROM Avisos_Greve WHERE ANO >= 1996 GROUP BY Ano_Inicio")
 
         
         for row in cursor.fetchall():
