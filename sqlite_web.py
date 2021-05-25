@@ -147,52 +147,47 @@ class SqliteDataSet(DataSet):
     @property
     def barchart_data(self):
         cursor = self.query("SELECT ANO, TIPO, COUNT(DISTINCT ID) AS NUM_ORG FROM Org_Sindical, ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL AND Ano >= 1977 UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) GROUP BY ANO, TIPO HAVING ANO >= 1996")
-        lista = []
-
-        for i in range(0,7):
-            lista.append(0)
-
-        for row in cursor.fetchall():
-        	if row[1].startswith('CONF'):
-        		lista.append(row[2])
-
-        return lista
+        return [row[2] for row in cursor.fetchall() if row[1].startswith('CONF')]
+        #lista = []
+        #for i in range(0,7):
+        #    lista.append(0)
+        #for row in cursor.fetchall():
+       # 	if row[1].startswith('CONF'):
+       # 		lista.append(row[2])
+        #return lista
 
     #federacoes
     @property
     def barchart_data2(self):
         cursor = self.query("SELECT ANO, TIPO, COUNT(DISTINCT ID) AS NUM_ORG FROM Org_Sindical, ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL AND Ano >= 1977 UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) GROUP BY ANO, TIPO HAVING ANO >= 1996")
-        lista = []
-
-        for i in range(0,7):
-            lista.append(0)
-
-        for row in cursor.fetchall():
-        	if row[1].startswith('FED'):
-        		lista.append(row[2])
-        return lista
+        return [row[2] for row in cursor.fetchall() if row[1].startswith('FED')]
+        #lista = []
+        #for i in range(0,7):
+        #    lista.append(0)
+        #for row in cursor.fetchall():
+        #	if row[1].startswith('FED'):
+        #		lista.append(row[2])
+        #return lista
 
 
     #sindicatos
     @property
     def barchart_data3(self):
     	cursor = self.query("SELECT ANO, TIPO, COUNT(DISTINCT ID) AS NUM_ORG FROM Org_Sindical, ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL AND Ano >= 1977 UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) GROUP BY ANO, TIPO HAVING ANO >= 1996")
-    	return [row[2] for row in cursor.fetchall() if row[1].startswith('SIND') and row[0] >= 1977]
+    	return [row[2] for row in cursor.fetchall() if row[1].startswith('SIND')]
 
     #unioes
     @property
     def barchart_data4(self):
     	cursor = self.query("SELECT ANO, TIPO, COUNT(DISTINCT ID) AS NUM_ORG FROM Org_Sindical, ( SELECT DISTINCT CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL AND Ano >= 1977 UNION SELECT DISTINCT CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) AS Ano FROM Org_Sindical WHERE Data_Primeira_Actividade IS NOT NULL) AS ANOS WHERE CAST(strftime('%Y',date(Data_Primeira_Actividade)) AS DECIMAL) <= ANO AND (Activa = 1 OR CAST(strftime('%Y',date(Data_Ultima_Actividade)) AS DECIMAL) >= ANO) GROUP BY ANO, TIPO HAVING ANO >= 1996")
-    	lista = []
-
-    	for i in range(0,7):
-    		lista.append(0)
-
-    	for row in cursor.fetchall():
-    		if row[1].startswith('UNI'):
-    			lista.append(row[2])
-
-    	return lista
+    	return [row[2] for row in cursor.fetchall() if row[1].startswith('UNI')]
+        #lista = []
+    	#for i in range(0,7):
+    	#	lista.append(0)
+    	#for row in cursor.fetchall():
+    	#	if row[1].startswith('UNI'):
+    	#		lista.append(row[2])
+    	#return lista
 
     #choroplethMapDistritos
     @property
