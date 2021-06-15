@@ -45,9 +45,13 @@ def getTable_AlteracoesEstatutos(ano,cursor):
 			ambGeo = ""
 		else:
 			ambGeo = linha["ambitoGeografico"]
-
+		if "servico" not in linha:
+                        servico = ""
+		else:
+			servico = linha["servico"]
+		
 		sql_command = format_str.format(tipo=linha["tipo"],especie=linha["especie"],subEspecie=linha["subEspecie"],numero=linha["numero"],ano=linha["ano"],controlo=linha["controlo"],
-			servico=linha["servico"],codEntG=linha["codEntG"],codEntE=linha["codEntE"],numAlt=linha["numAlt"],numBTE=linha["numBTE"],dataBTE=linha["dataBTE"],
+			servico=servico,codEntG=linha["codEntG"],codEntE=linha["codEntE"],numAlt=linha["numAlt"],numBTE=linha["numBTE"],dataBTE=linha["dataBTE"],
 			serieBTE=linha["serieBTE"],ambitoGeografico=ambGeo)
 
 		cursor.execute(sql_command)
