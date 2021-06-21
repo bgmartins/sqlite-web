@@ -81,9 +81,14 @@ def getTable_EleicoesCorposGerentes(ano,cursor):
 			inscritos = ""
 		else:
 			inscritos = linha["inscritos"]
+
+		if "votates" not in linha:
+			votantes = ""
+		else:
+			inscritos = linha["votantes"]
 			
 		sql_command = format_str.format(codEntG=linha["codEntG"],codEntE=linha["codEntE"],numAlt=linha["numAlt"],numeroEleicao=linha["numeroEleicao"],dataEleicao=linha["dataEleicao"],inscritos=inscritos,
-			votantes=linha["votantes"],mesesMandato=linha["mesesMandato"],dataBTE=linha["dataBTE"],numBTE=linha["numBTE"],serieBTE=linha["serieBTE"],numMaxEfect=linha["numMaxEfect"],
+			votantes=votantes,mesesMandato=linha["mesesMandato"],dataBTE=linha["dataBTE"],numBTE=linha["numBTE"],serieBTE=linha["serieBTE"],numMaxEfect=linha["numMaxEfect"],
 			numMinEfect=linha["numMinEfect"],numMaxSupl=linha["numMaxSupl"],numMinSupl=linha["numMinSupl"],numHEfect=linha["numHEfect"],numHSupl=linha["numHSupl"],numMEfect=linha["numMEfect"],
 			numMSupl=linha["numMSupl"],tipo=linha["tipo"],especie=linha["especie"],subEspecie=linha["subEspecie"],numero=linha["numero"],ano=linha["ano"],controlo=linha["controlo"],servico=servico)
 		
